@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCS — Platform Site Flow v3.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Figtree',sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh;overflow:hidden;}
+.topbar{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:#161b27;border-bottom:1px solid #1e2740;position:relative;z-index:300;flex-shrink:0;}
+.brand{font-family:'Playfair Display',serif;font-weight:700;font-size:19px;color:#f1f5f9;}
+.cs-sup{font-family:'Figtree',sans-serif!important;font-size:.48em;font-weight:700;color:#4a7fd4;vertical-align:super;letter-spacing:.3px;margin-left:2px;}
+.topbar-center{display:flex;align-items:center;gap:10px;}
+.flow-title{font-size:13px;font-weight:600;color:#94a3b8;}
+.flow-ver{font-size:10px;font-weight:700;letter-spacing:.8px;background:#1e2740;border:1px solid #2d3a5a;color:#4a7fd4;padding:3px 9px;border-radius:100px;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.meta{font-size:11px;color:#475569;font-weight:500;}
+.draft-badge{background:#2d1f00;border:1px solid #f59e0b;color:#f59e0b;font-size:10px;font-weight:700;letter-spacing:.8px;padding:3px 10px;border-radius:100px;}
+.toolbar{display:flex;gap:4px;}
+.tool-btn{background:#1e2740;border:1px solid #2d3a5a;color:#94a3b8;font-size:11px;font-weight:600;padding:5px 12px;border-radius:7px;cursor:pointer;transition:all .15s;font-family:'Figtree',sans-serif;}
+.tool-btn:hover{background:#2d3a5a;color:#e2e8f0;}
+
+.canvas-outer{width:100vw;height:calc(100vh - 52px);overflow:hidden;position:relative;cursor:grab;}
+.canvas-outer.panning{cursor:grabbing;}
+.canvas-bg{position:absolute;top:0;left:0;width:100%;height:100%;background-image:radial-gradient(circle,#1e2740 1px,transparent 1px);background-size:28px 28px;pointer-events:none;}
+.canvas-inner{position:absolute;top:0;left:0;transform-origin:0 0;}
+
+/* Swimlanes */
+.swimlane{position:absolute;border-radius:20px;border:1px solid;pointer-events:none;}
+.lane-tag{position:absolute;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:5px 12px;border-radius:7px;pointer-events:none;}
+
+/* SVG */
+svg.flow-svg{position:absolute;top:0;left:0;pointer-events:none;overflow:visible;}
+
+/* Nodes */
+.node{position:absolute;border-radius:14px;border:1.5px solid #2d3a5a;background:#1a2035;box-shadow:0 4px 20px rgba(0,0,0,.45),0 1px 3px rgba(0,0,0,.3);cursor:move;user-select:none;transition:box-shadow .2s;min-width:190px;}
+.node:hover{box-shadow:0 8px 32px rgba(0,0,0,.55),0 0 0 1px rgba(74,127,212,.35);}
+.node-hd{display:flex;align-items:center;gap:9px;padding:10px 14px 9px;border-radius:13px 13px 0 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.n-icon{font-size:15px;flex-shrink:0;}
+.n-title{font-weight:700;font-size:12px;color:#f1f5f9;line-height:1.3;flex:1;}
+.node-bd{padding:8px 14px 11px;}
+.n-sub{font-size:10px;color:#64748b;line-height:1.5;margin-bottom:5px;}
+.n-bullets{display:flex;flex-direction:column;gap:2px;}
+.n-b{font-size:10px;color:#94a3b8;line-height:1.5;display:flex;gap:5px;align-items:flex-start;}
+.n-b::before{content:'·';color:#4a7fd4;font-weight:700;flex-shrink:0;}
+.node-status{position:absolute;top:-9px;right:10px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 8px;border-radius:100px;}
+
+
+
+
+.nv-shared .node-hd{background:rgba(148,163,184,.07);}
+.nv-shared{border-color:#475569;}
+.nv-rec .node-hd{background:rgba(36,82,160,.18);}
+.nv-rec{border-color:#2452a0;}
+.nv-app .node-hd{background:rgba(14,116,144,.18);}
+.nv-app{border-color:#0e7490;}
+.nv-sys .node-hd{background:rgba(124,58,237,.14);}
+.nv-sys{border-color:#7c3aed;}
+.nv-ok .node-hd{background:rgba(15,107,58,.2);}
+.nv-ok{border-color:#16a34a;}
+.nv-err .node-hd{background:rgba(153,27,27,.2);}
+.nv-err{border-color:#dc2626;}
+
+/* Diamonds */
+.diam-wrap{position:absolute;cursor:move;user-select:none;}
+.diam-shape{transform:rotate(45deg);border-radius:6px;border:1.5px solid #f59e0b;background:#1a150a;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:box-shadow .2s;}
+.diam-shape:hover{box-shadow:0 0 0 2px #f59e0b,0 8px 24px rgba(245,158,11,.15);}
+.diam-txt{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;font-weight:700;color:#f59e0b;text-align:center;line-height:1.3;pointer-events:none;white-space:nowrap;}
+
+/* Edge labels */
+.e-lbl{position:absolute;font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:5px;pointer-events:none;transform:translate(-50%,-50%);white-space:nowrap;z-index:10;}
+.el-y{background:#0a2e1a;border:1px solid #16a34a;color:#4ade80;}
+.el-n{background:#2d0a0a;border:1px solid #dc2626;color:#f87171;}
+.el-f{background:#0f1a35;border:1px solid #2452a0;color:#7bb8ff;}
+.el-s{background:#1a1535;border:1px solid #7c3aed;color:#c4b5fd;}
+.el-r{background:#1c1f2e;border:1px solid #475569;color:#94a3b8;}
+
+/* Legend */
+.legend{position:fixed;top:68px;left:18px;background:#161b27;border:1px solid #1e2740;border-radius:14px;padding:16px 18px;width:192px;box-shadow:0 4px 20px rgba(0,0,0,.4);z-index:200;transition:transform .25s;}
+.legend.hidden{transform:translateX(-220px);}
+.leg-toggle{position:fixed;top:68px;left:18px;width:30px;height:30px;background:#161b27;border:1px solid #1e2740;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:201;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:left .25s;color:#94a3b8;}
+.leg-toggle.open{left:222px;}
+.leg-h{font-size:9.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#475569;margin-bottom:12px;}
+.leg-sec{margin-bottom:12px;}
+.leg-sec-h{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#2d3a5a;margin-bottom:7px;}
+.leg-r{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px;color:#64748b;font-weight:500;}
+.leg-nd{width:14px;height:14px;border-radius:4px;border:1.5px solid;flex-shrink:0;}
+.leg-dm{width:12px;height:12px;transform:rotate(45deg);border-radius:2px;border:1.5px solid #f59e0b;background:#1a150a;flex-shrink:0;}
+.leg-ln{width:22px;height:0;flex-shrink:0;position:relative;border-top:2px solid;}
+.leg-ln::after{content:'▶';position:absolute;right:-5px;top:50%;transform:translateY(-50%);font-size:7px;}
+
+/* Zoom */
+.zoom-ctrl{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:#161b27;border:1px solid #1e2740;border-radius:10px;padding:6px 14px;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:200;}
+.z-btn{background:none;border:none;color:#94a3b8;font-size:16px;cursor:pointer;padding:2px 8px;border-radius:6px;font-family:'Figtree',sans-serif;}
+.z-btn:hover{background:#1e2740;color:#e2e8f0;}
+.z-lbl{font-size:11px;color:#475569;font-weight:600;min-width:42px;text-align:center;}
+
+/* Minimap */
+.minimap{position:fixed;bottom:24px;right:24px;width:170px;height:100px;background:#161b27;border:1px solid #1e2740;border-radius:10px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.4);z-index:200;}
+.mm-vp{position:absolute;border:1.5px solid #4a7fd4;border-radius:3px;background:rgba(74,127,212,.08);pointer-events:none;}
+.mm-lbl{position:absolute;bottom:4px;left:8px;font-size:9px;color:#2d3a5a;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">Nova<sup class="cs-sup">CS</sup></div>
+  <div class="topbar-center">
+    <span class="flow-title">Platform Site Flow</span>
+    <span class="flow-ver">v3.0</span>
+  </div>
+  <div class="topbar-right">
+    <span class="meta">VP Review · March 2026</span>
+    <span class="draft-badge">DRAFT</span>
+    <div class="toolbar">
+      <button class="tool-btn" onclick="fitView()">⊞ Fit View</button>
+      <button class="tool-btn" onclick="resetView()">⟳ Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Legend toggle -->
+<div class="leg-toggle open" id="leg-btn" onclick="toggleLeg()">✕</div>
+<div class="legend" id="legend">
+  <div class="leg-h">Legend</div>
+  <div class="leg-sec">
+    <div class="leg-sec-h">Node Types</div>
+    <div class="leg-r"><div class="leg-nd" style="background:rgba(148,163,184,.08);border-color:#475569;"></div>Shared / Public</div>
+    <div class="leg-r"><div class="leg-nd" style="background:rgba(36,82,160,.18);border-color:#2452a0;"></div>Recruiter Portal</div>
+    <div class="leg-r"><div class="leg-nd" style="background:rgba(14,116,144,.18);border-color:#0e7490;"></div>Applicant Portal</div>
+    <div class="leg-r"><div class="leg-nd" style="background:rgba(124,58,237,.14);border-color:#7c3aed;"></div>System / Sub-page</div>
+    <div class="leg-r"><div class="leg-nd" style="background:rgba(15,107,58,.2);border-color:#16a34a;"></div>Terminal · Success</div>
+    <div class="leg-r"><div class="leg-nd" style="background:rgba(153,27,27,.2);border-color:#dc2626;"></div>Terminal · Error</div>
+    <div class="leg-r"><div class="leg-dm"></div>Decision / Branch</div>
+  </div>
+  <div class="leg-sec">
+    <div class="leg-sec-h">Connections</div>
+    <div class="leg-r"><div class="leg-ln" style="border-color:#4a7fd4;"><span style="color:#4a7fd4;position:absolute;right:-5px;top:50%;transform:translateY(-50%);font-size:7px;">▶</span></div>Recruiter flow</div>
+    <div class="leg-r"><div class="leg-ln" style="border-color:#0e7490;"><span style="color:#0e7490;position:absolute;right:-5px;top:50%;transform:translateY(-50%);font-size:7px;">▶</span></div>Applicant flow</div>
+    <div class="leg-r"><div class="leg-ln" style="border-color:#7c3aed;border-top-style:dashed;"><span style="color:#7c3aed;position:absolute;right:-5px;top:50%;transform:translateY(-50%);font-size:7px;">▶</span></div>Sub-page / Modal</div>
+    <div class="leg-r"><div class="leg-ln" style="border-color:#dc2626;"><span style="color:#dc2626;position:absolute;right:-5px;top:50%;transform:translateY(-50%);font-size:7px;">▶</span></div>Error / Failure</div>
+    <div class="leg-r"><div class="leg-ln" style="border-color:#475569;border-top-style:dashed;"><span style="color:#475569;position:absolute;right:-5px;top:50%;transform:translateY(-50%);font-size:7px;">▶</span></div>Retry / Return</div>
+  </div>
+
+  <div style="border-top:1px solid #1e2740;padding-top:9px;font-size:10px;color:#2d3a5a;line-height:1.75;">
+    ◆ Diamond = conditional branch<br>
+    Drag to pan · Scroll to zoom<br>
+    Nodes are draggable
+  </div>
+</div>
+
+<div class="canvas-outer" id="co">
+  <div class="canvas-bg"></div>
+  <div class="canvas-inner" id="ci">
+    <svg class="flow-svg" id="fsvg" style="width:3400px;height:2600px;"></svg>
+
+    <!-- SWIMLANES -->
+    <div class="swimlane" style="left:60px;top:148px;width:1120px;height:1660px;border-color:rgba(36,82,160,.2);background:rgba(36,82,160,.022);"></div>
+    <div class="lane-tag" style="left:76px;top:160px;background:rgba(36,82,160,.2);border:1px solid rgba(36,82,160,.35);color:#4a7fd4;">🏢 Recruiter Portal</div>
+
+    <div class="swimlane" style="left:1260px;top:148px;width:940px;height:1420px;border-color:rgba(14,116,144,.2);background:rgba(14,116,144,.022);"></div>
+    <div class="lane-tag" style="left:1276px;top:160px;background:rgba(14,116,144,.2);border:1px solid rgba(14,116,144,.35);color:#22d3ee;">🎯 Applicant Portal</div>
+
+    <div class="swimlane" style="left:2340px;top:148px;width:420px;height:760px;border-color:rgba(220,38,38,.18);background:rgba(220,38,38,.018);"></div>
+    <div class="lane-tag" style="left:2356px;top:160px;background:rgba(220,38,38,.18);border:1px solid rgba(220,38,38,.3);color:#f87171;">⚠ Error States</div>
+
+    <!-- ══════════ NODES ══════════ -->
+
+    <!-- LANDING -->
+    <div class="node nv-shared" id="n-landing" style="left:1110px;top:28px;width:226px;">
+      <div class="node-hd"><span class="n-icon">🏠</span><div class="n-title">Landing Page</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Public entry — portal selection</div>
+        <div class="n-bullets">
+          <div class="n-b">NovaCS brand + tagline</div>
+          <div class="n-b">Recruiter Portal CTA</div>
+          <div class="n-b">Applicant Portal CTA</div>
+          <div class="n-b">Security & trust signals</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RECRUITER ── -->
+    <div class="node nv-rec" id="n-rlogin" style="left:200px;top:210px;width:250px;">
+      <div class="node-hd"><span class="n-icon">🏢</span><div class="n-title">Recruiter Portal — Sign In</div></div>
+      <div class="node-bd">
+        <div class="n-sub">2-step authentication flow</div>
+        <div class="n-bullets">
+          <div class="n-b">Select Organisation (dropdown)</div>
+          <div class="n-b">Email + Password entry</div>
+          <div class="n-b">Session persistence</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DECISION: auth -->
+    <div class="diam-wrap" id="d-rauth" style="left:271px;top:438px;">
+      <div class="diam-shape" style="width:86px;height:86px;"></div>
+      <div class="diam-txt" style="width:86px;height:86px;">Auth<br>Valid?</div>
+    </div>
+
+    <!-- INVALID LOGIN ERROR -->
+    <div class="node nv-err" id="n-rerr" style="left:480px;top:436px;width:210px;">
+      <div class="node-hd"><span class="n-icon">🔒</span><div class="n-title">Invalid Login</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Authentication failure</div>
+        <div class="n-bullets">
+          <div class="n-b">Wrong credentials message</div>
+          <div class="n-b">Attempt counter displayed</div>
+          <div class="n-b">Max 3 attempts → lockout</div>
+          <div class="n-b">Contact support link</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="node nv-rec" id="n-dash" style="left:168px;top:608px;width:290px;">
+      <div class="node-hd"><span class="n-icon">📊</span><div class="n-title">Dashboard Overview</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Post-login home for recruiters</div>
+        <div class="n-bullets">
+          <div class="n-b">Stats: invited / completed / pass rate</div>
+          <div class="n-b">Adjustable pass/fail threshold</div>
+          <div class="n-b">Recent candidates table</div>
+          <div class="n-b">Quick-issue access code CTA</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CANDIDATES -->
+    <div class="node nv-rec" id="n-cands" style="left:68px;top:890px;width:235px;">
+      <div class="node-hd"><span class="n-icon">👥</span><div class="n-title">Candidates</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Full candidate management</div>
+        <div class="n-bullets">
+          <div class="n-b">Candidate info & contact</div>
+          <div class="n-b">Weighted score + rank</div>
+          <div class="n-b">Search, filter & sort</div>
+          <div class="n-b">Recruiter notes & comments</div>
+          <div class="n-b">CSV export</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CANDIDATE PROFILE -->
+    <div class="node nv-sys" id="n-profile" style="left:68px;top:1200px;width:235px;">
+      <div class="node-hd"><span class="n-icon">🪪</span><div class="n-title">Candidate Profile</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Full-page detail view</div>
+        <div class="n-bullets">
+          <div class="n-b">Category score breakdown</div>
+          <div class="n-b">Pipeline stage selector</div>
+          <div class="n-b">Shortlist / Reject actions</div>
+          <div class="n-b">Notes & activity log</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCESS CODES -->
+    <div class="node nv-rec" id="n-codes" style="left:360px;top:890px;width:210px;">
+      <div class="node-hd"><span class="n-icon">🔑</span><div class="n-title">Access Codes</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Manage all issued codes</div>
+        <div class="n-bullets">
+          <div class="n-b">View used / unused status</div>
+          <div class="n-b">Copy & share codes</div>
+          <div class="n-b">Filter by candidate / status</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREATE & ISSUE -->
+    <div class="node nv-rec" id="n-issue" style="left:360px;top:1130px;width:210px;">
+      <div class="node-hd"><span class="n-icon">➕</span><div class="n-title">Create & Issue Codes</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Generate per-candidate access</div>
+        <div class="n-bullets">
+          <div class="n-b">Name + email + role entry</div>
+          <div class="n-b">Auto-generate 6-char code</div>
+          <div class="n-b">Copy / share instantly</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVITE MANAGER -->
+    <div class="node nv-rec" id="n-invite" style="left:360px;top:1380px;width:210px;">
+      <div class="node-hd"><span class="n-icon">📨</span><div class="n-title">Invite Manager</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Batch candidate invitations</div>
+        <div class="n-bullets">
+          <div class="n-b">Bulk upload via CSV</div>
+          <div class="n-b">Track sent / opened / done</div>
+          <div class="n-b">Resend & manage per batch</div>
+          <div class="n-b">Preview invite email</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="node nv-rec" id="n-settings" style="left:628px;top:890px;width:210px;">
+      <div class="node-hd"><span class="n-icon">⚙️</span><div class="n-title">Settings & Branding</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Organisation configuration</div>
+        <div class="n-bullets">
+          <div class="n-b">Logo upload + org name</div>
+          <div class="n-b">Accent colour picker</div>
+          <div class="n-b">Time limit configuration</div>
+          <div class="n-b">Tab detection toggle</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHORTLIST / WEIGHTINGS -->
+    <div class="node nv-rec" id="n-shortlist" style="left:628px;top:1130px;width:225px;">
+      <div class="node-hd"><span class="n-icon">⚖️</span><div class="n-title">Shortlist / Fail / Weightings</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Decision tools + scoring config</div>
+        <div class="n-bullets">
+          <div class="n-b">Pass/fail threshold slider</div>
+          <div class="n-b">Category weight config</div>
+          <div class="n-b">Shortlist / Reject / Stage</div>
+          <div class="n-b">Leaderboard ranked view</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="node nv-sys" id="n-analytics" style="left:916px;top:890px;width:220px;">
+      <div class="node-hd"><span class="n-icon">📈</span><div class="n-title">Analytics & Reports</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Performance trends & exports</div>
+        <div class="n-bullets">
+          <div class="n-b">Score distributions per batch</div>
+          <div class="n-b">Category averages over time</div>
+          <div class="n-b">Pass rate trends</div>
+          <div class="n-b">Export PDF / CSV reports</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASSESSMENT CUSTOMISATION -->
+    <div class="node nv-sys" id="n-custom" style="left:916px;top:1130px;width:220px;">
+      <div class="node-hd"><span class="n-icon">🎛️</span><div class="n-title">Assessment Customisation</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Question bank + test builder</div>
+        <div class="n-bullets">
+          <div class="n-b">Add / edit custom questions</div>
+          <div class="n-b">Per-category question count</div>
+          <div class="n-b">Preview applicant view</div>
+          <div class="n-b">Version control per batch</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── APPLICANT ── -->
+    <div class="node nv-app" id="n-alogin" style="left:1370px;top:210px;width:265px;">
+      <div class="node-hd"><span class="n-icon">🎯</span><div class="n-title">Applicant Portal — Sign In</div></div>
+      <div class="node-bd">
+        <div class="n-sub">3-step authenticated entry</div>
+        <div class="n-bullets">
+          <div class="n-b">Select Organisation (dropdown)</div>
+          <div class="n-b">Enter sign-in details + email</div>
+          <div class="n-b">Access code input (6-char)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DECISION: code valid -->
+    <div class="diam-wrap" id="d-code" style="left:1460px;top:456px;">
+      <div class="diam-shape" style="width:86px;height:86px;"></div>
+      <div class="diam-txt" style="width:86px;height:86px;">Code<br>Valid?</div>
+    </div>
+
+    <!-- CODE ERROR -->
+    <div class="node nv-err" id="n-cerr" style="left:1676px;top:452px;width:215px;">
+      <div class="node-hd"><span class="n-icon">🚫</span><div class="n-title">Code Invalid / Expired</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Access code error screen</div>
+        <div class="n-bullets">
+          <div class="n-b">Invalid code message</div>
+          <div class="n-b">Already-used detection</div>
+          <div class="n-b">Contact organisation prompt</div>
+          <div class="n-b">Retry option (3 attempts)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IDENTITY VERIFY -->
+    <div class="node nv-app" id="n-identity" style="left:1365px;top:630px;width:265px;">
+      <div class="node-hd"><span class="n-icon">🪪</span><div class="n-title">Identity Verification</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Confirm applicant identity before test</div>
+        <div class="n-bullets">
+          <div class="n-b">Full name confirmation</div>
+          <div class="n-b">Email address confirmation</div>
+          <div class="n-b">Last 4 digits of phone</div>
+          <div class="n-b">All 3 fields must match</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DECISION: identity match -->
+    <div class="diam-wrap" id="d-id" style="left:1460px;top:866px;">
+      <div class="diam-shape" style="width:86px;height:86px;"></div>
+      <div class="diam-txt" style="width:86px;height:86px;">Identity<br>Match?</div>
+    </div>
+
+    <!-- IDENTITY ERROR -->
+    <div class="node nv-err" id="n-iderr" style="left:1676px;top:862px;width:215px;">
+      <div class="node-hd"><span class="n-icon">⛔</span><div class="n-title">Identity Mismatch</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Verification failed screen</div>
+        <div class="n-bullets">
+          <div class="n-b">Details do not match message</div>
+          <div class="n-b">Remaining attempts shown</div>
+          <div class="n-b">Lockout after 3 failures</div>
+          <div class="n-b">Contact organisation prompt</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSTRUCTIONS -->
+    <div class="node nv-app" id="n-instruct" style="left:1352px;top:1050px;width:290px;">
+      <div class="node-hd"><span class="n-icon">📋</span><div class="n-title">Assessment Introduction & Instructions</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Pre-test brief — timer not yet running</div>
+        <div class="n-bullets">
+          <div class="n-b">25 questions across 4 sections</div>
+          <div class="n-b">25 min timer — starts on "Begin"</div>
+          <div class="n-b">No going back between sections</div>
+          <div class="n-b">Double-check answers reminder</div>
+          <div class="n-b">Tab-switch detection warning</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASSESSMENT -->
+    <div class="node nv-app" id="n-assess" style="left:1352px;top:1330px;width:290px;">
+      <div class="node-hd"><span class="n-icon">❓</span><div class="n-title">Assessment</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Timed · 25 questions · 4 sections</div>
+        <div class="n-bullets">
+          <div class="n-b">Section intro card × 4 (⚖️🔢💬🎭)</div>
+          <div class="n-b">Question view + progress + timer</div>
+          <div class="n-b">Prev / Next nav within section</div>
+          <div class="n-b">Tab-switch detection active</div>
+          <div class="n-b">Randomised question order</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DECISION: time expired -->
+    <div class="diam-wrap" id="d-time" style="left:1706px;top:1375px;">
+      <div class="diam-shape" style="width:86px;height:86px;"></div>
+      <div class="diam-txt" style="width:86px;height:86px;">Timer<br>Expired?</div>
+    </div>
+
+    <!-- SUBMITTED -->
+    <div class="node nv-ok" id="n-submitted" style="left:1352px;top:1620px;width:290px;">
+      <div class="node-hd"><span class="n-icon">✅</span><div class="n-title">Submitted Confirmation</div></div>
+      <div class="node-bd">
+        <div class="n-sub">End state — assessment complete</div>
+        <div class="n-bullets">
+          <div class="n-b">Submission summary (time, Q count)</div>
+          <div class="n-b">Access code marked expired</div>
+          <div class="n-b">Next steps / what happens message</div>
+          <div class="n-b">No score shown to applicant</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ERROR STATES ── -->
+    <div class="node nv-err" id="n-timeout" style="left:2380px;top:200px;width:210px;">
+      <div class="node-hd"><span class="n-icon">⏰</span><div class="n-title">Session Timeout</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Timer reached zero</div>
+        <div class="n-bullets">
+          <div class="n-b">Auto-submit on expiry</div>
+          <div class="n-b">Partial answers saved</div>
+          <div class="n-b">Timeout confirmation shown</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node nv-err" id="n-404" style="left:2380px;top:460px;width:210px;">
+      <div class="node-hd"><span class="n-icon">🌐</span><div class="n-title">404 / Not Found</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Broken or invalid URL</div>
+        <div class="n-bullets">
+          <div class="n-b">NovaCS branded error page</div>
+          <div class="n-b">Return to Landing CTA</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node nv-err" id="n-locked" style="left:2380px;top:680px;width:210px;">
+      <div class="node-hd"><span class="n-icon">🔒</span><div class="n-title">Account Locked</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Too many failed attempts</div>
+        <div class="n-bullets">
+          <div class="n-b">Lockout timer displayed</div>
+          <div class="n-b">Contact support link</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PUBLIC / MARKETING LANE -->
+    <div class="swimlane" style="left:60px;top:1880px;width:2280px;height:380px;border-color:rgba(148,163,184,.15);background:rgba(148,163,184,.015);"></div>
+    <div class="lane-tag" style="left:76px;top:1892px;background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.25);color:#94a3b8;">🌐 Public / Marketing & System</div>
+
+    <div class="node nv-shared" id="n-pwreset" style="left:200px;top:1940px;width:235px;">
+      <div class="node-hd"><span class="n-icon">🔄</span><div class="n-title">Password Reset</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Forgot password flow</div>
+        <div class="n-bullets">
+          <div class="n-b">Enter registered email</div>
+          <div class="n-b">Reset link sent via email</div>
+          <div class="n-b">Set new password screen</div>
+          <div class="n-b">Redirect back to login</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node nv-sys" id="n-email" style="left:500px;top:1940px;width:260px;">
+      <div class="node-hd"><span class="n-icon">📧</span><div class="n-title">Email Notification System</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Automated transactional emails</div>
+        <div class="n-bullets">
+          <div class="n-b">Access code delivery to applicant</div>
+          <div class="n-b">Batch invite emails</div>
+          <div class="n-b">Submission confirmation to applicant</div>
+          <div class="n-b">Recruiter alert — candidate completed</div>
+          <div class="n-b">Password reset link</div>
+          <div class="n-b">Enquiry confirmation (prospect)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node nv-shared" id="n-contact" style="left:830px;top:1940px;width:280px;">
+      <div class="node-hd"><span class="n-icon">📞</span><div class="n-title">Contact & Demo Request</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Prospect enquiry — discovery & quote</div>
+        <div class="n-bullets">
+          <div class="n-b">Company name + size + industry</div>
+          <div class="n-b">Use case + est. candidates/month</div>
+          <div class="n-b">Preferred contact method</div>
+          <div class="n-b">Submit → 24hr response SLA</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node nv-ok" id="n-contact-ok" style="left:1180px;top:1940px;width:230px;">
+      <div class="node-hd"><span class="n-icon">✉️</span><div class="n-title">Enquiry Confirmed</div></div>
+      <div class="node-bd">
+        <div class="n-sub">Post-submission confirmation</div>
+        <div class="n-bullets">
+          <div class="n-b">Thank you message</div>
+          <div class="n-b">What to expect next</div>
+          <div class="n-b">Auto-email to prospect</div>
+          <div class="n-b">Auto-alert to NovaCS team</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node nv-sys" id="n-admin" style="left:1490px;top:1940px;width:265px;">
+      <div class="node-hd"><span class="n-icon">🛡️</span><div class="n-title">Admin Super-Panel</div></div>
+      <div class="node-bd">
+        <div class="n-sub">NovaCS internal — top-left nav access</div>
+        <div class="n-bullets">
+          <div class="n-b">View &amp; manage all client organisations</div>
+          <div class="n-b">Activate / suspend accounts</div>
+          <div class="n-b">Override settings per org</div>
+          <div class="n-b">Platform-wide usage stats</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /canvas-inner -->
+</div><!-- /canvas-outer -->
+
+<!-- MINIMAP -->
+<div class="minimap" id="mm">
+  <canvas id="mm-canvas" width="170" height="100"></canvas>
+  <div class="mm-vp" id="mm-vp"></div>
+  <div class="mm-lbl">Overview</div>
+</div>
+
+<!-- ZOOM -->
+<div class="zoom-ctrl">
+  <button class="z-btn" onclick="doZoom(-0.1)">−</button>
+  <div class="z-lbl" id="zlbl">75%</div>
+  <button class="z-btn" onclick="doZoom(0.1)">+</button>
+</div>
+
+<script>
+// ─── STATE ───
+let sc=0.75, tx=80, ty=40;
+let panning=false, ps={x:0,y:0};
+const co=document.getElementById('co');
+const ci=document.getElementById('ci');
+
+function applyT(){
+  ci.style.transform=`translate(${tx}px,${ty}px) scale(${sc})`;
+  document.getElementById('zlbl').textContent=Math.round(sc*100)+'%';
+  updateMM();
+}
+
+// ─── EDGES ───
+const EDGES=[
+  // Landing → portals
+  {a:'n-landing',as:'bottom', b:'n-rlogin',bs:'top', col:'#4a7fd4', lbl:'Recruiter',lc:'el-f', type:'curve'},
+  {a:'n-landing',as:'bottom', b:'n-alogin',bs:'top', col:'#0e7490', lbl:'Applicant',lc:'el-f', type:'curve'},
+  {a:'n-landing',as:'right',  b:'n-404',  bs:'left', col:'#dc2626', lbl:'Invalid URL',lc:'el-n', type:'curve', dash:true},
+
+  // Recruiter auth
+  {a:'n-rlogin',as:'bottom', b:'d-rauth',bs:'top',  col:'#4a7fd4', type:'straight'},
+  {a:'d-rauth',as:'bottom',  b:'n-dash', bs:'top',  col:'#16a34a', lbl:'✓ Valid', lc:'el-y', type:'straight'},
+  {a:'d-rauth',as:'right',   b:'n-rerr', bs:'left', col:'#dc2626', lbl:'✗ Failed',lc:'el-n', type:'straight'},
+  {a:'n-rerr',as:'top',      b:'n-rlogin',bs:'right', col:'#475569', lbl:'Retry',lc:'el-r', type:'curve', dash:true},
+  {a:'n-rerr',as:'right',    b:'n-locked',bs:'left', col:'#dc2626', lbl:'Max attempts', lc:'el-n', type:'curve', dash:true},
+
+  // Dashboard → sub-pages
+  {a:'n-dash',as:'bottom', b:'n-cands',    bs:'top', col:'#4a7fd4', type:'curve'},
+  {a:'n-dash',as:'bottom', b:'n-codes',    bs:'top', col:'#4a7fd4', type:'curve'},
+  {a:'n-dash',as:'bottom', b:'n-settings', bs:'top', col:'#4a7fd4', type:'curve'},
+  {a:'n-dash',as:'bottom', b:'n-analytics',bs:'top', col:'#4a7fd4', type:'curve'},
+
+  // Sub-page links
+  {a:'n-cands',as:'bottom',   b:'n-profile', bs:'top', col:'#7c3aed', lbl:'View Profile',lc:'el-s', type:'straight', dash:true},
+  {a:'n-codes',as:'bottom',   b:'n-issue',   bs:'top', col:'#4a7fd4', type:'straight', dash:true},
+  {a:'n-issue',as:'bottom',   b:'n-invite',  bs:'top', col:'#4a7fd4', type:'straight'},
+  {a:'n-settings',as:'bottom',b:'n-shortlist',bs:'top',col:'#4a7fd4', type:'straight', dash:true},
+  {a:'n-analytics',as:'bottom',b:'n-custom', bs:'top', col:'#7c3aed', type:'straight', dash:true},
+
+  // Applicant auth
+  {a:'n-alogin',as:'bottom',  b:'d-code',     bs:'top',  col:'#0e7490', type:'straight'},
+  {a:'d-code',as:'bottom',    b:'n-identity', bs:'top',  col:'#16a34a', lbl:'✓ Valid',    lc:'el-y', type:'straight'},
+  {a:'d-code',as:'right',     b:'n-cerr',     bs:'left', col:'#dc2626', lbl:'✗ Invalid/Expired', lc:'el-n', type:'straight'},
+  {a:'n-cerr',as:'top',       b:'n-alogin',   bs:'right',col:'#475569', lbl:'Retry', lc:'el-r', type:'curve', dash:true},
+
+  // Identity
+  {a:'n-identity',as:'bottom',b:'d-id',     bs:'top',  col:'#0e7490', type:'straight'},
+  {a:'d-id',as:'bottom',      b:'n-instruct',bs:'top', col:'#16a34a', lbl:'✓ Match',   lc:'el-y', type:'straight'},
+  {a:'d-id',as:'right',       b:'n-iderr',  bs:'left', col:'#dc2626', lbl:'✗ No Match',lc:'el-n', type:'straight'},
+  {a:'n-iderr',as:'top',      b:'n-identity',bs:'right',col:'#475569',lbl:'Retry',lc:'el-r',type:'curve',dash:true},
+  {a:'n-iderr',as:'right',    b:'n-locked', bs:'left', col:'#dc2626', lbl:'Max attempts',lc:'el-n',type:'curve',dash:true},
+
+  // Assessment flow
+  {a:'n-instruct',as:'bottom',b:'n-assess',   bs:'top',  col:'#0e7490', lbl:'Begin (timer starts)',lc:'el-f', type:'straight'},
+  {a:'n-assess',as:'right',   b:'d-time',     bs:'left', col:'#0e7490', type:'straight', dash:true},
+  {a:'n-assess',as:'bottom',  b:'n-submitted',bs:'top',  col:'#16a34a', lbl:'✓ Submit',lc:'el-y', type:'straight'},
+  {a:'d-time',as:'top',       b:'n-timeout',  bs:'left', col:'#dc2626', lbl:'✗ Expired → auto-submit',lc:'el-n', type:'curve'},
+  {a:'d-time',as:'bottom',    b:'n-submitted',bs:'right',col:'#dc2626', lbl:'Auto-submit',lc:'el-n', type:'curve'},
+  // Password reset from recruiter login
+  {a:'n-rlogin',as:'bottom', b:'n-pwreset',bs:'top', col:'#475569', lbl:'Forgot password',lc:'el-r', type:'curve', dash:true},
+
+  // Email system — triggered by key actions
+  {a:'n-issue',as:'bottom',    b:'n-email',bs:'top', col:'#7c3aed', lbl:'Sends code',lc:'el-s', type:'curve', dash:true},
+  {a:'n-invite',as:'bottom',   b:'n-email',bs:'top', col:'#7c3aed', lbl:'Sends invite',lc:'el-s', type:'curve', dash:true},
+  {a:'n-submitted',as:'bottom',b:'n-email',bs:'top', col:'#7c3aed', lbl:'Notifies recruiter',lc:'el-s', type:'curve', dash:true},
+  {a:'n-pwreset',as:'right',   b:'n-email',bs:'left',col:'#7c3aed', lbl:'Sends reset link',lc:'el-s', type:'straight', dash:true},
+  {a:'n-contact',as:'right',   b:'n-email',bs:'top', col:'#7c3aed', lbl:'Sends confirmation',lc:'el-s', type:'curve', dash:true},
+
+  // Contact form flow
+  {a:'n-landing',as:'bottom',  b:'n-contact',bs:'top', col:'#94a3b8', lbl:'Get in touch',lc:'el-r', type:'curve', dash:true},
+  {a:'n-contact',as:'right',   b:'n-contact-ok',bs:'left', col:'#16a34a', lbl:'Submit',lc:'el-y', type:'straight'},
+
+  // Admin super-panel from dashboard
+  {a:'n-dash',as:'right', b:'n-admin',bs:'top', col:'#7c3aed', lbl:'Super-panel (nav)',lc:'el-s', type:'curve', dash:true},
+];
+
+function nEdge(id,side){
+  const el=document.getElementById(id);
+  if(!el)return{x:0,y:0};
+  const l=parseFloat(el.style.left)||0,t=parseFloat(el.style.top)||0;
+  const w=el.offsetWidth,h=el.offsetHeight;
+  if(side==='bottom')return{x:l+w/2,y:t+h};
+  if(side==='top')   return{x:l+w/2,y:t};
+  if(side==='left')  return{x:l,    y:t+h/2};
+  if(side==='right') return{x:l+w,  y:t+h/2};
+  return{x:l+w/2,y:t+h/2};
+}
+function dEdge(id,side){
+  const el=document.getElementById(id);
+  if(!el)return{x:0,y:0};
+  const l=parseFloat(el.style.left)||0,t=parseFloat(el.style.top)||0;
+  const s=86,cx=l+s/2,cy=t+s/2;
+  if(side==='bottom')return{x:cx,y:t+s};
+  if(side==='top')   return{x:cx,y:t};
+  if(side==='left')  return{x:l, y:cy};
+  if(side==='right') return{x:l+s,y:cy};
+  return{x:cx,y:cy};
+}
+function getEdge(id,side){
+  return id.startsWith('d-')?dEdge(id,side):nEdge(id,side);
+}
+
+function drawEdges(){
+  const svg=document.getElementById('fsvg');
+  svg.querySelectorAll('.ep,.elbl-el').forEach(e=>e.remove());
+  document.querySelectorAll('.e-lbl').forEach(e=>e.remove());
+
+  let defs=svg.querySelector('defs');
+  if(!defs){defs=document.createElementNS('http://www.w3.org/2000/svg','defs');svg.appendChild(defs);}
+
+  const colMap={'#4a7fd4':'nb','#0e7490':'tb','#dc2626':'rb','#16a34a':'gb','#7c3aed':'pb','#475569':'sb'};
+  const usedCols=[...new Set(EDGES.map(e=>e.col))];
+  usedCols.forEach(c=>{
+    const mid='arr-'+colMap[c];
+    if(!defs.querySelector('#'+mid)){
+      const m=document.createElementNS('http://www.w3.org/2000/svg','marker');
+      m.setAttribute('id',mid);m.setAttribute('markerWidth','9');m.setAttribute('markerHeight','9');
+      m.setAttribute('refX','8');m.setAttribute('refY','3');m.setAttribute('orient','auto');
+      const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+      p.setAttribute('d','M0,0 L0,6 L8,3 z');p.setAttribute('fill',c);
+      m.appendChild(p);defs.appendChild(m);
+    }
+  });
+
+  EDGES.forEach(e=>{
+    const from=getEdge(e.a,e.as), to=getEdge(e.b,e.bs);
+    const mid='arr-'+colMap[e.col];
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.classList.add('ep');
+
+    const dx=to.x-from.x, dy=to.y-from.y;
+    let d;
+
+    if(e.type==='curve'){
+      if(e.as==='bottom'&&e.bs==='top'){
+        const my=from.y+(dy)*0.5;
+        d=`M${from.x},${from.y} C${from.x},${my} ${to.x},${my} ${to.x},${to.y}`;
+      } else if(e.as==='top'&&e.bs==='right'){
+        d=`M${from.x},${from.y} C${from.x},${from.y-80} ${to.x+80},${to.y} ${to.x},${to.y}`;
+      } else if(e.as==='right'&&e.bs==='left'){
+        d=`M${from.x},${from.y} C${from.x+Math.abs(dx)*0.4},${from.y} ${to.x-Math.abs(dx)*0.4},${to.y} ${to.x},${to.y}`;
+      } else if(e.as==='bottom'&&e.bs==='right'){
+        d=`M${from.x},${from.y} C${from.x},${from.y+80} ${to.x+80},${to.y} ${to.x},${to.y}`;
+      } else if(e.as==='top'&&e.bs==='left'){
+        d=`M${from.x},${from.y} C${from.x},${from.y-60} ${to.x-60},${to.y} ${to.x},${to.y}`;
+      } else {
+        d=`M${from.x},${from.y} C${from.x+dx*0.4},${from.y} ${from.x+dx*0.6},${to.y} ${to.x},${to.y}`;
+      }
+    } else {
+      // straight/orthogonal
+      if(e.as==='bottom'&&e.bs==='top'){
+        if(Math.abs(dx)<6){
+          d=`M${from.x},${from.y} L${to.x},${to.y}`;
+        } else {
+          const my=from.y+(dy/2);
+          d=`M${from.x},${from.y} L${from.x},${my} L${to.x},${my} L${to.x},${to.y}`;
+        }
+      } else if(e.as==='right'&&e.bs==='left'){
+        if(Math.abs(dy)<6){
+          d=`M${from.x},${from.y} L${to.x},${to.y}`;
+        } else {
+          const mx=from.x+(dx/2);
+          d=`M${from.x},${from.y} L${mx},${from.y} L${mx},${to.y} L${to.x},${to.y}`;
+        }
+      } else {
+        d=`M${from.x},${from.y} L${to.x},${to.y}`;
+      }
+    }
+
+    path.setAttribute('d',d);
+    path.setAttribute('stroke',e.col);
+    path.setAttribute('stroke-width',e.dash?'1.5':'2');
+    path.setAttribute('fill','none');
+    path.setAttribute('marker-end',`url(#${mid})`);
+    if(e.dash)path.setAttribute('stroke-dasharray','6,4');
+    svg.appendChild(path);
+
+    // Label
+    if(e.lbl){
+      const lx=(from.x+to.x)/2, ly=(from.y+to.y)/2;
+      const lel=document.createElement('div');
+      lel.className='e-lbl '+(e.lc||'el-f');
+      lel.textContent=e.lbl;
+      lel.style.left=lx+'px';lel.style.top=ly+'px';
+      ci.appendChild(lel);
+    }
+  });
+}
+
+// ─── PAN & ZOOM ───
+co.addEventListener('mousedown',e=>{
+  if(e.target.closest('.node,.diam-wrap'))return;
+  panning=true;co.classList.add('panning');
+  ps={x:e.clientX-tx,y:e.clientY-ty};e.preventDefault();
+});
+window.addEventListener('mousemove',e=>{if(!panning)return;tx=e.clientX-ps.x;ty=e.clientY-ps.y;applyT();});
+window.addEventListener('mouseup',()=>{panning=false;co.classList.remove('panning');});
+co.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const r=co.getBoundingClientRect();
+  doZoom(-e.deltaY*0.001,e.clientX-r.left,e.clientY-r.top);
+},{passive:false});
+
+function doZoom(delta,cx,cy){
+  const r=co.getBoundingClientRect();
+  const px=cx??r.width/2,py=cy??r.height/2;
+  const ns=Math.min(2.5,Math.max(0.15,sc+delta));
+  tx=px-(px-tx)*(ns/sc);ty=py-(py-ty)*(ns/sc);sc=ns;applyT();
+}
+function resetView(){sc=0.75;tx=80;ty=40;applyT();}
+function fitView(){
+  const nodes=ci.querySelectorAll('.node,.diam-wrap');
+  let mx=Infinity,my=Infinity,Mx=-Infinity,My=-Infinity;
+  nodes.forEach(n=>{
+    const l=parseFloat(n.style.left)||0,t=parseFloat(n.style.top)||0;
+    const w=n.offsetWidth||180,h=n.offsetHeight||100;
+    mx=Math.min(mx,l);my=Math.min(my,t);Mx=Math.max(Mx,l+w);My=Math.max(My,t+h);
+  });
+  const r=co.getBoundingClientRect();
+  const cw=Mx-mx+120,ch=My-my+120;
+  sc=Math.max(0.15,Math.min(r.width/cw,r.height/ch,1.5));
+  tx=(r.width-cw*sc)/2-mx*sc+60;ty=(r.height-ch*sc)/2-my*sc+60;
+  applyT();
+}
+
+// ─── NODE DRAG ───
+let dragging=null,doff={x:0,y:0};
+function initNodeDrag(el){
+  el.addEventListener('mousedown',e=>{
+    if(e.button!==0)return;
+    dragging=el;
+    const l=parseFloat(el.style.left)||0,t=parseFloat(el.style.top)||0;
+    doff={x:e.clientX/sc-l,y:e.clientY/sc-t};
+    e.stopPropagation();
+  });
+}
+window.addEventListener('mousemove',e=>{
+  if(!dragging)return;
+  dragging.style.left=Math.round((e.clientX/sc-doff.x)/10)*10+'px';
+  dragging.style.top =Math.round((e.clientY/sc-doff.y)/10)*10+'px';
+  drawEdges();
+});
+window.addEventListener('mouseup',()=>{dragging=null;});
+document.querySelectorAll('.node,.diam-wrap').forEach(initNodeDrag);
+
+// ─── MINIMAP ───
+function updateMM(){
+  const CW=3400,CH=2400;
+  const mm=document.getElementById('mm');
+  const mmW=mm.offsetWidth,mmH=mm.offsetHeight;
+  const msc=Math.min(mmW/CW,mmH/CH);
+  const vp=document.getElementById('mm-vp');
+  const r=co.getBoundingClientRect();
+  const vpX=-tx/sc,vpY=-ty/sc,vpW=r.width/sc,vpH=r.height/sc;
+  vp.style.left=Math.max(0,vpX*msc)+'px';
+  vp.style.top =Math.max(0,vpY*msc)+'px';
+  vp.style.width =Math.min(vpW*msc,mmW)+'px';
+  vp.style.height=Math.min(vpH*msc,mmH)+'px';
+
+  // Draw minimap nodes
+  const canvas=document.getElementById('mm-canvas');
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,mmW,mmH);
+  document.querySelectorAll('.node').forEach(n=>{
+    const l=parseFloat(n.style.left)||0,t=parseFloat(n.style.top)||0;
+    const w=(n.offsetWidth||180)*msc,h=(n.offsetHeight||100)*msc;
+    const border=n.style.borderColor||n.className.includes('nv-rec')?'#2452a0':n.className.includes('nv-app')?'#0e7490':'#475569';
+    ctx.fillStyle=border==='#2452a0'?'rgba(36,82,160,.5)':border==='#0e7490'?'rgba(14,116,144,.5)':n.className.includes('nv-err')?'rgba(220,38,38,.5)':'rgba(74,127,212,.3)';
+    ctx.beginPath();
+    ctx.roundRect(l*msc,t*msc,Math.max(w,3),Math.max(h,2),2);
+    ctx.fill();
+  });
+  document.querySelectorAll('.diam-wrap').forEach(n=>{
+    const l=parseFloat(n.style.left)||0,t=parseFloat(n.style.top)||0;
+    ctx.fillStyle='rgba(245,158,11,.5)';
+    ctx.fillRect(l*msc,t*msc,8*msc,8*msc);
+  });
+}
+
+// ─── LEGEND TOGGLE ───
+let legOpen=true;
+function toggleLeg(){
+  legOpen=!legOpen;
+  document.getElementById('legend').classList.toggle('hidden',!legOpen);
+  const btn=document.getElementById('leg-btn');
+  btn.classList.toggle('open',legOpen);
+  btn.textContent=legOpen?'✕':'☰';
+}
+
+// ─── INIT ───
+applyT();
+setTimeout(()=>{drawEdges();updateMM();},200);
+window.addEventListener('resize',updateMM);
+</script>
+</body>
+</html>
