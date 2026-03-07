@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCS — Error</title>
+<link rel="stylesheet" href="../css/base.css">
+<style>
+body { background: var(--bg); display: flex; flex-direction: column; min-height: 100vh; }
+
+.error-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.error-card {
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 52px 44px 44px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+
+.error-icon-ring {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 30px;
+  position: relative;
+}
+.error-icon-ring.danger  { background: var(--danger-bg);  border: 2px solid var(--danger-border); }
+.error-icon-ring.warning { background: var(--warning-bg); border: 2px solid var(--warning-border); }
+.error-icon-ring.info    { background: var(--navy-50);    border: 2px solid var(--navy-100); }
+
+.error-code {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--slate-400); margin-bottom: 10px;
+}
+
+.error-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px; font-weight: 700;
+  color: var(--navy-900);
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+.error-desc {
+  font-size: 14px;
+  color: var(--slate-600);
+  line-height: 1.75;
+  margin-bottom: 28px;
+}
+
+.error-actions {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.error-actions .btn { justify-content: center; }
+
+.error-detail {
+  margin-top: 24px;
+  padding: 14px 18px;
+  background: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--r);
+  font-size: 12px;
+  color: var(--slate-500);
+  line-height: 1.7;
+  text-align: left;
+}
+.error-detail strong { color: var(--slate-700); }
+
+.attempts-row {
+  display: flex; justify-content: center; gap: 6px; margin-bottom: 22px;
+}
+.attempt-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--danger);
+  opacity: 0.3;
+}
+.attempt-dot.used { opacity: 1; }
+
+.countdown-ring {
+  position: relative;
+  width: 80px; height: 80px;
+  margin: 0 auto 20px;
+}
+.countdown-num {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--navy-700);
+}
+svg.ring-svg { transform: rotate(-90deg); }
+.ring-track { fill: none; stroke: var(--slate-200); stroke-width: 5; }
+.ring-fill  { fill: none; stroke: var(--navy-600); stroke-width: 5; stroke-linecap: round;
+              stroke-dasharray: 220; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
+
+/* ── NAV BAR (minimal) ── */
+.mini-nav {
+  height: 52px;
+  background: var(--white);
+  border-bottom: 1px solid var(--slate-200);
+  display: flex; align-items: center; padding: 0 28px;
+  box-shadow: var(--shadow-sm);
+}
+</style>
+</head>
+<body>
+
+<div class="mini-nav">
+  <a href="../index.html" class="nova-wordmark" style="font-size:18px;">Nova<sup class="cs-sup">CS</sup></a>
+</div>
+
+<!-- Dynamically show the right error panel based on URL param ?type= -->
+<div class="error-wrap">
+
+  <!-- CODE EXPIRED / INVALID -->
+  <div class="error-card" id="err-code" style="display:none;">
+    <div class="error-icon-ring danger">🚫</div>
+    <div class="error-code">Error A01</div>
+    <div class="error-title">Access code invalid or expired</div>
+    <div class="error-desc">
+      The code you entered doesn't match our records, or it has already been used.<br><br>
+      Each access code is single-use and expires once the assessment is submitted.
+    </div>
+    <div class="attempts-row" id="code-attempts">
+      <div class="attempt-dot used"></div>
+      <div class="attempt-dot"></div>
+      <div class="attempt-dot"></div>
+    </div>
+    <div class="error-actions">
+      <button class="btn btn-navy btn-lg" onclick="history.back()">← Try again</button>
+      <button class="btn btn-outline" onclick="window.location='../index.html'">Return to home</button>
+    </div>
+    <div class="error-detail">
+      <strong>Need a new code?</strong> Contact the organisation that sent your invitation — they can issue a replacement access code from their recruiter dashboard.
+    </div>
+  </div>
+
+  <!-- IDENTITY MISMATCH -->
+  <div class="error-card" id="err-identity" style="display:none;">
+    <div class="error-icon-ring danger">⛔</div>
+    <div class="error-code">Error A02</div>
+    <div class="error-title">Identity details don't match</div>
+    <div class="error-desc">
+      The details you entered don't match what we have on file for this access code.<br><br>
+      Please check your full name, email address, and the last 4 digits of your phone number.
+    </div>
+    <div class="attempts-row" id="identity-attempts">
+      <div class="attempt-dot used"></div>
+      <div class="attempt-dot used"></div>
+      <div class="attempt-dot"></div>
+    </div>
+    <div class="error-actions">
+      <button class="btn btn-navy btn-lg" onclick="history.back()">← Try again</button>
+      <a href="../index.html" class="btn btn-outline">Return to home</a>
+    </div>
+    <div class="error-detail">
+      <strong>1 attempt remaining.</strong> After 3 failed attempts your access code will be locked. Contact the organisation that invited you if you believe there's been an error.
+    </div>
+  </div>
+
+  <!-- ACCOUNT LOCKED -->
+  <div class="error-card" id="err-locked" style="display:none;">
+    <div class="error-icon-ring danger">🔒</div>
+    <div class="error-code">Error A03</div>
+    <div class="error-title">Account locked</div>
+    <div class="error-desc">
+      Too many failed attempts have been made with this access code.<br><br>
+      For security, this session has been locked and cannot be retried.
+    </div>
+    <div class="error-actions">
+      <a href="../index.html" class="btn btn-navy btn-lg">Return to home</a>
+    </div>
+    <div class="error-detail">
+      <strong>What to do next:</strong> Contact the organisation that sent your invitation and ask them to issue a new access code. Reference error code <strong>A03</strong>.
+    </div>
+  </div>
+
+  <!-- SESSION TIMEOUT -->
+  <div class="error-card" id="err-timeout" style="display:none;">
+    <div class="error-icon-ring warning">⏰</div>
+    <div class="error-code">Notice A04</div>
+    <div class="error-title">Time's up</div>
+    <div class="error-desc">
+      Your 25-minute assessment window has ended. Your answers have been automatically saved and submitted.
+    </div>
+    <div class="error-actions">
+      <a href="submitted.html" class="btn btn-navy btn-lg">View submission →</a>
+    </div>
+    <div class="error-detail">
+      <strong>What happens next:</strong> Your recruiter will be notified and will review your results. You don't need to do anything else.
+    </div>
+  </div>
+
+  <!-- INVALID LOGIN (Recruiter) -->
+  <div class="error-card" id="err-login" style="display:none;">
+    <div class="error-icon-ring danger">🔐</div>
+    <div class="error-code">Error R01</div>
+    <div class="error-title">Incorrect credentials</div>
+    <div class="error-desc">
+      The email address or password you entered is incorrect. Please check your details and try again.
+    </div>
+    <div class="attempts-row" id="login-attempts">
+      <div class="attempt-dot used"></div>
+      <div class="attempt-dot"></div>
+      <div class="attempt-dot"></div>
+    </div>
+    <div class="error-actions">
+      <button class="btn btn-navy btn-lg" onclick="history.back()">← Try again</button>
+      <a href="password-reset.html" class="btn btn-outline">Forgot password?</a>
+    </div>
+    <div class="error-detail">
+      <strong>3 attempts allowed.</strong> After 3 failed attempts your account will be temporarily locked. Contact your NovaCS administrator if you need access restored.
+    </div>
+  </div>
+
+  <!-- 404 NOT FOUND -->
+  <div class="error-card" id="err-404" style="display:none;">
+    <div class="error-icon-ring info">🌐</div>
+    <div class="error-code">Error 404</div>
+    <div class="error-title">Page not found</div>
+    <div class="error-desc">
+      The page you're looking for doesn't exist or has been moved.<br><br>
+      If you followed a link, it may be out of date.
+    </div>
+    <div class="error-actions">
+      <a href="../index.html" class="btn btn-navy btn-lg">← Back to NovaCS</a>
+    </div>
+  </div>
+
+  <!-- DEFAULT FALLBACK -->
+  <div class="error-card" id="err-default">
+    <div class="error-icon-ring danger">⚠️</div>
+    <div class="error-code">Unexpected error</div>
+    <div class="error-title">Something went wrong</div>
+    <div class="error-desc">
+      An unexpected error occurred. Please try again, or return to the home page.
+    </div>
+    <div class="error-actions">
+      <button class="btn btn-navy btn-lg" onclick="history.back()">← Go back</button>
+      <a href="../index.html" class="btn btn-outline">Return to home</a>
+    </div>
+  </div>
+
+</div><!-- /error-wrap -->
+
+<script>
+// Show the right panel based on ?type= URL param
+// Usage: error.html?type=code | identity | locked | timeout | login | 404
+const type = new URLSearchParams(window.location.search).get('type');
+const attempts = parseInt(new URLSearchParams(window.location.search).get('attempts')) || 1;
+
+const panels = ['err-code','err-identity','err-locked','err-timeout','err-login','err-404','err-default'];
+
+function show(id) {
+  panels.forEach(p => document.getElementById(p).style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+}
+
+// Set attempt dots
+function setAttempts(containerId, used, total = 3) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = Array.from({ length: total }, (_, i) =>
+    `<div class="attempt-dot ${i < used ? 'used' : ''}"></div>`
+  ).join('');
+}
+
+switch (type) {
+  case 'code':     show('err-code');     setAttempts('code-attempts', attempts);     break;
+  case 'identity': show('err-identity'); setAttempts('identity-attempts', attempts); break;
+  case 'locked':   show('err-locked');   break;
+  case 'timeout':  show('err-timeout');  break;
+  case 'login':    show('err-login');    setAttempts('login-attempts', attempts);    break;
+  case '404':      show('err-404');      break;
+  default:         show('err-default');  break;
+}
+
+// Update page title per error type
+const titles = {
+  code: 'Invalid Code', identity: 'Identity Mismatch', locked: 'Account Locked',
+  timeout: 'Time Expired', login: 'Login Failed', '404': '404 Not Found'
+};
+if (titles[type]) document.title = `NovaCS — ${titles[type]}`;
+</script>
+</body>
+</html>

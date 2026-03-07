@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCS — Candidate Profile</title>
+<link rel="stylesheet" href="../css/base.css">
+<style>
+body { background: var(--bg); }
+
+/* ── TOPBAR ── */
+.topbar { height: var(--topbar-h); background: var(--white); border-bottom: 1px solid var(--slate-200); box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: sticky; top: 0; z-index: 100; }
+.topbar-left { display: flex; align-items: center; gap: 16px; }
+.back-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--slate-600); text-decoration: none; padding: 6px 12px; border-radius: var(--r-sm); background: var(--slate-100); border: 1px solid var(--slate-200); transition: all .15s; }
+.back-btn:hover { color: var(--navy-600); border-color: var(--navy-200); text-decoration: none; }
+.topbar-divider { width: 1px; height: 20px; background: var(--slate-200); }
+
+/* ── LAYOUT ── */
+.page-wrap { max-width: 1080px; margin: 0 auto; padding: 32px 28px 80px; }
+
+/* ── PROFILE HEADER ── */
+.profile-header {
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--r-xl);
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.cand-avatar {
+  width: 64px; height: 64px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: var(--shadow);
+}
+.profile-meta { flex: 1; min-width: 200px; }
+.profile-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--navy-900);
+  margin-bottom: 4px;
+  display: flex; align-items: center; gap: 10px;
+}
+.flag-badge { font-size: 12px; color: var(--warning); font-family: 'Figtree', sans-serif; font-weight: 700; background: var(--warning-bg); border: 1px solid var(--warning-border); padding: 2px 10px; border-radius: 100px; display: inline-flex; align-items: center; gap: 4px; }
+.profile-role { font-size: 14px; color: var(--slate-600); margin-bottom: 10px; }
+.profile-tags { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.profile-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+/* Score hero */
+.score-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--navy-50);
+  border: 1px solid var(--navy-100);
+  border-radius: var(--r-lg);
+  padding: 20px 28px;
+  min-width: 140px;
+  text-align: center;
+}
+.score-hero-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.score-hero-label { font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--slate-400); margin-bottom: 8px; }
+.score-hero-rank { font-size: 12px; font-weight: 600; color: var(--slate-500); }
+
+/* ── GRID LAYOUT ── */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 780px) { .profile-grid { grid-template-columns: 1fr; } }
+
+/* ── SECTION CARD ── */
+.section-card {
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.section-card-head {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--slate-200);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-card-head h3 { font-size: 15px; font-weight: 700; }
+.section-card-body { padding: 20px 22px; }
+
+/* Category score bars */
+.cat-score { margin-bottom: 18px; }
+.cat-score:last-child { margin-bottom: 0; }
+.cat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+.cat-label { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.cat-num { font-size: 13px; font-weight: 700; }
+.cat-bar { height: 8px; background: var(--slate-100); border-radius: 100px; overflow: hidden; }
+.cat-fill { height: 100%; border-radius: 100px; transition: width .6s cubic-bezier(.4,0,.2,1); }
+.cat-weight { font-size: 10px; color: var(--slate-400); font-weight: 600; margin-left: 4px; }
+
+/* ── STAGE PIPELINE ── */
+.stage-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.stage-opt {
+  padding: 7px 16px;
+  border-radius: 100px;
+  border: 1.5px solid var(--slate-200);
+  background: var(--slate-50);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--slate-600);
+  cursor: pointer;
+  transition: all .15s;
+}
+.stage-opt:hover { border-color: var(--navy-400); color: var(--navy-600); background: var(--navy-50); }
+.stage-opt.active { background: var(--navy-700); border-color: var(--navy-700); color: #fff; }
+
+/* ── NOTES ── */
+.notes-area {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--slate-200);
+  border-radius: var(--r-sm);
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: var(--slate-900);
+  resize: vertical;
+  outline: none;
+  transition: border-color .15s;
+  background: var(--slate-50);
+}
+.notes-area:focus { border-color: var(--navy-400); background: var(--white); box-shadow: 0 0 0 3px rgba(74,127,212,.1); }
+.notes-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
+
+/* ── ACTIVITY LOG ── */
+.activity-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--slate-100);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.activity-text { font-size: 12.5px; color: var(--slate-700); line-height: 1.5; }
+.activity-time { font-size: 11px; color: var(--slate-400); margin-top: 2px; }
+
+/* ── CONTACT CARD ── */
+.contact-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--slate-100); font-size: 13px; }
+.contact-row:last-child { border-bottom: none; }
+.contact-row-icon { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; color: var(--slate-400); }
+.contact-row-val { color: var(--slate-700); font-weight: 500; }
+
+/* ── DECISION BUTTONS ── */
+.decision-row { display: flex; gap: 10px; margin-top: 16px; }
+.decision-row .btn { flex: 1; justify-content: center; }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--slate-900); color: #fff; padding: 11px 22px; border-radius: var(--r); font-size: 13px; font-weight: 600; opacity: 0; transition: all .25s; pointer-events: none; z-index: 999; white-space: nowrap; box-shadow: var(--shadow-lg); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="dashboard.html" class="back-btn">← Candidates</a>
+    <div class="topbar-divider"></div>
+    <a href="../index.html" class="nova-wordmark" style="font-size:18px;">Nova<sup class="cs-sup">CS</sup></a>
+  </div>
+  <div style="display:flex;gap:10px;">
+    <button class="btn btn-outline btn-sm" onclick="exportProfile()">↓ Export PDF</button>
+    <button class="btn btn-navy btn-sm" onclick="showToast('Email sent to candidate','ok')">✉ Send email</button>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+  <!-- PROFILE HEADER -->
+  <div class="profile-header" id="profile-header">
+    <div class="cand-avatar" id="cand-avatar"></div>
+    <div class="profile-meta">
+      <div class="profile-name" id="cand-name-el">—
+        <span class="flag-badge" id="flag-badge" style="display:none;">⚠ Tab switch flagged</span>
+      </div>
+      <div class="profile-role" id="cand-role-el">—</div>
+      <div class="profile-tags" id="profile-tags"></div>
+    </div>
+    <div class="profile-actions" id="profile-actions">
+      <div class="score-hero" id="score-hero">
+        <div class="score-hero-label">Weighted Score</div>
+        <div class="score-hero-num" id="score-num">—</div>
+        <div class="score-hero-rank" id="score-rank"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="profile-grid">
+
+    <!-- LEFT COLUMN -->
+    <div>
+
+      <!-- SCORE BREAKDOWN -->
+      <div class="section-card">
+        <div class="section-card-head">
+          <h3>Score Breakdown</h3>
+          <span class="text-muted text-sm" id="score-date">—</span>
+        </div>
+        <div class="section-card-body" id="score-breakdown">
+          <p style="color:var(--slate-400);font-size:13px;">Assessment not yet completed.</p>
+        </div>
+      </div>
+
+      <!-- STAGE PIPELINE -->
+      <div class="section-card">
+        <div class="section-card-head"><h3>Hiring Stage</h3></div>
+        <div class="section-card-body">
+          <p style="font-size:12.5px;color:var(--slate-500);margin-bottom:14px;">Select the current stage for this candidate in your pipeline.</p>
+          <div class="stage-row" id="stage-row">
+            <div class="stage-opt" onclick="setStage(this,'Screening')">Screening</div>
+            <div class="stage-opt" onclick="setStage(this,'Phone Screen')">Phone Screen</div>
+            <div class="stage-opt" onclick="setStage(this,'Interview')">Interview</div>
+            <div class="stage-opt" onclick="setStage(this,'Final Round')">Final Round</div>
+            <div class="stage-opt" onclick="setStage(this,'Offer')">Offer</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECRUITER NOTES -->
+      <div class="section-card">
+        <div class="section-card-head"><h3>Recruiter Notes</h3></div>
+        <div class="section-card-body">
+          <textarea class="notes-area" id="notes-area" placeholder="Add your notes about this candidate — interview observations, red flags, standout qualities…"></textarea>
+          <div class="notes-actions">
+            <button class="btn btn-navy btn-sm" onclick="saveNotes()">Save notes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY LOG -->
+      <div class="section-card">
+        <div class="section-card-head"><h3>Activity Log</h3></div>
+        <div class="section-card-body" id="activity-log">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div>
+
+      <!-- DECISION -->
+      <div class="section-card" style="margin-bottom:20px;">
+        <div class="section-card-head"><h3>Decision</h3></div>
+        <div class="section-card-body">
+          <p style="font-size:12.5px;color:var(--slate-500);margin-bottom:4px;">Mark this candidate as shortlisted or rejected. This appears on the dashboard and leaderboard.</p>
+          <div class="decision-row">
+            <button class="btn btn-success" id="btn-shortlist" onclick="makeDecision('shortlisted')">★ Shortlist</button>
+            <button class="btn btn-danger"  id="btn-reject"    onclick="makeDecision('rejected')">✗ Reject</button>
+          </div>
+          <div id="decision-note" style="margin-top:12px;font-size:12px;color:var(--slate-400);text-align:center;"></div>
+        </div>
+      </div>
+
+      <!-- CONTACT INFO -->
+      <div class="section-card" style="margin-bottom:20px;">
+        <div class="section-card-head"><h3>Contact Details</h3></div>
+        <div class="section-card-body">
+          <div class="contact-row"><span class="contact-row-icon">✉</span><span class="contact-row-val" id="contact-email">—</span></div>
+          <div class="contact-row"><span class="contact-row-icon">🏢</span><span class="contact-row-val" id="contact-org">—</span></div>
+          <div class="contact-row"><span class="contact-row-icon">💼</span><span class="contact-row-val" id="contact-role">—</span></div>
+          <div class="contact-row"><span class="contact-row-icon">📅</span><span class="contact-row-val" id="contact-date">—</span></div>
+          <div class="contact-row"><span class="contact-row-icon">⏱</span><span class="contact-row-val" id="contact-time">—</span></div>
+          <div class="contact-row"><span class="contact-row-icon">🔑</span><span class="contact-row-val" id="contact-code" style="font-family:monospace;letter-spacing:2px;">—</span></div>
+        </div>
+      </div>
+
+      <!-- ASSESSMENT SUMMARY -->
+      <div class="section-card">
+        <div class="section-card-head"><h3>Assessment Summary</h3></div>
+        <div class="section-card-body" id="assess-summary">
+          <div class="contact-row"><span class="contact-row-icon">❓</span><span class="contact-row-val" id="sum-answered">—</span></div>
+          <div class="contact-row"><span class="contact-row-icon">⏰</span><span class="contact-row-val" id="sum-time">—</span></div>
+          <div class="contact-row"><span class="contact-row-icon">🔒</span><span class="contact-row-val" id="sum-flag">—</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="../js/utils.js"></script>
+<script src="../js/data.js"></script>
+<script>
+// Read candidate ID from URL param — ?id=1
+const params = new URLSearchParams(window.location.search);
+const candId = parseInt(params.get('id')) || 1;
+const CAND   = getCandById(candId);
+const ORGS_MAP = { acme:'Acme Corp', nexgen:'NexGen Talent Ltd', vertex:'Vertex Consulting', clear:'ClearPath Recruitment' };
+
+const CATS = [
+  { key:'judgement',   label:'Judgement & Decision Making', icon:'⚖️',  weight:'35%' },
+  { key:'numerical',   label:'Numerical Reasoning',          icon:'🔢',  weight:'25%' },
+  { key:'verbal',      label:'Verbal & Communication',       icon:'💬',  weight:'20%' },
+  { key:'situational', label:'Situational Scenarios',        icon:'🎭',  weight:'20%' },
+];
+
+function render() {
+  if (!CAND) {
+    document.querySelector('.page-wrap').innerHTML = '<div class="card" style="text-align:center;padding:60px;"><h2>Candidate not found</h2><a href="dashboard.html" class="btn btn-navy" style="margin-top:20px;">← Back</a></div>';
+    return;
+  }
+
+  const ws = wScore(CAND.scores);
+
+  // Avatar
+  const av = document.getElementById('cand-avatar');
+  av.textContent = CAND.initials;
+  av.style.background = CAND.color;
+
+  // Name / role
+  document.getElementById('cand-name-el').childNodes[0].textContent = CAND.name + ' ';
+  if (CAND.flagged) document.getElementById('flag-badge').style.display = 'inline-flex';
+  document.getElementById('cand-role-el').textContent = CAND.role;
+  document.title = `NovaCS — ${CAND.name}`;
+
+  // Tags
+  const tags = document.getElementById('profile-tags');
+  tags.innerHTML = `
+    ${ws !== null ? `<span class="pill ${ws >= 65 ? 'pill-pass':'pill-fail'}">${ws >= 65 ? '✓ Pass':'✗ Fail'} · ${ws}%</span>` : '<span class="pill pill-pending">⏳ Pending</span>'}
+    ${CAND.decision === 'shortlisted' ? '<span class="pill pill-shortlisted">★ Shortlisted</span>' : ''}
+    ${CAND.decision === 'rejected'    ? '<span class="pill pill-rejected">✗ Rejected</span>'      : ''}
+    ${CAND.stage ? `<span class="pill pill-done">→ ${CAND.stage}</span>` : ''}
+  `;
+
+  // Score hero
+  if (ws !== null) {
+    const scoreEl = document.getElementById('score-num');
+    scoreEl.textContent = ws + '%';
+    scoreEl.style.color = scoreColor(ws);
+    const rank = rankOf(CAND.id);
+    document.getElementById('score-rank').textContent = rank ? `Ranked #${rank} overall` : '';
+  } else {
+    document.getElementById('score-num').textContent = '—';
+    document.getElementById('score-rank').textContent = 'Not yet completed';
+  }
+
+  // Score breakdown
+  if (CAND.scores) {
+    document.getElementById('score-date').textContent = `Completed ${CAND.date}`;
+    document.getElementById('score-breakdown').innerHTML = CATS.map(c => {
+      const val = CAND.scores[c.key];
+      const col = scoreColor(val);
+      return `
+        <div class="cat-score">
+          <div class="cat-header">
+            <div class="cat-label">${c.icon} ${c.label} <span class="cat-weight">${c.weight}</span></div>
+            <div class="cat-num" style="color:${col}">${val}%</div>
+          </div>
+          <div class="cat-bar"><div class="cat-fill" style="width:${val}%;background:${col}"></div></div>
+        </div>`;
+    }).join('');
+  }
+
+  // Stage
+  if (CAND.stage) {
+    document.querySelectorAll('.stage-opt').forEach(o => {
+      o.classList.toggle('active', o.textContent === CAND.stage);
+    });
+  }
+
+  // Notes
+  document.getElementById('notes-area').value = CAND.notes || '';
+
+  // Decision
+  updateDecisionUI();
+
+  // Contact
+  document.getElementById('contact-email').textContent = CAND.email;
+  document.getElementById('contact-org').textContent   = ORGS_MAP[CAND.org] || CAND.org;
+  document.getElementById('contact-role').textContent  = CAND.role;
+  document.getElementById('contact-date').textContent  = `Applied ${CAND.date}`;
+  document.getElementById('contact-time').textContent  = CAND.time ? `Completed in ${CAND.time}` : 'Not yet completed';
+  document.getElementById('contact-code').textContent  = CAND.code;
+
+  // Assessment summary
+  document.getElementById('sum-answered').textContent = CAND.answered !== null ? `${CAND.answered} of 25 questions answered` : 'Not yet attempted';
+  document.getElementById('sum-time').textContent     = CAND.time ? `${CAND.time} time taken` : '—';
+  document.getElementById('sum-flag').textContent     = CAND.flagged ? '⚠ Tab switch detected' : 'No integrity flags';
+
+  // Activity log
+  renderActivity();
+}
+
+function renderActivity() {
+  const log = document.getElementById('activity-log');
+  const items = [
+    { dot: '#0f6b3a', text: `Access code <strong>${CAND.code}</strong> issued`, time: CAND.date + ' · Code created' },
+    ...(CAND.status === 'completed' || CAND.status === 'pending' ? [{ dot: '#2452a0', text: 'Candidate verified identity and began assessment', time: CAND.date }] : []),
+    ...(CAND.status === 'completed' ? [{ dot: '#0f6b3a', text: 'Assessment submitted — all 4 sections completed', time: CAND.date + ' · ' + (CAND.time || '') }] : []),
+    ...(CAND.flagged ? [{ dot: '#854d0e', text: '⚠ Tab switch detected during assessment', time: CAND.date }] : []),
+    ...(CAND.decision !== 'none' ? [{ dot: CAND.decision === 'shortlisted' ? '#0f6b3a' : '#991b1b', text: `Marked as <strong>${CAND.decision}</strong> by recruiter`, time: 'Recent' }] : []),
+    ...(CAND.notes ? [{ dot: '#2452a0', text: 'Recruiter notes saved', time: 'Recent' }] : []),
+  ];
+  log.innerHTML = items.reverse().map(i => `
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${i.dot}"></div>
+      <div>
+        <div class="activity-text">${i.text}</div>
+        <div class="activity-time">${i.time}</div>
+      </div>
+    </div>`).join('');
+}
+
+function setStage(el, stage) {
+  document.querySelectorAll('.stage-opt').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  updateCand(CAND.id, { stage });
+  CAND.stage = stage;
+  showToast(`Stage updated: ${stage}`);
+  renderActivity();
+}
+
+function saveNotes() {
+  const notes = document.getElementById('notes-area').value;
+  updateCand(CAND.id, { notes });
+  CAND.notes = notes;
+  showToast('Notes saved');
+  renderActivity();
+}
+
+function makeDecision(decision) {
+  updateCand(CAND.id, { decision });
+  CAND.decision = decision;
+  updateDecisionUI();
+  render();
+  showToast(decision === 'shortlisted' ? '★ Candidate shortlisted' : '✗ Candidate rejected',
+            decision === 'shortlisted' ? 'ok' : 'err');
+}
+
+function updateDecisionUI() {
+  const note = document.getElementById('decision-note');
+  const sl   = document.getElementById('btn-shortlist');
+  const rj   = document.getElementById('btn-reject');
+  if (CAND.decision === 'shortlisted') {
+    note.textContent = '★ Currently shortlisted';
+    note.style.color = 'var(--success)';
+    sl.textContent = '★ Shortlisted'; sl.style.opacity = '1';
+    rj.style.opacity = '.5';
+  } else if (CAND.decision === 'rejected') {
+    note.textContent = '✗ Currently rejected';
+    note.style.color = 'var(--danger)';
+    rj.textContent = '✗ Rejected'; rj.style.opacity = '1';
+    sl.style.opacity = '.5';
+  } else {
+    note.textContent = 'No decision made yet';
+  }
+}
+
+function exportProfile() { showToast('PDF export — connect to backend', 'warn'); }
+
+render();
+</script>
+</body>
+</html>

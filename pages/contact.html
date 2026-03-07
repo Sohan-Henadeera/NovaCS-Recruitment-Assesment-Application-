@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCS — Contact & Demo Request</title>
+<link rel="stylesheet" href="../css/base.css">
+<style>
+body { background: var(--bg); }
+
+/* ── NAV ── */
+.nav {
+  height: 58px;
+  background: var(--white);
+  border-bottom: 1px solid var(--slate-200);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-right { display: flex; align-items: center; gap: 14px; }
+.nav-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--slate-600);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.nav-link:hover { color: var(--navy-600); text-decoration: none; }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 100%);
+  padding: 72px 40px 64px;
+  text-align: center;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 100px;
+  padding: 5px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 14px;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+.hero h1 em { font-style: italic; color: var(--navy-400); }
+.hero-sub {
+  font-size: 16px;
+  color: rgba(255,255,255,0.6);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ── MAIN LAYOUT ── */
+.page-body {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 56px 32px 80px;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 48px;
+  align-items: start;
+}
+@media (max-width: 840px) {
+  .page-body { grid-template-columns: 1fr; }
+  .info-col { order: -1; }
+}
+
+/* ── FORM CARD ── */
+.form-card {
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--r-xl);
+  padding: 36px;
+  box-shadow: var(--shadow-md);
+}
+.form-card h2 {
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+.form-card .form-sub {
+  font-size: 13px;
+  color: var(--slate-500);
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+select.field-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+textarea.field-input { resize: vertical; min-height: 100px; }
+
+.form-divider {
+  border: none;
+  border-top: 1px solid var(--slate-200);
+  margin: 24px 0;
+}
+
+.submit-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 14px;
+  font-size: 15px;
+  border-radius: var(--r);
+  margin-top: 4px;
+}
+
+.form-privacy {
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--slate-400);
+  margin-top: 14px;
+  line-height: 1.6;
+}
+
+/* ── INFO COLUMN ── */
+.info-col {}
+
+.section-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--navy-500);
+  margin-bottom: 16px;
+}
+
+.info-block {
+  margin-bottom: 36px;
+}
+.info-block h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: var(--navy-900);
+}
+.info-block p {
+  font-size: 14px;
+  color: var(--slate-600);
+  line-height: 1.7;
+}
+
+/* What's included */
+.includes-list { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.include-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-xs);
+}
+.include-icon {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  background: var(--navy-50);
+  border: 1px solid var(--navy-100);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.include-text h4 { font-size: 13px; font-weight: 700; margin-bottom: 2px; font-family: 'Figtree', sans-serif; }
+.include-text p  { font-size: 12px; color: var(--slate-500); line-height: 1.5; }
+
+/* Process steps */
+.steps { display: flex; flex-direction: column; gap: 0; margin-top: 20px; }
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  position: relative;
+  padding-bottom: 20px;
+}
+.step:last-child { padding-bottom: 0; }
+.step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 36px;
+  width: 2px;
+  height: calc(100% - 20px);
+  background: var(--slate-200);
+}
+.step-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--navy-700);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.step-body h4 { font-size: 13px; font-weight: 700; margin-bottom: 2px; font-family: 'Figtree', sans-serif; }
+.step-body p  { font-size: 12px; color: var(--slate-500); line-height: 1.5; }
+
+/* ── CONFIRMATION STATE ── */
+.confirm-wrap {
+  text-align: center;
+  padding: 48px 32px;
+  display: none;
+}
+.confirm-wrap.show { display: block; }
+.confirm-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--success-bg);
+  border: 2px solid var(--success-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 20px;
+}
+.confirm-wrap h2 { font-size: 24px; margin-bottom: 10px; }
+.confirm-wrap p  { font-size: 14px; color: var(--slate-600); line-height: 1.7; max-width: 360px; margin: 0 auto 24px; }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--slate-900); color: #fff; padding: 11px 22px; border-radius: var(--r); font-size: 13px; font-weight: 600; opacity: 0; transition: all .25s; pointer-events: none; z-index: 999; white-space: nowrap; box-shadow: var(--shadow-lg); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="../index.html" class="nova-wordmark">Nova<sup class="cs-sup">CS</sup></a>
+  <div class="nav-right">
+    <a href="../index.html" class="nav-link">Back to platform</a>
+    <a href="../index.html" class="btn btn-navy btn-sm">Sign in</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">📞 Get in touch</div>
+  <h1>Let's talk about <em>your</em> hiring needs</h1>
+  <p class="hero-sub">Tell us about your organisation and we'll come back to you within 24 hours with a tailored setup and quote.</p>
+</div>
+
+<!-- PAGE BODY -->
+<div class="page-body">
+
+  <!-- FORM -->
+  <div>
+    <!-- Form card -->
+    <div class="form-card" id="form-card">
+      <h2>Request a demo</h2>
+      <p class="form-sub">Fill in the form below and a member of the NovaCS team will be in touch to walk you through the platform and discuss your setup.</p>
+
+      <div class="form-row">
+        <div class="field">
+          <label class="field-label">First name *</label>
+          <input class="field-input" id="f-fname" type="text" placeholder="Jordan"/>
+        </div>
+        <div class="field">
+          <label class="field-label">Last name *</label>
+          <input class="field-input" id="f-lname" type="text" placeholder="Smith"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Work email *</label>
+        <input class="field-input" id="f-email" type="email" placeholder="jordan@yourcompany.com"/>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label class="field-label">Company name *</label>
+          <input class="field-input" id="f-company" type="text" placeholder="Acme Recruitment"/>
+        </div>
+        <div class="field">
+          <label class="field-label">Company size *</label>
+          <select class="field-input" id="f-size">
+            <option value="">Select…</option>
+            <option>1–10 employees</option>
+            <option>11–50 employees</option>
+            <option>51–200 employees</option>
+            <option>201–500 employees</option>
+            <option>500+ employees</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Industry / sector *</label>
+        <select class="field-input" id="f-industry">
+          <option value="">Select…</option>
+          <option>Recruitment / Staffing agency</option>
+          <option>Technology</option>
+          <option>Finance & Professional services</option>
+          <option>Healthcare</option>
+          <option>Retail & Hospitality</option>
+          <option>Education</option>
+          <option>Government & Public sector</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <hr class="form-divider">
+
+      <div class="field">
+        <label class="field-label">Estimated candidates per month</label>
+        <select class="field-input" id="f-volume">
+          <option value="">Select…</option>
+          <option>Fewer than 20</option>
+          <option>20–50</option>
+          <option>51–100</option>
+          <option>101–250</option>
+          <option>250+</option>
+          <option>Not sure yet</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Which features are most important to you?</label>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-top:4px;" id="f-features">
+          <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--slate-700);cursor:pointer;">
+            <input type="checkbox" value="Candidate assessment & scoring" style="accent-color:var(--navy-600);width:15px;height:15px;"> Candidate assessment & scoring
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--slate-700);cursor:pointer;">
+            <input type="checkbox" value="Custom branding per organisation" style="accent-color:var(--navy-600);width:15px;height:15px;"> Custom branding per organisation
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--slate-700);cursor:pointer;">
+            <input type="checkbox" value="Analytics & reporting" style="accent-color:var(--navy-600);width:15px;height:15px;"> Analytics & reporting
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--slate-700);cursor:pointer;">
+            <input type="checkbox" value="Custom question bank" style="accent-color:var(--navy-600);width:15px;height:15px;"> Custom question bank
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--slate-700);cursor:pointer;">
+            <input type="checkbox" value="Batch invite manager" style="accent-color:var(--navy-600);width:15px;height:15px;"> Batch invite manager
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--slate-700);cursor:pointer;">
+            <input type="checkbox" value="Multi-org / agency management" style="accent-color:var(--navy-600);width:15px;height:15px;"> Multi-org / agency management
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Anything else you'd like us to know?</label>
+        <textarea class="field-input" id="f-notes" placeholder="Tell us about your current process, any specific requirements, or questions you have…"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Preferred contact method</label>
+        <select class="field-input" id="f-contact">
+          <option>Email</option>
+          <option>Phone call</option>
+          <option>Video call (Teams / Zoom)</option>
+        </select>
+      </div>
+
+      <div id="form-err" class="field-error" style="margin-bottom:12px;">Please fill in all required fields marked with *</div>
+
+      <button class="btn btn-navy submit-btn" onclick="submitForm()">Send Request →</button>
+      <p class="form-privacy">🔒 We'll never share your details. By submitting you agree to be contacted by the NovaCS team about this enquiry only.</p>
+    </div>
+
+    <!-- Confirmation -->
+    <div class="confirm-wrap card" id="confirm-card">
+      <div class="confirm-icon">✅</div>
+      <h2>We've got your request</h2>
+      <p>Thanks <span id="confirm-name">there</span> — a member of the NovaCS team will be in touch at <strong id="confirm-email"></strong> within 24 hours to arrange a demo and discuss your setup.</p>
+      <div style="background:var(--navy-50);border:1px solid var(--navy-100);border-radius:var(--r);padding:16px 20px;text-align:left;margin-bottom:24px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--slate-400);margin-bottom:10px;">Your submission summary</div>
+        <div id="confirm-summary" style="font-size:13px;color:var(--slate-700);line-height:1.8;"></div>
+      </div>
+      <a href="../index.html" class="btn btn-outline">← Back to platform</a>
+    </div>
+  </div>
+
+  <!-- INFO COLUMN -->
+  <div class="info-col">
+    <div class="info-block">
+      <div class="section-label">What's included</div>
+      <div class="includes-list">
+        <div class="include-item">
+          <div class="include-icon">🎯</div>
+          <div class="include-text">
+            <h4>Fully managed onboarding</h4>
+            <p>We set up your organisation, configure your assessment, and train your team — no technical lift required.</p>
+          </div>
+        </div>
+        <div class="include-item">
+          <div class="include-icon">⚖️</div>
+          <div class="include-text">
+            <h4>Custom scoring & weighting</h4>
+            <p>Tailor category weights to reflect what actually matters for your roles and hiring criteria.</p>
+          </div>
+        </div>
+        <div class="include-item">
+          <div class="include-icon">🎨</div>
+          <div class="include-text">
+            <h4>White-label branding</h4>
+            <p>Your logo, colours and organisation name throughout — candidates see your brand, not ours.</p>
+          </div>
+        </div>
+        <div class="include-item">
+          <div class="include-icon">📊</div>
+          <div class="include-text">
+            <h4>Recruiter dashboard & analytics</h4>
+            <p>Full candidate management, leaderboards, pass/fail thresholds and reporting in one place.</p>
+          </div>
+        </div>
+        <div class="include-item">
+          <div class="include-icon">🛡️</div>
+          <div class="include-text">
+            <h4>Secure & bias-reducing</h4>
+            <p>One-use session codes, identity verification, and tab-switch detection — fair for every candidate.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-block" style="margin-top:40px;">
+      <div class="section-label">How it works</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>You submit this form</h4>
+            <p>Tell us about your organisation and what you're looking for.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>We reach out within 24 hours</h4>
+            <p>A member of the team contacts you to learn more and schedule a demo.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h4>Live demo & tailored quote</h4>
+            <p>We walk you through the platform live and provide a custom quote based on your needs.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h4>We onboard your organisation</h4>
+            <p>Once agreed, we configure your account and you're ready to start assessing candidates.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="../js/utils.js"></script>
+<script>
+function submitForm() {
+  const fname   = document.getElementById('f-fname').value.trim();
+  const lname   = document.getElementById('f-lname').value.trim();
+  const email   = document.getElementById('f-email').value.trim();
+  const company = document.getElementById('f-company').value.trim();
+  const size    = document.getElementById('f-size').value;
+  const industry= document.getElementById('f-industry').value;
+  const errEl   = document.getElementById('form-err');
+
+  if (!fname || !lname || !email || !company || !size || !industry) {
+    errEl.classList.add('show');
+    errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  errEl.classList.remove('show');
+
+  // Collect features
+  const features = [...document.querySelectorAll('#f-features input:checked')].map(c => c.value);
+  const volume   = document.getElementById('f-volume').value;
+  const contact  = document.getElementById('f-contact').value;
+  const notes    = document.getElementById('f-notes').value.trim();
+
+  // Show confirmation
+  document.getElementById('confirm-name').textContent  = fname;
+  document.getElementById('confirm-email').textContent = email;
+  document.getElementById('confirm-summary').innerHTML = `
+    <div><strong>Company:</strong> ${company} (${size})</div>
+    <div><strong>Industry:</strong> ${industry}</div>
+    ${volume ? `<div><strong>Volume:</strong> ${volume} candidates/month</div>` : ''}
+    ${features.length ? `<div><strong>Priorities:</strong> ${features.join(', ')}</div>` : ''}
+    <div><strong>Contact via:</strong> ${contact}</div>
+  `;
+
+  document.getElementById('form-card').style.display = 'none';
+  document.getElementById('confirm-card').classList.add('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
