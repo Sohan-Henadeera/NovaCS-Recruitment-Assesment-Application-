@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCS — Client Systems & Digital Solutions</title>
+<meta name="description" content="NovaCS is a web-based recruitment assessment platform. Issue access codes, assess candidates at scale, and make smarter hiring decisions with weighted scoring and a full recruiter dashboard.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-900:#0d1b2a;--navy-800:#1a2e45;--navy-700:#1e3a5f;--navy-600:#2452a0;
+  --navy-500:#2d64c8;--navy-400:#4a7fd4;--navy-200:#9bbce8;--navy-100:#dce8f7;--navy-50:#eef4fc;
+  --green-800:#0a5a30;--green-700:#0f6b3a;--green-600:#158a4a;--green-100:#a3d4b8;--green-50:#e6f4ed;
+  --slate-900:#1c2333;--slate-700:#334155;--slate-600:#475569;--slate-500:#64748b;
+  --slate-400:#94a3b8;--slate-300:#cbd5e1;--slate-200:#e2e8f0;--slate-100:#f1f5f9;--slate-50:#f8fafc;
+  --white:#fff;--cream:#f7f4ef;
+  --r-sm:8px;--r:12px;--r-lg:16px;--r-xl:22px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Figtree',sans-serif;background:var(--white);color:var(--slate-900);overflow-x:hidden;}
+
+/* ── NAV ── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 52px;height:68px;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--slate-200);
+  transition:box-shadow .3s;
+}
+.nav.scrolled{box-shadow:0 4px 24px rgba(13,27,42,.09);}
+.nav-logo{display:flex;align-items:baseline;text-decoration:none;gap:0;}
+.nav-logo-nova{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:var(--slate-900);letter-spacing:-.3px;}
+.nav-logo-cs{font-family:'Figtree',sans-serif;font-size:11px;font-weight:700;color:var(--navy-500);vertical-align:super;margin-left:2px;}
+.nav-sub{font-size:11px;color:var(--slate-400);margin-left:10px;font-weight:400;letter-spacing:.2px;}
+.nav-links{display:flex;align-items:center;gap:24px;}
+.nav-link{font-size:13.5px;font-weight:500;color:var(--slate-500);text-decoration:none;transition:color .18s;}
+.nav-link:hover{color:var(--slate-900);}
+.nav-link.active{color:var(--slate-900);font-weight:600;}
+.nav-ctas{display:flex;align-items:center;gap:10px;}
+.btn-nav-ghost{padding:8px 18px;border-radius:var(--r-sm);font-size:13px;font-weight:600;color:var(--navy-700);background:none;border:1.5px solid var(--slate-200);cursor:pointer;text-decoration:none;transition:all .18s;font-family:'Figtree',sans-serif;}
+.btn-nav-ghost:hover{border-color:var(--navy-400);color:var(--navy-600);background:var(--navy-50);}
+.btn-nav-solid{padding:8px 20px;border-radius:var(--r-sm);font-size:13px;font-weight:700;color:#fff;background:var(--navy-700);border:none;cursor:pointer;text-decoration:none;transition:all .18s;font-family:'Figtree',sans-serif;box-shadow:0 2px 8px rgba(30,58,95,.22);}
+.btn-nav-solid:hover{background:var(--navy-800);transform:translateY(-1px);}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:120px 48px 80px;background:var(--cream);position:relative;overflow:hidden;text-align:center;
+}
+.hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--slate-300) 1px,transparent 1px),linear-gradient(90deg,var(--slate-300) 1px,transparent 1px);background-size:56px 56px;opacity:.25;pointer-events:none;}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 75% 65% at 50% 42%,var(--cream) 28%,transparent 100%);pointer-events:none;}
+.hero-inner{position:relative;z-index:2;max-width:780px;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--navy-50);border:1px solid var(--navy-100);border-radius:100px;padding:5px 16px;font-size:11.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--navy-600);margin-bottom:30px;animation:fadeUp .55s ease both;}
+.badge-pulse{width:6px;height:6px;border-radius:50%;background:var(--navy-500);animation:badgePulse 2s infinite;}
+@keyframes badgePulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.75);}}
+.hero-h1{font-family:'Playfair Display',serif;font-size:clamp(38px,5.5vw,66px);font-weight:700;color:var(--slate-900);line-height:1.08;letter-spacing:-.04em;margin-bottom:22px;animation:fadeUp .55s ease .1s both;}
+.hero-h1 em{font-style:italic;color:var(--navy-600);}
+.hero-p{font-size:clamp(15px,1.8vw,18px);color:var(--slate-500);line-height:1.8;max-width:570px;margin:0 auto 42px;animation:fadeUp .55s ease .2s both;}
+.hero-ctas{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;animation:fadeUp .55s ease .3s both;}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 30px;border-radius:var(--r-sm);font-size:15px;font-weight:700;color:#fff;background:var(--navy-700);border:none;cursor:pointer;text-decoration:none;transition:all .22s;box-shadow:0 4px 18px rgba(30,58,95,.3);font-family:'Figtree',sans-serif;}
+.btn-primary:hover{background:var(--navy-800);transform:translateY(-2px);box-shadow:0 8px 28px rgba(30,58,95,.38);}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:var(--r-sm);font-size:15px;font-weight:600;color:var(--slate-700);background:var(--white);border:1.5px solid var(--slate-300);cursor:pointer;text-decoration:none;transition:all .22s;font-family:'Figtree',sans-serif;}
+.btn-secondary:hover{border-color:var(--navy-400);color:var(--navy-600);transform:translateY(-2px);}
+.hero-trust{display:flex;align-items:center;justify-content:center;gap:20px;margin-top:44px;animation:fadeUp .55s ease .45s both;flex-wrap:wrap;}
+.trust-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--slate-400);font-weight:500;}
+.trust-dot{width:4px;height:4px;border-radius:50%;background:var(--slate-300);}
+.hero-scroll{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:2;animation:fadeUp .55s ease .6s both;}
+.scroll-label{font-size:10.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--slate-400);}
+.scroll-chevron{width:20px;height:20px;border-right:2px solid var(--slate-300);border-bottom:2px solid var(--slate-300);transform:rotate(45deg);animation:bounce 1.6s ease infinite;}
+@keyframes bounce{0%,100%{transform:rotate(45deg) translate(0,0);}50%{transform:rotate(45deg) translate(3px,3px);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+
+/* ── SECTIONS ── */
+.section{padding:96px 52px;}
+.section-inner{max-width:1100px;margin:0 auto;}
+.section-eyebrow{font-size:10.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy-500);margin-bottom:12px;}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(28px,3.5vw,42px);font-weight:700;color:var(--slate-900);line-height:1.14;letter-spacing:-.03em;margin-bottom:16px;}
+.section-title em{font-style:italic;color:var(--navy-600);}
+.section-sub{font-size:16px;color:var(--slate-500);line-height:1.8;max-width:540px;}
+
+/* ── PORTALS ── */
+#portals{background:var(--white);}
+.portals-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:52px;}
+.portal-card{border-radius:var(--r-xl);overflow:hidden;border:1.5px solid var(--slate-200);display:flex;flex-direction:column;text-decoration:none;transition:transform .22s,box-shadow .22s,border-color .22s;background:var(--white);}
+.portal-card:hover{transform:translateY(-5px);box-shadow:0 24px 64px rgba(13,27,42,.1);border-color:transparent;}
+.portal-accent{height:4px;flex-shrink:0;}
+.acc-navy{background:linear-gradient(90deg,var(--navy-900),var(--navy-500),var(--navy-400));}
+.acc-green{background:linear-gradient(90deg,var(--green-700),var(--green-600),#4abe8a);}
+.portal-body{padding:32px 32px 24px;flex:1;}
+.portal-icon{width:54px;height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px;}
+.pi-navy{background:var(--navy-50);border:1px solid var(--navy-100);}
+.pi-green{background:var(--green-50);border:1px solid var(--green-100);}
+.portal-tag{font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.pt-navy{color:var(--navy-600);}
+.pt-green{color:var(--green-700);}
+.portal-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--slate-900);margin-bottom:10px;}
+.portal-desc{font-size:13.5px;color:var(--slate-500);line-height:1.75;margin-bottom:20px;}
+.portal-feats{display:flex;flex-direction:column;gap:8px;margin-bottom:28px;}
+.portal-feat{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--slate-600);line-height:1.5;}
+.feat-tick{width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px;}
+.ft-navy{background:var(--navy-600);}
+.ft-green{background:var(--green-600);}
+.portal-cta{margin:0 32px 28px;padding:13px 18px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:space-between;font-family:'Figtree',sans-serif;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .18s;text-decoration:none;}
+.pc-navy{background:var(--navy-700);color:#fff;box-shadow:0 4px 14px rgba(30,58,95,.28);}
+.portal-card:hover .pc-navy{background:var(--navy-800);}
+.pc-green{background:var(--green-700);color:#fff;box-shadow:0 4px 14px rgba(15,107,58,.28);}
+.portal-card:hover .pc-green{background:var(--green-800);}
+
+/* ── STATS ── */
+#stats{background:var(--navy-900);position:relative;overflow:hidden;}
+#stats::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(74,127,212,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(74,127,212,.05) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;}
+#stats::after{content:'';position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(36,82,160,.1) 0%,transparent 70%);top:-250px;right:-150px;pointer-events:none;}
+.stats-head{position:relative;z-index:2;margin-bottom:56px;}
+.stats-head .section-eyebrow{color:var(--navy-400);}
+.stats-head .section-title{color:var(--white);}
+.stats-head .section-title em{color:var(--navy-400);}
+.stats-head .section-sub{color:rgba(255,255,255,.42);}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;position:relative;z-index:2;}
+.stat-cell{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:36px 28px;transition:background .2s;}
+.stat-cell:hover{background:rgba(255,255,255,.08);}
+.stat-cell:first-child{border-radius:var(--r-lg) 0 0 var(--r-lg);}
+.stat-cell:last-child{border-radius:0 var(--r-lg) var(--r-lg) 0;}
+.stat-num{font-family:'Playfair Display',serif;font-size:50px;font-weight:700;color:var(--white);line-height:1;margin-bottom:8px;letter-spacing:-.03em;}
+.stat-num span{font-size:26px;color:var(--navy-400);}
+.stat-lbl{font-size:13px;font-weight:600;color:rgba(255,255,255,.48);line-height:1.5;}
+.stat-note{font-size:11.5px;color:rgba(255,255,255,.22);margin-top:5px;}
+
+/* ── HOW IT WORKS ── */
+#how{background:var(--slate-50);}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:52px;}
+.how-step{background:var(--white);border:1.5px solid var(--slate-200);border-radius:var(--r-lg);padding:28px;position:relative;transition:all .22s;}
+.how-step:hover{border-color:var(--navy-200);box-shadow:0 8px 32px rgba(13,27,42,.07);transform:translateY(-3px);}
+.how-num{font-family:'Playfair Display',serif;font-size:48px;font-weight:700;color:var(--slate-100);line-height:1;position:absolute;top:16px;right:20px;letter-spacing:-.04em;}
+.how-icon{font-size:26px;margin-bottom:14px;}
+.how-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--slate-900);margin-bottom:8px;}
+.how-desc{font-size:13px;color:var(--slate-500);line-height:1.7;}
+.how-arrow{display:flex;justify-content:center;margin-top:48px;gap:16px;align-items:center;}
+.how-arrow-line{height:2px;flex:1;background:linear-gradient(90deg,var(--slate-200),var(--navy-200),var(--slate-200));}
+.how-arrow-cta{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;border-radius:var(--r-sm);background:var(--navy-700);color:#fff;font-size:13.5px;font-weight:700;text-decoration:none;transition:all .2s;font-family:'Figtree',sans-serif;box-shadow:0 4px 14px rgba(30,58,95,.25);}
+.how-arrow-cta:hover{background:var(--navy-800);transform:translateY(-1px);}
+
+/* ── FEATURES ── */
+#features{background:var(--white);}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:52px;}
+.feat-card{background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-lg);padding:26px;transition:all .22s;}
+.feat-card:hover{background:var(--white);border-color:var(--navy-200);box-shadow:0 8px 32px rgba(13,27,42,.07);transform:translateY(-3px);}
+.feat-card-icon{font-size:24px;margin-bottom:14px;}
+.feat-card-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--slate-900);margin-bottom:8px;}
+.feat-card-desc{font-size:13px;color:var(--slate-500);line-height:1.7;}
+.feat-pill{display:inline-block;margin-top:14px;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 10px;border-radius:100px;}
+.pill-live{background:var(--navy-50);color:var(--navy-600);border:1px solid var(--navy-100);}
+.pill-soon{background:var(--slate-100);color:var(--slate-500);border:1px solid var(--slate-200);}
+
+/* ── PREVIEW ── */
+#preview{background:var(--slate-50);}
+.preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:52px;}
+.preview-shot{border-radius:var(--r-lg);overflow:hidden;border:1.5px solid var(--slate-200);background:var(--white);aspect-ratio:16/10;position:relative;display:flex;align-items:center;justify-content:center;transition:all .22s;}
+.preview-shot:hover{border-color:var(--navy-200);box-shadow:0 12px 40px rgba(13,27,42,.1);transform:translateY(-3px);}
+.preview-shot-inner{width:100%;height:100%;padding:14px;}
+.preview-wide{grid-column:1/-1;aspect-ratio:21/9;}
+.preview-lbl{position:absolute;bottom:12px;left:14px;background:rgba(255,255,255,.95);border:1px solid var(--slate-200);border-radius:var(--r-sm);padding:5px 12px;font-size:12px;font-weight:700;color:var(--slate-700);backdrop-filter:blur(8px);}
+/* Mock dashboard */
+.mock-dash{display:flex;height:100%;gap:9px;}
+.mock-sb{width:56px;background:var(--slate-50);border-radius:var(--r-sm);padding:9px 7px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--slate-200);}
+.mock-sb-logo{width:26px;height:26px;border-radius:6px;background:var(--navy-700);margin-bottom:6px;}
+.m-line{height:5px;border-radius:2px;background:var(--slate-200);}
+.m-line.on{background:var(--navy-500);}
+.m-line.w5{width:50%}.m-line.w6{width:60%}.m-line.w7{width:70%}.m-line.w8{width:80%}
+.mock-main{flex:1;display:flex;flex-direction:column;gap:7px;}
+.mock-topbar{height:26px;background:var(--white);border-radius:var(--r-sm);border:1px solid var(--slate-200);display:flex;align-items:center;padding:0 9px;gap:6px;}
+.mock-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.mock-card{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-sm);padding:7px;}
+.mock-card-n{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;}
+.mock-card-b{height:4px;border-radius:2px;background:var(--slate-200);margin-top:3px;width:55%;}
+.mock-tbl{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-sm);flex:1;padding:7px;}
+.mock-row{display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid var(--slate-100);}
+.mock-row:last-child{border-bottom:none;}
+.mock-av{width:13px;height:13px;border-radius:50%;flex-shrink:0;}
+.mock-bdg{height:13px;width:26px;border-radius:100px;flex-shrink:0;}
+/* Mock assess */
+.mock-assess{display:flex;flex-direction:column;height:100%;gap:7px;}
+.mock-strip{height:26px;background:var(--white);border-radius:var(--r-sm);border:1px solid var(--slate-200);display:flex;align-items:center;padding:0 9px;gap:6px;}
+.mock-pg{flex:1;height:4px;border-radius:2px;background:var(--slate-200);overflow:hidden;}
+.mock-pg-f{height:100%;width:48%;background:linear-gradient(90deg,var(--green-700),var(--green-600));border-radius:2px;}
+.mock-timer-txt{font-size:9px;font-weight:700;color:var(--slate-500);font-family:'Playfair Display',serif;white-space:nowrap;}
+.mock-qblock{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-sm);padding:9px;flex:1;}
+.mock-opts{display:flex;flex-direction:column;gap:4px;margin-top:8px;}
+.mock-opt{display:flex;align-items:center;gap:5px;padding:5px 7px;border-radius:5px;border:1px solid var(--slate-200);background:var(--slate-50);}
+.mock-opt.s{border-color:var(--green-600);background:var(--green-50);}
+.mock-ol{width:13px;height:13px;border-radius:3px;background:var(--slate-200);flex-shrink:0;font-size:6px;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--slate-500);}
+.mock-opt.s .mock-ol{background:var(--green-600);color:#fff;}
+/* Mock profile */
+.mock-prof{display:flex;height:100%;gap:9px;}
+.mock-pl{width:130px;background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-sm);padding:11px;display:flex;flex-direction:column;align-items:center;gap:7px;}
+.mock-pav{width:36px;height:36px;border-radius:50%;background:var(--navy-200);}
+.mock-ring{width:52px;height:52px;border-radius:50%;border:3px solid var(--navy-100);display:flex;align-items:center;justify-content:center;position:relative;}
+.mock-ring::before{content:'';position:absolute;inset:-3px;border-radius:50%;border:3px solid transparent;border-top-color:var(--navy-600);border-right-color:var(--navy-500);}
+.mock-ring-n{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--navy-700);}
+.mock-pr{flex:1;display:flex;flex-direction:column;gap:7px;}
+.mock-pr-top{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.mock-mc{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-sm);padding:7px;}
+.mock-mb{height:4px;border-radius:2px;background:var(--slate-200);overflow:hidden;margin-top:5px;}
+.mock-mf{height:100%;border-radius:2px;}
+.mock-pr-bot{flex:1;background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-sm);padding:9px;display:flex;flex-direction:column;gap:5px;}
+.mock-pr-row{display:flex;gap:5px;align-items:center;}
+
+/* ── COMING ── */
+#coming{background:var(--cream);position:relative;overflow:hidden;}
+#coming::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--slate-300) 1px,transparent 1px),linear-gradient(90deg,var(--slate-300) 1px,transparent 1px);background-size:56px 56px;opacity:.22;pointer-events:none;}
+.coming-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:52px;position:relative;z-index:2;}
+.coming-card{background:var(--white);border:1.5px solid var(--slate-200);border-radius:var(--r-lg);padding:26px;display:flex;gap:16px;}
+.coming-icon{width:44px;height:44px;border-radius:12px;background:var(--slate-100);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.coming-title{font-weight:700;font-size:14.5px;color:var(--slate-800);margin-bottom:5px;}
+.coming-desc{font-size:13px;color:var(--slate-500);line-height:1.65;}
+.coming-pill{display:inline-block;margin-top:10px;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 10px;border-radius:100px;background:var(--slate-100);color:var(--slate-500);border:1px solid var(--slate-200);}
+
+/* ── CTA ── */
+#cta{background:var(--navy-800);padding:88px 52px;text-align:center;position:relative;overflow:hidden;}
+#cta::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(74,127,212,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(74,127,212,.06) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;}
+.cta-inner{position:relative;z-index:2;max-width:620px;margin:0 auto;}
+.cta-h{font-family:'Playfair Display',serif;font-size:clamp(26px,3.8vw,42px);font-weight:700;color:var(--white);margin-bottom:14px;letter-spacing:-.03em;line-height:1.15;}
+.cta-h em{font-style:italic;color:var(--navy-400);}
+.cta-p{font-size:16px;color:rgba(255,255,255,.42);line-height:1.75;margin-bottom:36px;}
+.cta-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;}
+.btn-cta-w{padding:13px 30px;border-radius:var(--r-sm);font-size:14.5px;font-weight:700;color:var(--navy-800);background:var(--white);border:none;cursor:pointer;text-decoration:none;transition:all .2s;font-family:'Figtree',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.22);}
+.btn-cta-w:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.btn-cta-o{padding:13px 26px;border-radius:var(--r-sm);font-size:14.5px;font-weight:600;color:rgba(255,255,255,.78);background:none;border:1.5px solid rgba(255,255,255,.22);cursor:pointer;text-decoration:none;transition:all .2s;font-family:'Figtree',sans-serif;}
+.btn-cta-o:hover{border-color:rgba(255,255,255,.5);color:#fff;transform:translateY(-2px);}
+
+/* ── FOOTER ── */
+footer{background:var(--navy-900);padding:52px 52px 32px;}
+.footer-wrap{max-width:1100px;margin:0 auto;}
+.footer-top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:36px;border-bottom:1px solid rgba(255,255,255,.07);gap:40px;flex-wrap:wrap;}
+.footer-brand-mark{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:rgba(255,255,255,.9);}
+.footer-brand-mark sup{font-family:'Figtree',sans-serif;font-size:11px;font-weight:700;color:rgba(160,185,230,.9);vertical-align:super;margin-left:2px;}
+.footer-tagline{font-size:12px;color:rgba(255,255,255,.28);margin-top:6px;letter-spacing:.4px;}
+.footer-desc{font-size:13px;color:rgba(255,255,255,.32);margin-top:10px;max-width:240px;line-height:1.7;}
+.footer-cols{display:flex;gap:52px;flex-wrap:wrap;}
+.footer-col-h{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:14px;}
+.footer-col-links{display:flex;flex-direction:column;gap:10px;}
+.footer-a{font-size:13px;color:rgba(255,255,255,.42);text-decoration:none;transition:color .18s;}
+.footer-a:hover{color:rgba(255,255,255,.85);}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;font-size:12px;color:rgba(255,255,255,.2);flex-wrap:wrap;gap:8px;}
+.footer-bottom a{color:rgba(255,255,255,.28);text-decoration:none;transition:color .18s;}
+.footer-bottom a:hover{color:rgba(255,255,255,.6);}
+
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:none;}
+.rd1{transition-delay:.08s;}.rd2{transition-delay:.16s;}.rd3{transition-delay:.24s;}.rd4{transition-delay:.32s;}
+
+@media(max-width:960px){
+  .nav{padding:0 24px;}.nav-sub,.nav-links{display:none;}
+  .hero{padding:100px 24px 80px;}
+  .section{padding:72px 24px;}
+  .portals-grid,.how-grid,.feat-grid,.preview-grid,.coming-grid,.stats-grid{grid-template-columns:1fr;}
+  .preview-wide{grid-column:auto;}
+  .stats-grid .stat-cell:first-child{border-radius:var(--r-lg) var(--r-lg) 0 0;}
+  .stats-grid .stat-cell:last-child{border-radius:0 0 var(--r-lg) var(--r-lg);}
+  #cta{padding:64px 24px;}
+  footer{padding:40px 24px 28px;}
+  .footer-cols{gap:28px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="nav" id="navbar">
+  <a class="nav-logo" href="index.html">
+    <span class="nav-logo-nova">Nova</span><sup class="nav-logo-cs">CS</sup>
+    <span class="nav-sub">Client Systems &amp; Digital Solutions</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="#portals">Portals</a>
+    <a class="nav-link" href="#how">How It Works</a>
+    <a class="nav-link" href="#features">Features</a>
+    <a class="nav-link" href="#coming">Roadmap</a>
+    <a class="nav-link" href="marketing.html">About</a>
+    <a class="nav-link" href="pages/contact.html">Contact</a>
+  </div>
+  <div class="nav-ctas">
+    <a class="btn-nav-ghost" href="pages/contact.html">Request Access</a>
+    <a class="btn-nav-solid" href="pages/login.html">Recruiter Login →</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div class="hero-badge"><span class="badge-pulse"></span>Recruitment Assessment Platform</div>
+    <h1 class="hero-h1">Hire with <em>clarity,</em><br>not guesswork</h1>
+    <p class="hero-p">NovaCS gives recruitment teams a structured, consistent way to assess candidates at scale — from access code to offer letter. Built for modern hiring.</p>
+    <div class="hero-ctas">
+      <a class="btn-primary" href="pages/login.html">Recruiter Portal →</a>
+      <a class="btn-secondary" href="pages/assess.html">I have an access code</a>
+    </div>
+    <div class="hero-trust">
+      <div class="trust-item">✓ &nbsp;No setup required</div>
+      <div class="trust-dot"></div>
+      <div class="trust-item">✓ &nbsp;Works on any device</div>
+      <div class="trust-dot"></div>
+      <div class="trust-item">✓ &nbsp;Results delivered instantly</div>
+      <div class="trust-dot"></div>
+      <div class="trust-item">✓ &nbsp;Single-use access codes</div>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <span class="scroll-label">Explore</span>
+    <div class="scroll-chevron"></div>
+  </div>
+</section>
+
+<!-- ── PORTALS ── -->
+<section class="section" id="portals">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Two portals, one platform</div>
+      <h2 class="section-title">A dedicated experience for <em>everyone</em></h2>
+      <p class="section-sub">Whether you're running a hiring campaign or sitting a timed assessment, NovaCS has a purpose-built portal for you.</p>
+    </div>
+    <div class="portals-grid">
+
+      <a class="portal-card reveal rd1" href="pages/login.html">
+        <div class="portal-accent acc-navy"></div>
+        <div class="portal-body">
+          <div class="portal-icon pi-navy">🏢</div>
+          <div class="portal-tag pt-navy">For Recruiters &amp; Hiring Teams</div>
+          <div class="portal-title">Recruiter Dashboard</div>
+          <div class="portal-desc">Manage your full hiring pipeline — issue access codes, track candidates, review scores, and make shortlist decisions all in one place.</div>
+          <div class="portal-feats">
+            <div class="portal-feat"><div class="feat-tick ft-navy">✓</div>Issue single-use access codes individually or in bulk via CSV</div>
+            <div class="portal-feat"><div class="feat-tick ft-navy">✓</div>View ranked candidate scores with category breakdowns</div>
+            <div class="portal-feat"><div class="feat-tick ft-navy">✓</div>Batch analytics, pass rate tracking and CSV exports</div>
+            <div class="portal-feat"><div class="feat-tick ft-navy">✓</div>Multi-recruiter team with role-based access</div>
+          </div>
+        </div>
+        <div class="portal-cta pc-navy"><span>Sign in to Dashboard</span><span>→</span></div>
+      </a>
+
+      <a class="portal-card reveal rd2" href="pages/assess.html">
+        <div class="portal-accent acc-green"></div>
+        <div class="portal-body">
+          <div class="portal-icon pi-green">📋</div>
+          <div class="portal-tag pt-green">For Job Applicants</div>
+          <div class="portal-title">Candidate Assessment</div>
+          <div class="portal-desc">Received an access code from your recruiter? Enter it here to start your assessment. 25 questions across 4 skill categories, completed in 25 minutes.</div>
+          <div class="portal-feats">
+            <div class="portal-feat"><div class="feat-tick ft-green">✓</div>Verify with your access code and last 4 digits of your phone</div>
+            <div class="portal-feat"><div class="feat-tick ft-green">✓</div>25 questions · 25 minute time limit · one attempt</div>
+            <div class="portal-feat"><div class="feat-tick ft-green">✓</div>Covers judgement, numerical, verbal &amp; situational skills</div>
+            <div class="portal-feat"><div class="feat-tick ft-green">✓</div>Fully browser-based — works on mobile, tablet &amp; desktop</div>
+          </div>
+        </div>
+        <div class="portal-cta pc-green"><span>Begin Assessment</span><span>→</span></div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<section class="section" id="stats">
+  <div class="section-inner">
+    <div class="stats-head reveal">
+      <div class="section-eyebrow">By the numbers</div>
+      <h2 class="section-title">Built for <em>real hiring volume</em></h2>
+      <p class="section-sub">NovaCS is designed around the practical realities of high-volume recruitment — fast to deploy, easy to manage, and consistent at scale.</p>
+    </div>
+    <div class="stats-grid reveal">
+      <div class="stat-cell">
+        <div class="stat-num">4<span> skills</span></div>
+        <div class="stat-lbl">Assessed per candidate</div>
+        <div class="stat-note">Judgement · Numerical · Verbal · Situational</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num">25<span> min</span></div>
+        <div class="stat-lbl">Average completion time</div>
+        <div class="stat-note">One focused session, start to finish</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num">100<span>%</span></div>
+        <div class="stat-lbl">Automated scoring</div>
+        <div class="stat-note">Results reach the recruiter dashboard instantly</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num">1<span> click</span></div>
+        <div class="stat-lbl">To shortlist or reject</div>
+        <div class="stat-note">Streamlined decisions directly from the dashboard</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="section" id="how">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Simple by design</div>
+      <h2 class="section-title">How <em>NovaCS</em> works</h2>
+      <p class="section-sub">Three steps from setup to decision. No complex integrations, no training required — your team can be assessing candidates the same day.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-step reveal rd1">
+        <div class="how-num">01</div>
+        <div class="how-icon">🏢</div>
+        <div class="how-title">Set up your organisation</div>
+        <div class="how-desc">Request access to NovaCS, create your organisation profile, configure your scoring weights and pass threshold to match the role requirements.</div>
+      </div>
+      <div class="how-step reveal rd2">
+        <div class="how-num">02</div>
+        <div class="how-icon">🔑</div>
+        <div class="how-title">Issue access codes</div>
+        <div class="how-desc">Invite candidates individually or upload a CSV of applicants to bulk-generate unique, single-use access codes. Codes can be time-limited and revoked at any time.</div>
+      </div>
+      <div class="how-step reveal rd3">
+        <div class="how-num">03</div>
+        <div class="how-icon">📊</div>
+        <div class="how-title">Review and decide</div>
+        <div class="how-desc">As candidates complete their assessments, scores land in your dashboard automatically. Review weighted scores, category breakdowns, and move candidates through your pipeline.</div>
+      </div>
+    </div>
+    <div class="how-arrow reveal">
+      <div class="how-arrow-line"></div>
+      <a class="how-arrow-cta" href="pages/contact.html">Get started with NovaCS →</a>
+      <div class="how-arrow-line"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Platform features</div>
+      <h2 class="section-title">Everything your team needs to <em>assess at scale</em></h2>
+      <p class="section-sub">A complete toolkit for modern recruitment — from candidate verification through to post-assessment analytics.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card reveal rd1">
+        <div class="feat-card-icon">⚖️</div>
+        <div class="feat-card-title">Configurable Weighted Scoring</div>
+        <div class="feat-card-desc">Set the weight of each skill category to match role requirements. Adjust pass thresholds per open position. Scores are recalculated automatically.</div>
+        <span class="feat-pill pill-live">Live now</span>
+      </div>
+      <div class="feat-card reveal rd2">
+        <div class="feat-card-icon">🔑</div>
+        <div class="feat-card-title">Single-Use Access Codes</div>
+        <div class="feat-card-desc">Every candidate gets a unique, time-bound code. Issue individually via the dashboard or bulk-upload via CSV. Codes expire on use and can be revoked.</div>
+        <span class="feat-pill pill-live">Live now</span>
+      </div>
+      <div class="feat-card reveal rd3">
+        <div class="feat-card-icon">📊</div>
+        <div class="feat-card-title">Batch Analytics</div>
+        <div class="feat-card-desc">Compare all candidates in a cohort at a glance. View score distributions, pass rates by role, category averages, and completion trends over time.</div>
+        <span class="feat-pill pill-live">Live now</span>
+      </div>
+      <div class="feat-card reveal rd1">
+        <div class="feat-card-icon">👤</div>
+        <div class="feat-card-title">Full Candidate Profiles</div>
+        <div class="feat-card-desc">Each candidate gets a dedicated profile with their weighted score, category breakdown, hiring pipeline stage, recruiter notes and email action templates.</div>
+        <span class="feat-pill pill-live">Live now</span>
+      </div>
+      <div class="feat-card reveal rd2">
+        <div class="feat-card-icon">🛡️</div>
+        <div class="feat-card-title">Integrity &amp; Anti-Cheat</div>
+        <div class="feat-card-desc">Tab-switching is detected and flagged to the recruiter automatically. Single-use codes prevent repeat attempts. Each assessment is time-limited and locked to one device session.</div>
+        <span class="feat-pill pill-live">Live now</span>
+      </div>
+      <div class="feat-card reveal rd3">
+        <div class="feat-card-icon">👥</div>
+        <div class="feat-card-title">Multi-Recruiter Teams</div>
+        <div class="feat-card-desc">Invite your entire hiring team to your organisation. Assign admin, recruiter or viewer permissions. All activity is logged in the audit trail.</div>
+        <span class="feat-pill pill-live">Live now</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PREVIEW ── -->
+<section class="section" id="preview">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Platform preview</div>
+      <h2 class="section-title">Clean, fast, <em>purpose-built</em></h2>
+      <p class="section-sub">Every screen is designed to minimise time-to-decision. No bloat, no unnecessary clicks — just the information your team needs.</p>
+    </div>
+    <div class="preview-grid">
+      <!-- Dashboard mockup -->
+      <div class="preview-shot reveal rd1">
+        <div class="preview-shot-inner">
+          <div class="mock-dash">
+            <div class="mock-sb">
+              <div class="mock-sb-logo"></div>
+              <div class="m-line on w7"></div>
+              <div class="m-line w8"></div><div class="m-line w6"></div>
+              <div class="m-line w8"></div><div class="m-line w5"></div>
+              <div class="m-line w7"></div>
+            </div>
+            <div class="mock-main">
+              <div class="mock-topbar">
+                <div class="m-line on" style="width:38px"></div>
+                <div class="m-line" style="width:22px"></div>
+                <div class="m-line" style="width:22px"></div>
+              </div>
+              <div class="mock-cards">
+                <div class="mock-card"><div class="mock-card-n" style="color:var(--navy-700)">142</div><div class="mock-card-b"></div></div>
+                <div class="mock-card"><div class="mock-card-n" style="color:var(--green-600)">68%</div><div class="mock-card-b"></div></div>
+                <div class="mock-card"><div class="mock-card-n" style="color:var(--navy-500)">97</div><div class="mock-card-b"></div></div>
+                <div class="mock-card"><div class="mock-card-n" style="color:var(--slate-400)">12</div><div class="mock-card-b"></div></div>
+              </div>
+              <div class="mock-tbl">
+                <div class="mock-row"><div class="mock-av" style="background:var(--navy-200)"></div><div class="m-line w7"></div><div style="flex:1"></div><div class="mock-bdg" style="background:var(--green-50);border:1px solid var(--green-100)"></div></div>
+                <div class="mock-row"><div class="mock-av" style="background:#c4b5fd"></div><div class="m-line w6"></div><div style="flex:1"></div><div class="mock-bdg" style="background:var(--navy-50);border:1px solid var(--navy-100)"></div></div>
+                <div class="mock-row"><div class="mock-av" style="background:#fde68a"></div><div class="m-line w8"></div><div style="flex:1"></div><div class="mock-bdg" style="background:var(--slate-100);border:1px solid var(--slate-200)"></div></div>
+                <div class="mock-row"><div class="mock-av" style="background:#fca5a5"></div><div class="m-line w5"></div><div style="flex:1"></div><div class="mock-bdg" style="background:#fef2f2;border:1px solid #fca5a5"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-lbl">📊 Recruiter Dashboard</div>
+      </div>
+      <!-- Assessment mockup -->
+      <div class="preview-shot reveal rd2">
+        <div class="preview-shot-inner">
+          <div class="mock-assess">
+            <div class="mock-strip">
+              <div class="mock-pg"><div class="mock-pg-f"></div></div>
+              <div class="mock-timer-txt">14:22</div>
+            </div>
+            <div style="font-size:8.5px;font-weight:700;color:var(--green-700);letter-spacing:.5px;text-transform:uppercase;padding:0 2px">⚖️ Judgement &amp; Decision Making</div>
+            <div class="mock-qblock">
+              <div class="m-line w5" style="height:3px;margin-bottom:7px"></div>
+              <div class="m-line" style="height:3px;margin-bottom:3px"></div>
+              <div class="m-line w7" style="height:3px;margin-bottom:3px"></div>
+              <div class="mock-opts">
+                <div class="mock-opt"><div class="mock-ol">A</div><div class="m-line w8" style="height:3px"></div></div>
+                <div class="mock-opt s"><div class="mock-ol">B</div><div class="m-line w6" style="height:3px;background:var(--green-100)"></div></div>
+                <div class="mock-opt"><div class="mock-ol">C</div><div class="m-line w7" style="height:3px"></div></div>
+                <div class="mock-opt"><div class="mock-ol">D</div><div class="m-line w5" style="height:3px"></div></div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:5px">
+              <div style="height:20px;width:54px;border-radius:5px;background:var(--slate-200)"></div>
+              <div style="height:20px;width:80px;border-radius:5px;background:var(--green-600)"></div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-lbl">📋 Candidate Assessment</div>
+      </div>
+      <!-- Candidate profile wide -->
+      <div class="preview-shot preview-wide reveal">
+        <div class="preview-shot-inner">
+          <div class="mock-prof">
+            <div class="mock-pl">
+              <div class="mock-pav"></div>
+              <div class="m-line w6" style="height:4px;width:60%"></div>
+              <div class="m-line w5" style="height:3px;width:45%"></div>
+              <div class="mock-ring"><div class="mock-ring-n">92%</div></div>
+              <div class="m-line" style="height:3px;width:80%"></div>
+              <div class="m-line" style="height:3px;width:70%"></div>
+              <div class="m-line" style="height:3px;width:80%"></div>
+            </div>
+            <div class="mock-pr">
+              <div class="mock-pr-top">
+                <div class="mock-mc"><div class="m-line w5" style="height:3px"></div><div class="mock-mb"><div class="mock-mf" style="width:92%;background:var(--navy-500)"></div></div></div>
+                <div class="mock-mc"><div class="m-line w5" style="height:3px"></div><div class="mock-mb"><div class="mock-mf" style="width:78%;background:var(--green-600)"></div></div></div>
+                <div class="mock-mc"><div class="m-line w5" style="height:3px"></div><div class="mock-mb"><div class="mock-mf" style="width:85%;background:#7c3aed"></div></div></div>
+              </div>
+              <div class="mock-pr-bot">
+                <div class="mock-pr-row"><div style="width:18px;height:18px;border-radius:50%;background:var(--slate-200);flex-shrink:0"></div><div class="m-line" style="width:70px;height:3px"></div><div style="flex:1"></div><div class="mock-bdg" style="background:var(--green-50);border:1px solid var(--green-100)"></div></div>
+                <div class="mock-pr-row"><div style="width:18px;height:18px;border-radius:50%;background:var(--slate-200);flex-shrink:0"></div><div class="m-line" style="width:58px;height:3px"></div><div style="flex:1"></div><div class="mock-bdg" style="background:var(--navy-50);border:1px solid var(--navy-100)"></div></div>
+                <div class="mock-pr-row"><div style="width:18px;height:18px;border-radius:50%;background:var(--slate-200);flex-shrink:0"></div><div class="m-line" style="width:64px;height:3px"></div><div style="flex:1"></div><div class="mock-bdg" style="background:var(--slate-100);border:1px solid var(--slate-200)"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-lbl">👤 Candidate Profile</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COMING SOON ── -->
+<section class="section" id="coming">
+  <div class="section-inner">
+    <div class="reveal" style="position:relative;z-index:2">
+      <div class="section-eyebrow">What's coming</div>
+      <h2 class="section-title">The <em>roadmap</em> ahead</h2>
+      <p class="section-sub">NovaCS is in active development. Here's what the team is building next — and what's further down the line.</p>
+    </div>
+    <div class="coming-grid">
+      <div class="coming-card reveal rd1">
+        <div class="coming-icon">🤖</div>
+        <div>
+          <div class="coming-title">AI Question Generation</div>
+          <div class="coming-desc">Automatically generate role-specific question sets from a job description. Tailored assessments in minutes, not hours.</div>
+          <span class="coming-pill">Q3 2026</span>
+        </div>
+      </div>
+      <div class="coming-card reveal rd2">
+        <div class="coming-icon">🔗</div>
+        <div>
+          <div class="coming-title">ATS Integrations</div>
+          <div class="coming-desc">Push candidate scores directly into Workable, Greenhouse, Lever and other leading ATS platforms via native integrations.</div>
+          <span class="coming-pill">Q3 2026</span>
+        </div>
+      </div>
+      <div class="coming-card reveal rd1">
+        <div class="coming-icon">🎥</div>
+        <div>
+          <div class="coming-title">Video Response Questions</div>
+          <div class="coming-desc">Add short video response prompts to assessments — ideal for roles where communication presence and delivery matter.</div>
+          <span class="coming-pill">Q4 2026</span>
+        </div>
+      </div>
+      <div class="coming-card reveal rd2">
+        <div class="coming-icon">📱</div>
+        <div>
+          <div class="coming-title">Native Mobile App</div>
+          <div class="coming-desc">A dedicated iOS and Android recruiter app for reviewing candidates, updating pipeline stages, and issuing codes on the go.</div>
+          <span class="coming-pill">Q4 2026</span>
+        </div>
+      </div>
+      <div class="coming-card reveal rd1">
+        <div class="coming-icon">🌍</div>
+        <div>
+          <div class="coming-title">Multi-language Assessments</div>
+          <div class="coming-desc">Deliver assessments in the candidate's preferred language. Initial support planned for Spanish, French, Mandarin and Arabic.</div>
+          <span class="coming-pill">2027</span>
+        </div>
+      </div>
+      <div class="coming-card reveal rd2">
+        <div class="coming-icon">📈</div>
+        <div>
+          <div class="coming-title">Predictive Hiring Analytics</div>
+          <div class="coming-desc">Track correlation between assessment scores and long-term performance data to continuously refine scoring weights and thresholds.</div>
+          <span class="coming-pill">2027</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section id="cta">
+  <div class="cta-inner">
+    <h2 class="cta-h">Ready to hire <em>smarter?</em></h2>
+    <p class="cta-p">Get in touch to set up your organisation on NovaCS. If you already have access, sign straight into your recruiter dashboard.</p>
+    <div class="cta-btns">
+      <a class="btn-cta-w" href="pages/contact.html">Request Platform Access</a>
+      <a class="btn-cta-o" href="pages/login.html">Sign In to Dashboard →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-wrap">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-mark">Nova<sup>CS</sup></div>
+        <div class="footer-tagline">Client Systems &amp; Digital Solutions</div>
+        <div class="footer-desc">A web-based recruitment assessment platform for modern hiring teams. Issue codes, assess candidates, and make decisions at scale.</div>
+      </div>
+      <div class="footer-cols">
+        <div>
+          <div class="footer-col-h">Platform</div>
+          <div class="footer-col-links">
+            <a class="footer-a" href="pages/login.html">Recruiter Login</a>
+            <a class="footer-a" href="pages/assess.html">Candidate Assessment</a>
+            <a class="footer-a" href="#features">Features</a>
+            <a class="footer-a" href="#how">How It Works</a>
+            <a class="footer-a" href="#coming">Roadmap</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer-col-h">Company</div>
+          <div class="footer-col-links">
+            <a class="footer-a" href="marketing.html">About NovaCS</a>
+            <a class="footer-a" href="marketing.html#how">Our Approach</a>
+            <a class="footer-a" href="pages/contact.html">Contact Us</a>
+            <a class="footer-a" href="pages/contact.html">Request Access</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer-col-h">Support</div>
+          <div class="footer-col-links">
+            <a class="footer-a" href="pages/contact.html">Help &amp; Support</a>
+            <a class="footer-a" href="pages/contact.html">Report an Issue</a>
+            <a class="footer-a" href="pages/password-reset.html">Password Reset</a>
+            <a class="footer-a" href="pages/contact.html">FAQ</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NovaCS · Client Systems &amp; Digital Solutions. All rights reserved.</span>
+      <span>Built for modern recruitment teams.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Nav scroll effect
+const nav=document.getElementById('navbar');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>20));
+
+// Active nav link on scroll
+const sections=document.querySelectorAll('section[id]');
+const navLinks=document.querySelectorAll('.nav-link[href^="#"]');
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const match=document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if(match) match.classList.add('active');
+    }
+  });
+},{threshold:.4,rootMargin:'-68px 0px 0px 0px'});
+sections.forEach(s=>observer.observe(s));
+
+// Scroll reveal
+const reveals=document.querySelectorAll('.reveal');
+const ro=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');ro.unobserve(e.target);}});
+},{threshold:.1});
+reveals.forEach(el=>ro.observe(el));
+</script>
+</body>
+</html>
