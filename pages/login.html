@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCS — Recruiter Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-900:#0d1b2a;--navy-800:#1a2e45;--navy-700:#1e3a5f;--navy-600:#2452a0;
+  --navy-500:#2d64c8;--navy-400:#4a7fd4;--navy-200:#9bbce8;--navy-100:#dce8f7;--navy-50:#eef4fc;
+  --slate-900:#1c2333;--slate-700:#334155;--slate-600:#475569;--slate-500:#64748b;
+  --slate-400:#94a3b8;--slate-200:#e2e8f0;--slate-100:#f1f5f9;--slate-50:#f8fafc;
+  --white:#ffffff;--cream:#f7f4ef;
+  --success:#0f6b3a;--success-bg:#e6f4ed;--success-border:#a3d4b8;
+  --danger:#991b1b;--danger-bg:#fef2f2;--danger-border:#fca5a5;
+  --r-sm:8px;--r:12px;--r-lg:16px;--r-xl:22px;
+  --bg:#edf0f7;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+
+body{
+  font-family:'Figtree',sans-serif;
+  min-height:100vh;
+  background:#2d3a6b;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  position:relative;
+  overflow:hidden;
+}
+
+
+
+
+
+
+
+
+
+/* ── LOGIN CARD ── */
+.login-card{
+  background:var(--white);
+  border-radius:var(--r-xl);
+  width:100%;max-width:500px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.08),
+    0 32px 80px rgba(0,0,0,.5),
+    0 8px 24px rgba(0,0,0,.3);
+  position:relative;z-index:10;
+  overflow:hidden;
+  animation:cardIn .5s cubic-bezier(.4,0,.2,1) both;
+  animation-delay:.05s;
+}
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(24px) scale(.98);}
+  to{opacity:1;transform:none;}
+}
+
+/* Card top accent bar */
+.card-accent{
+  height:4px;
+  background:linear-gradient(90deg,var(--navy-900),var(--navy-600),var(--navy-400));
+}
+
+/* Card header */
+.card-header{
+  padding:28px 36px 0;
+  border-bottom:1px solid var(--slate-100);
+  padding-bottom:22px;
+}
+.card-logo{
+  display:flex;align-items:baseline;gap:0;margin-bottom:20px;
+}
+.card-logo-nova{
+  font-family:'Playfair Display',serif;font-size:20px;font-weight:700;
+  color:var(--slate-900);letter-spacing:-.2px;
+}
+.card-logo-cs{
+  font-family:'Figtree',sans-serif;font-size:11px;font-weight:700;
+  color:var(--navy-500);vertical-align:super;margin-left:2px;font-style:normal;
+}
+.card-title{
+  font-family:'Playfair Display',serif;font-size:26px;font-weight:700;
+  color:var(--slate-900);letter-spacing:-.3px;margin-bottom:4px;
+}
+.card-subtitle{font-size:13.5px;color:var(--slate-400);}
+
+/* Step pills */
+.step-pills{display:flex;gap:6px;margin-top:16px;}
+.step-pill{
+  height:3px;border-radius:2px;background:var(--slate-200);
+  transition:all .3s;
+}
+.step-pill.w-short{width:24px;}
+.step-pill.w-long{flex:1;}
+.step-pill.active{background:var(--navy-600);}
+.step-pill.done{background:var(--navy-300,#7aaee0);}
+
+/* Card body */
+.card-body{padding:24px 36px 28px;}
+
+/* Org grid */
+.org-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:22px;}
+.org-card{
+  background:var(--slate-50);border:1.5px solid var(--slate-200);
+  border-radius:var(--r);padding:13px 14px;cursor:pointer;
+  transition:all .18s;display:flex;align-items:center;gap:10px;
+}
+.org-card:hover{border-color:var(--navy-300,#7aaee0);background:var(--navy-50);}
+.org-card.selected{
+  border-color:var(--navy-600);background:var(--navy-50);
+  box-shadow:0 0 0 3px rgba(36,82,160,.12);
+}
+.org-av{
+  width:32px;height:32px;border-radius:var(--r-sm);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.org-name{font-size:12.5px;font-weight:700;color:var(--slate-800);line-height:1.2;}
+.org-type{font-size:11px;color:var(--slate-400);}
+.org-tick{
+  width:16px;height:16px;border-radius:50%;border:1.5px solid var(--slate-300);
+  margin-left:auto;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:9px;color:transparent;transition:all .18s;
+}
+.org-card.selected .org-tick{background:var(--navy-600);border-color:var(--navy-600);color:#fff;}
+
+/* Form fields */
+.field{margin-bottom:16px;}
+.field-label{
+  display:block;font-size:10.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--slate-500);margin-bottom:7px;
+}
+.field-input{
+  width:100%;background:var(--slate-50);border:1.5px solid var(--slate-200);
+  border-radius:var(--r-sm);padding:11px 14px;
+  font-family:'Figtree',sans-serif;font-size:14px;color:var(--slate-900);
+  outline:none;transition:all .18s;
+}
+.field-input:focus{background:var(--white);border-color:var(--navy-500);box-shadow:0 0 0 3px rgba(36,82,160,.1);}
+.field-input.err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(153,27,27,.08);}
+.field-input::placeholder{color:var(--slate-400);}
+.pw-wrap{position:relative;}
+.pw-wrap .field-input{padding-right:42px;}
+.pw-eye{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--slate-400);
+  font-size:15px;padding:4px;transition:color .15s;line-height:1;
+}
+.pw-eye:hover{color:var(--slate-700);}
+
+/* Error / info banners */
+.banner{
+  border-radius:var(--r-sm);padding:10px 13px;
+  font-size:12.5px;font-weight:500;margin-bottom:14px;display:none;
+}
+.banner.show{display:flex;align-items:center;gap:8px;}
+.banner-err{background:var(--danger-bg);border:1.5px solid var(--danger-border);color:var(--danger);}
+.banner-ok{background:var(--success-bg);border:1.5px solid var(--success-border);color:var(--success);}
+
+/* Forgot */
+.forgot-row{display:flex;justify-content:flex-end;margin-top:-8px;margin-bottom:16px;}
+.forgot-link{font-size:12px;color:var(--navy-500);font-weight:500;text-decoration:none;transition:color .15s;}
+.forgot-link:hover{color:var(--navy-700);}
+
+/* Submit btn */
+.btn-submit{
+  width:100%;padding:13px;border:none;border-radius:var(--r-sm);
+  background:var(--navy-700);color:#fff;
+  font-family:'Figtree',sans-serif;font-size:14.5px;font-weight:700;
+  cursor:pointer;transition:all .2s;letter-spacing:.2px;
+  box-shadow:0 4px 16px rgba(30,58,95,.3);
+  display:flex;align-items:center;justify-content:center;gap:9px;
+}
+.btn-submit:hover:not(:disabled){background:var(--navy-800);transform:translateY(-1px);box-shadow:0 6px 22px rgba(30,58,95,.38);}
+.btn-submit:disabled{opacity:.55;cursor:not-allowed;}
+
+/* Back btn */
+.btn-back{
+  display:inline-flex;align-items:center;gap:5px;
+  background:none;border:none;cursor:pointer;
+  font-family:'Figtree',sans-serif;font-size:12.5px;font-weight:600;
+  color:var(--slate-400);padding:0;margin-bottom:20px;transition:color .15s;
+}
+.btn-back:hover{color:var(--slate-700);}
+
+/* Card footer */
+.card-footer{
+  padding:14px 36px 20px;border-top:1px solid var(--slate-100);
+  text-align:center;font-size:12px;color:var(--slate-400);
+}
+.card-footer a{color:var(--navy-500);font-weight:500;text-decoration:none;}
+.card-footer a:hover{color:var(--navy-700);}
+
+/* Divider */
+.divider{height:1px;background:var(--slate-100);margin:18px 0;}
+
+/* Spinner */
+.spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Step fade */
+.step-view{animation:stepIn .22s ease both;}
+@keyframes stepIn{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:none;}}
+
+to{opacity:1;transform:none;}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);
+  background:var(--slate-900);color:#fff;border-radius:var(--r);
+  padding:11px 20px;font-size:13px;font-weight:500;z-index:999;
+  opacity:0;transition:all .25s;box-shadow:0 8px 28px rgba(0,0,0,.4);
+  white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* Demo hint */
+.demo-hint{
+  margin-top:14px;background:var(--navy-50);border:1px solid var(--navy-100);
+  border-radius:var(--r-sm);padding:10px 13px;font-size:12px;color:var(--slate-500);
+  display:flex;align-items:flex-start;gap:8px;line-height:1.6;
+}
+.demo-hint-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+
+@media(max-width:600px){
+  
+  .float-stat,
+  .login-card{max-width:100%;}
+}
+
+/* ── Floating brand ── */
+.float-brand{
+  position:fixed;top:28px;left:28px;
+  display:flex;flex-direction:column;gap:5px;
+  animation:fadeSlideIn .6s ease both;
+  z-index:5;
+}
+.float-wordmark{
+  font-family:'Playfair Display',serif;font-size:24px;font-weight:700;
+  color:rgba(255,255,255,.92);letter-spacing:-.3px;line-height:1;
+}
+.float-wordmark sup{
+  font-family:'Figtree',sans-serif;font-size:12px;font-weight:700;
+  color:rgba(160,185,230,.95);vertical-align:super;margin-left:2px;font-style:normal;
+}
+.float-sub{
+  font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.5);
+}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+@media(max-width:600px){.float-brand{top:20px;left:20px;}}
+
+</style>
+</head>
+<body>
+
+
+<!-- Floating brand -->
+<div class="float-brand">
+  <div class="float-wordmark">Nova<sup>CS</sup></div>
+  <div class="float-sub">Client Systems &amp; Digital Solutions</div>
+</div>
+
+<!-- ── LOGIN CARD ── -->
+<div class="login-card">
+  <div class="card-accent"></div>
+
+  <div class="card-header">
+    <div class="card-logo">
+      <span class="card-logo-nova">Nova</span><sup class="card-logo-cs">CS</sup>
+    </div>
+    <div class="card-title" id="card-title">Welcome back</div>
+    <div class="card-subtitle" id="card-subtitle">Select your organisation to continue</div>
+    <div class="step-pills" id="step-pills">
+      <div class="step-pill w-short active" id="sp1"></div>
+      <div class="step-pill w-long" id="sp2"></div>
+    </div>
+  </div>
+
+  <!-- STEP 1: ORG -->
+  <div class="card-body" id="step-org">
+    <div class="org-grid" id="org-grid"></div>
+    <button class="btn-submit" id="org-btn" onclick="goStep2()" disabled>
+      Continue <span style="font-size:15px">→</span>
+    </button>
+    <div class="demo-hint">
+      <span class="demo-hint-icon">💡</span>
+      <span><b>Demo mode</b> — select any organisation and use <b>sarah.mitchell@acmecorp.com</b> with any password.</span>
+    </div>
+  </div>
+
+  <!-- STEP 2: CREDENTIALS -->
+  <div class="card-body" id="step-creds" style="display:none">
+    <button class="btn-back" onclick="goStep1()">← Back</button>
+    <div class="banner banner-err" id="err-banner">
+      <span>⚠</span><span id="err-msg">Incorrect email or password. Please try again.</span>
+    </div>
+    <div class="field">
+      <label class="field-label">Email Address</label>
+      <input class="field-input" type="email" id="email-in" placeholder="you@yourorg.com"
+        onkeydown="if(event.key==='Enter')document.getElementById('pw-in').focus()"
+        oninput="clearErr()"/>
+    </div>
+    <div class="field">
+      <label class="field-label">Password</label>
+      <div class="pw-wrap">
+        <input class="field-input" type="password" id="pw-in" placeholder="••••••••"
+          onkeydown="if(event.key==='Enter')doLogin()"
+          oninput="clearErr()"/>
+        <button class="pw-eye" onclick="togglePw()" id="pw-eye">👁</button>
+      </div>
+    </div>
+    <div class="forgot-row">
+      <a href="password-reset.html" class="forgot-link">Forgot password?</a>
+    </div>
+    <button class="btn-submit" id="login-btn" onclick="doLogin()">
+      <span id="login-lbl">Sign In</span>
+    </button>
+    <div class="demo-hint" style="margin-top:14px">
+      <span class="demo-hint-icon">💡</span>
+      <span><b>Demo:</b> use email <b>sarah.mitchell@acmecorp.com</b> with any password to sign in.</span>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    No account? <a href="contact.html">Request access</a>
+    &nbsp;·&nbsp;
+    <a href="../index.html">Back to portal</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ORGS=[
+  {id:'org-001',name:'Acme Corp',type:'Professional Services',color:'#1e3a5f',ab:'AC'},
+  {id:'org-002',name:'NexGen Talent',type:'Recruitment Agency',color:'#0f6b3a',ab:'NT'},
+  {id:'org-003',name:'Vertex Consulting',type:'Management Consulting',color:'#6d28d9',ab:'VC'},
+  {id:'org-004',name:'ClearPath',type:'Technology',color:'#0e4e6e',ab:'CP'},
+];
+const DEMO=[
+  {email:'sarah.mitchell@acmecorp.com',org:'org-001',name:'Sarah'},
+  {email:'admin@acmecorp.com',org:'org-001',name:'Admin'},
+  {email:'recruiter@nexgen.com',org:'org-002',name:'Alex'},
+];
+let selOrg=null,pwVis=false;
+
+// Render org grid
+document.getElementById('org-grid').innerHTML=ORGS.map(o=>`
+  <div class="org-card" id="oc-${o.id}" onclick="selOrgFn('${o.id}')">
+    <div class="org-av" style="background:${o.color}">${o.ab}</div>
+    <div style="flex:1;min-width:0">
+      <div class="org-name">${o.name}</div>
+      <div class="org-type">${o.type}</div>
+    </div>
+    <div class="org-tick" id="ot-${o.id}">✓</div>
+  </div>`).join('');
+
+function selOrgFn(id){
+  selOrg=id;
+  document.querySelectorAll('.org-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('oc-'+id).classList.add('selected');
+  document.getElementById('org-btn').disabled=false;
+}
+
+function goStep2(){
+  if(!selOrg)return;
+  const org=ORGS.find(o=>o.id===selOrg);
+  document.getElementById('card-title').textContent=org.name;
+  document.getElementById('card-subtitle').textContent='Sign in with your recruiter account';
+  document.getElementById('sp1').classList.remove('active');
+  document.getElementById('sp1').classList.add('done');
+  document.getElementById('sp2').classList.add('active');
+  document.getElementById('step-org').style.display='none';
+  const sc=document.getElementById('step-creds');
+  sc.style.display='block';sc.classList.add('step-view');
+  setTimeout(()=>document.getElementById('email-in').focus(),80);
+}
+
+function goStep1(){
+  document.getElementById('card-title').textContent='Welcome back';
+  document.getElementById('card-subtitle').textContent='Select your organisation to continue';
+  document.getElementById('sp1').classList.add('active');
+  document.getElementById('sp1').classList.remove('done');
+  document.getElementById('sp2').classList.remove('active');
+  document.getElementById('step-creds').style.display='none';
+  const so=document.getElementById('step-org');
+  so.style.display='block';so.classList.add('step-view');
+  clearErr();
+}
+
+function togglePw(){
+  pwVis=!pwVis;
+  document.getElementById('pw-in').type=pwVis?'text':'password';
+  document.getElementById('pw-eye').textContent=pwVis?'🙈':'👁';
+}
+
+function clearErr(){
+  document.getElementById('err-banner').classList.remove('show');
+  document.getElementById('email-in').classList.remove('err');
+  document.getElementById('pw-in').classList.remove('err');
+}
+
+function doLogin(){
+  clearErr();
+  const email=document.getElementById('email-in').value.trim().toLowerCase();
+  const pw=document.getElementById('pw-in').value;
+  if(!email||!email.includes('@')){
+    document.getElementById('email-in').classList.add('err');return;
+  }
+  if(!pw){document.getElementById('pw-in').classList.add('err');return;}
+
+  const btn=document.getElementById('login-btn');
+  btn.disabled=true;
+  document.getElementById('login-lbl').innerHTML='<div class="spinner"></div>';
+
+  setTimeout(()=>{
+    const match=DEMO.find(u=>u.email===email);
+    if(match&&match.org!==selOrg){
+      btn.disabled=false;
+      document.getElementById('login-lbl').textContent='Sign In';
+      document.getElementById('err-msg').textContent='This account belongs to a different organisation.';
+      document.getElementById('err-banner').classList.add('show');
+      return;
+    }
+    // Demo: any email + any password works
+    const name=match?match.name:'there';
+    showToast('Welcome back, '+name+'!');
+    setTimeout(()=>window.location.href='../dashboard.html',900);
+  },1100);
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>

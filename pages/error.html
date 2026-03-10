@@ -3,295 +3,222 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NovaCS — Error</title>
-<link rel="stylesheet" href="../css/base.css">
+<title>NovaCS — Page Error</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-body { background: var(--bg); display: flex; flex-direction: column; min-height: 100vh; }
-
-.error-wrap {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 24px;
+:root{
+  --navy-900:#0d1b2a;--navy-800:#1a2e45;--navy-700:#1e3a5f;--navy-600:#2452a0;
+  --navy-500:#2d64c8;--navy-400:#4a7fd4;--navy-100:#dce8f7;--navy-50:#eef4fc;
+  --slate-900:#1c2333;--slate-600:#475569;--slate-500:#64748b;
+  --slate-400:#94a3b8;--slate-200:#e2e8f0;--slate-100:#f1f5f9;--slate-50:#f8fafc;
+  --white:#fff;
+  --r-sm:8px;--r:12px;--r-lg:16px;--r-xl:22px;
+  --shadow-xl:0 22px 56px rgba(13,27,42,.22),0 6px 20px rgba(13,27,42,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;}
+body{
+  font-family:'Figtree',sans-serif;min-height:100vh;
+  background:#2d3a6b;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;
+  position:relative;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);
+  background-size:28px 28px;pointer-events:none;
 }
 
-.error-card {
-  background: var(--white);
-  border: 1px solid var(--slate-200);
-  border-radius: var(--r-xl);
-  box-shadow: var(--shadow-lg);
-  padding: 52px 44px 44px;
-  max-width: 480px;
-  width: 100%;
-  text-align: center;
-}
+.site-brand{position:fixed;top:28px;left:28px;display:flex;flex-direction:column;gap:5px;z-index:5;animation:fadeUp .55s ease both;}
+.brand-wordmark{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:rgba(255,255,255,.88);line-height:1;}
+.brand-wordmark sup{font-family:'Figtree',sans-serif;font-size:11px;font-weight:700;color:rgba(160,185,230,.9);vertical-align:super;margin-left:2px;}
+.brand-sub{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.38);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 
-.error-icon-ring {
-  width: 72px; height: 72px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 24px;
-  font-size: 30px;
-  position: relative;
+.card{
+  background:var(--white);border-radius:var(--r-xl);
+  width:100%;max-width:500px;
+  box-shadow:var(--shadow-xl);overflow:hidden;
+  position:relative;z-index:2;
+  animation:cardIn .45s cubic-bezier(.4,0,.2,1) .05s both;
 }
-.error-icon-ring.danger  { background: var(--danger-bg);  border: 2px solid var(--danger-border); }
-.error-icon-ring.warning { background: var(--warning-bg); border: 2px solid var(--warning-border); }
-.error-icon-ring.info    { background: var(--navy-50);    border: 2px solid var(--navy-100); }
+@keyframes cardIn{from{opacity:0;transform:translateY(22px) scale(.98);}to{opacity:1;transform:none;}}
 
-.error-code {
-  font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
-  color: var(--slate-400); margin-bottom: 10px;
-}
+.card-stripe{height:4px;}
+.stripe-404{background:linear-gradient(90deg,var(--navy-900),var(--navy-600),var(--navy-400));}
+.stripe-403{background:linear-gradient(90deg,#854d0e,#f59e0b);}
+.stripe-500{background:linear-gradient(90deg,#991b1b,#ef4444);}
+.stripe-offline{background:linear-gradient(90deg,#475569,#94a3b8);}
 
-.error-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 26px; font-weight: 700;
-  color: var(--navy-900);
-  margin-bottom: 12px;
-  line-height: 1.2;
-}
+.card-body{padding:40px 36px 28px;text-align:center;}
 
-.error-desc {
-  font-size: 14px;
-  color: var(--slate-600);
-  line-height: 1.75;
-  margin-bottom: 28px;
+.error-number{
+  font-family:'Playfair Display',serif;font-size:88px;font-weight:700;
+  line-height:1;letter-spacing:-.04em;margin-bottom:8px;
+  animation:popIn .4s cubic-bezier(.34,1.56,.64,1) .15s both;
 }
+@keyframes popIn{from{opacity:0;transform:scale(.65);}to{opacity:1;transform:none;}}
+.num-404{color:var(--navy-700);}
+.num-403{color:#854d0e;}
+.num-500{color:#991b1b;}
+.num-offline{color:var(--slate-400);}
 
-.error-actions {
-  display: flex; flex-direction: column; gap: 10px;
-}
-.error-actions .btn { justify-content: center; }
+.error-icon{font-size:32px;margin-bottom:14px;display:block;animation:popIn .4s cubic-bezier(.34,1.56,.64,1) .22s both;}
+.error-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--slate-900);margin-bottom:10px;}
+.error-desc{font-size:13.5px;color:var(--slate-500);line-height:1.8;margin-bottom:26px;max-width:370px;margin-left:auto;margin-right:auto;}
 
-.error-detail {
-  margin-top: 24px;
-  padding: 14px 18px;
-  background: var(--slate-50);
-  border: 1px solid var(--slate-200);
-  border-radius: var(--r);
-  font-size: 12px;
-  color: var(--slate-500);
-  line-height: 1.7;
-  text-align: left;
-}
-.error-detail strong { color: var(--slate-700); }
+.url-box{background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:11px 14px;margin-bottom:22px;text-align:left;display:none;}
+.url-box.visible{display:block;}
+.url-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--slate-400);margin-bottom:4px;}
+.url-val{font-family:'Courier New',monospace;font-size:12px;color:#334155;word-break:break-all;}
 
-.attempts-row {
-  display: flex; justify-content: center; gap: 6px; margin-bottom: 22px;
-}
-.attempt-dot {
-  width: 9px; height: 9px; border-radius: 50%;
-  background: var(--danger);
-  opacity: 0.3;
-}
-.attempt-dot.used { opacity: 1; }
+.actions{display:flex;flex-direction:column;gap:9px;margin-bottom:14px;}
+.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border:none;border-radius:var(--r-sm);background:var(--navy-700);color:#fff;font-family:'Figtree',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;box-shadow:0 4px 14px rgba(30,58,95,.3);}
+.btn-primary:hover{background:var(--navy-800);transform:translateY(-1px);box-shadow:0 8px 22px rgba(30,58,95,.38);}
+.btn-secondary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;border:1.5px solid var(--slate-200);border-radius:var(--r-sm);background:var(--white);color:var(--slate-600);font-family:'Figtree',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .18s;}
+.btn-secondary:hover{border-color:var(--navy-400);color:var(--navy-600);}
 
-.countdown-ring {
-  position: relative;
-  width: 80px; height: 80px;
-  margin: 0 auto 20px;
-}
-.countdown-num {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Playfair Display', serif;
-  font-size: 22px; font-weight: 700;
-  color: var(--navy-700);
-}
-svg.ring-svg { transform: rotate(-90deg); }
-.ring-track { fill: none; stroke: var(--slate-200); stroke-width: 5; }
-.ring-fill  { fill: none; stroke: var(--navy-600); stroke-width: 5; stroke-linecap: round;
-              stroke-dasharray: 220; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
+.quick-links{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ql{padding:10px 12px;border:1.5px solid var(--slate-200);border-radius:var(--r-sm);font-size:12.5px;font-weight:600;color:var(--slate-600);text-decoration:none;text-align:center;transition:all .15s;background:var(--white);}
+.ql:hover{border-color:var(--navy-400);color:var(--navy-600);background:var(--navy-50);}
 
-/* ── NAV BAR (minimal) ── */
-.mini-nav {
-  height: 52px;
-  background: var(--white);
-  border-bottom: 1px solid var(--slate-200);
-  display: flex; align-items: center; padding: 0 28px;
-  box-shadow: var(--shadow-sm);
-}
+.card-footer{padding:13px 36px 16px;border-top:1px solid var(--slate-100);text-align:center;font-size:12px;color:var(--slate-400);display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+.card-footer a{color:var(--navy-500);font-weight:500;text-decoration:none;transition:color .15s;}
+.card-footer a:hover{color:var(--navy-700);}
+.card-footer .dot{color:var(--slate-200);}
+
+@media(max-width:560px){.site-brand{top:16px;left:16px;}.card-body{padding:30px 22px 24px;}.card-footer{padding-left:22px;padding-right:22px;}.quick-links{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
-<div class="mini-nav">
-  <a href="../index.html" class="nova-wordmark" style="font-size:18px;">Nova<sup class="cs-sup">CS</sup></a>
+<div class="site-brand">
+  <div class="brand-wordmark">Nova<sup>CS</sup></div>
+  <div class="brand-sub">Client Systems &amp; Digital Solutions</div>
 </div>
 
-<!-- Dynamically show the right error panel based on URL param ?type= -->
-<div class="error-wrap">
-
-  <!-- CODE EXPIRED / INVALID -->
-  <div class="error-card" id="err-code" style="display:none;">
-    <div class="error-icon-ring danger">🚫</div>
-    <div class="error-code">Error A01</div>
-    <div class="error-title">Access code invalid or expired</div>
-    <div class="error-desc">
-      The code you entered doesn't match our records, or it has already been used.<br><br>
-      Each access code is single-use and expires once the assessment is submitted.
+<div class="card">
+  <div class="card-stripe" id="card-stripe"></div>
+  <div class="card-body">
+    <div class="error-number" id="error-number"></div>
+    <span class="error-icon" id="error-icon"></span>
+    <div class="error-title" id="error-title"></div>
+    <div class="error-desc" id="error-desc"></div>
+    <div class="url-box" id="url-box">
+      <div class="url-label">Requested page</div>
+      <div class="url-val" id="url-val"></div>
     </div>
-    <div class="attempts-row" id="code-attempts">
-      <div class="attempt-dot used"></div>
-      <div class="attempt-dot"></div>
-      <div class="attempt-dot"></div>
-    </div>
-    <div class="error-actions">
-      <button class="btn btn-navy btn-lg" onclick="history.back()">← Try again</button>
-      <button class="btn btn-outline" onclick="window.location='../index.html'">Return to home</button>
-    </div>
-    <div class="error-detail">
-      <strong>Need a new code?</strong> Contact the organisation that sent your invitation — they can issue a replacement access code from their recruiter dashboard.
-    </div>
+    <div class="actions" id="actions"></div>
+    <div class="quick-links" id="quick-links"></div>
   </div>
-
-  <!-- IDENTITY MISMATCH -->
-  <div class="error-card" id="err-identity" style="display:none;">
-    <div class="error-icon-ring danger">⛔</div>
-    <div class="error-code">Error A02</div>
-    <div class="error-title">Identity details don't match</div>
-    <div class="error-desc">
-      The details you entered don't match what we have on file for this access code.<br><br>
-      Please check your full name, email address, and the last 4 digits of your phone number.
-    </div>
-    <div class="attempts-row" id="identity-attempts">
-      <div class="attempt-dot used"></div>
-      <div class="attempt-dot used"></div>
-      <div class="attempt-dot"></div>
-    </div>
-    <div class="error-actions">
-      <button class="btn btn-navy btn-lg" onclick="history.back()">← Try again</button>
-      <a href="../index.html" class="btn btn-outline">Return to home</a>
-    </div>
-    <div class="error-detail">
-      <strong>1 attempt remaining.</strong> After 3 failed attempts your access code will be locked. Contact the organisation that invited you if you believe there's been an error.
-    </div>
+  <div class="card-footer">
+    <a href="../index.html">Portal home</a>
+    <span class="dot">·</span>
+    <a href="contact.html">Contact support</a>
+    <span class="dot">·</span>
+    <a href="login.html">Recruiter login</a>
+    <span class="dot">·</span>
+    <a href="assess.html">Candidate portal</a>
   </div>
-
-  <!-- ACCOUNT LOCKED -->
-  <div class="error-card" id="err-locked" style="display:none;">
-    <div class="error-icon-ring danger">🔒</div>
-    <div class="error-code">Error A03</div>
-    <div class="error-title">Account locked</div>
-    <div class="error-desc">
-      Too many failed attempts have been made with this access code.<br><br>
-      For security, this session has been locked and cannot be retried.
-    </div>
-    <div class="error-actions">
-      <a href="../index.html" class="btn btn-navy btn-lg">Return to home</a>
-    </div>
-    <div class="error-detail">
-      <strong>What to do next:</strong> Contact the organisation that sent your invitation and ask them to issue a new access code. Reference error code <strong>A03</strong>.
-    </div>
-  </div>
-
-  <!-- SESSION TIMEOUT -->
-  <div class="error-card" id="err-timeout" style="display:none;">
-    <div class="error-icon-ring warning">⏰</div>
-    <div class="error-code">Notice A04</div>
-    <div class="error-title">Time's up</div>
-    <div class="error-desc">
-      Your 25-minute assessment window has ended. Your answers have been automatically saved and submitted.
-    </div>
-    <div class="error-actions">
-      <a href="submitted.html" class="btn btn-navy btn-lg">View submission →</a>
-    </div>
-    <div class="error-detail">
-      <strong>What happens next:</strong> Your recruiter will be notified and will review your results. You don't need to do anything else.
-    </div>
-  </div>
-
-  <!-- INVALID LOGIN (Recruiter) -->
-  <div class="error-card" id="err-login" style="display:none;">
-    <div class="error-icon-ring danger">🔐</div>
-    <div class="error-code">Error R01</div>
-    <div class="error-title">Incorrect credentials</div>
-    <div class="error-desc">
-      The email address or password you entered is incorrect. Please check your details and try again.
-    </div>
-    <div class="attempts-row" id="login-attempts">
-      <div class="attempt-dot used"></div>
-      <div class="attempt-dot"></div>
-      <div class="attempt-dot"></div>
-    </div>
-    <div class="error-actions">
-      <button class="btn btn-navy btn-lg" onclick="history.back()">← Try again</button>
-      <a href="password-reset.html" class="btn btn-outline">Forgot password?</a>
-    </div>
-    <div class="error-detail">
-      <strong>3 attempts allowed.</strong> After 3 failed attempts your account will be temporarily locked. Contact your NovaCS administrator if you need access restored.
-    </div>
-  </div>
-
-  <!-- 404 NOT FOUND -->
-  <div class="error-card" id="err-404" style="display:none;">
-    <div class="error-icon-ring info">🌐</div>
-    <div class="error-code">Error 404</div>
-    <div class="error-title">Page not found</div>
-    <div class="error-desc">
-      The page you're looking for doesn't exist or has been moved.<br><br>
-      If you followed a link, it may be out of date.
-    </div>
-    <div class="error-actions">
-      <a href="../index.html" class="btn btn-navy btn-lg">← Back to NovaCS</a>
-    </div>
-  </div>
-
-  <!-- DEFAULT FALLBACK -->
-  <div class="error-card" id="err-default">
-    <div class="error-icon-ring danger">⚠️</div>
-    <div class="error-code">Unexpected error</div>
-    <div class="error-title">Something went wrong</div>
-    <div class="error-desc">
-      An unexpected error occurred. Please try again, or return to the home page.
-    </div>
-    <div class="error-actions">
-      <button class="btn btn-navy btn-lg" onclick="history.back()">← Go back</button>
-      <a href="../index.html" class="btn btn-outline">Return to home</a>
-    </div>
-  </div>
-
-</div><!-- /error-wrap -->
+</div>
 
 <script>
-// Show the right panel based on ?type= URL param
-// Usage: error.html?type=code | identity | locked | timeout | login | 404
-const type = new URLSearchParams(window.location.search).get('type');
-const attempts = parseInt(new URLSearchParams(window.location.search).get('attempts')) || 1;
+const params = new URLSearchParams(window.location.search);
+const code   = params.get('code') || '404';
+const from   = params.get('from') || '';
 
-const panels = ['err-code','err-identity','err-locked','err-timeout','err-login','err-404','err-default'];
-
-function show(id) {
-  panels.forEach(p => document.getElementById(p).style.display = 'none');
-  document.getElementById(id).style.display = 'block';
-}
-
-// Set attempt dots
-function setAttempts(containerId, used, total = 3) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  el.innerHTML = Array.from({ length: total }, (_, i) =>
-    `<div class="attempt-dot ${i < used ? 'used' : ''}"></div>`
-  ).join('');
-}
-
-switch (type) {
-  case 'code':     show('err-code');     setAttempts('code-attempts', attempts);     break;
-  case 'identity': show('err-identity'); setAttempts('identity-attempts', attempts); break;
-  case 'locked':   show('err-locked');   break;
-  case 'timeout':  show('err-timeout');  break;
-  case 'login':    show('err-login');    setAttempts('login-attempts', attempts);    break;
-  case '404':      show('err-404');      break;
-  default:         show('err-default');  break;
-}
-
-// Update page title per error type
-const titles = {
-  code: 'Invalid Code', identity: 'Identity Mismatch', locked: 'Account Locked',
-  timeout: 'Time Expired', login: 'Login Failed', '404': '404 Not Found'
+const configs = {
+  '404': {
+    stripe:   'stripe-404',
+    numClass: 'num-404',
+    number:   '404',
+    icon:     '🔍',
+    title:    'Page not found',
+    desc:     "The page you're looking for doesn't exist or may have been moved. Double-check the URL, or use one of the links below to get back on track.",
+    showUrl:  true,
+    actions: [
+      { href: '../index.html',             cls: 'btn-primary',   label: '← Back to portal home'       },
+      { href: 'javascript:history.back()', cls: 'btn-secondary', label: 'Go back to the previous page'},
+    ],
+    links: [
+      { href: 'login.html',        label: '🏢 Recruiter Login'  },
+      { href: 'assess.html',       label: '📋 Candidate Portal' },
+      { href: '../index.html#how', label: '⚙️ How It Works'     },
+      { href: 'contact.html',      label: '✉️ Contact Us'       },
+    ]
+  },
+  '403': {
+    stripe:   'stripe-403',
+    numClass: 'num-403',
+    number:   '403',
+    icon:     '🔒',
+    title:    'Access denied',
+    desc:     "You don't have permission to view this page. If you think this is a mistake, try signing in again or ask your organisation administrator for access.",
+    showUrl:  false,
+    actions: [
+      { href: 'login.html',    cls: 'btn-primary',   label: 'Sign in to your account →' },
+      { href: '../index.html', cls: 'btn-secondary', label: 'Return to portal home'     },
+    ],
+    links: [
+      { href: 'password-reset.html', label: '🔑 Reset password'  },
+      { href: 'contact.html',        label: '✉️ Contact support' },
+    ]
+  },
+  '500': {
+    stripe:   'stripe-500',
+    numClass: 'num-500',
+    number:   '500',
+    icon:     '⚡',
+    title:    'Something went wrong on our end',
+    desc:     "An unexpected server error occurred. Our team has been notified automatically. Try refreshing the page — if the problem keeps happening, please get in touch.",
+    showUrl:  false,
+    actions: [
+      { href: 'javascript:location.reload()', cls: 'btn-primary',   label: '↻ Refresh the page'    },
+      { href: '../index.html',                cls: 'btn-secondary', label: 'Return to portal home' },
+    ],
+    links: [
+      { href: 'contact.html', label: '✉️ Report this issue' },
+      { href: 'login.html',   label: '🏢 Recruiter login'  },
+    ]
+  },
+  'offline': {
+    stripe:   'stripe-offline',
+    numClass: 'num-offline',
+    number:   '—',
+    icon:     '📡',
+    title:    "You're offline",
+    desc:     "NovaCS can't connect right now. Check your internet connection and try again — nothing has been lost.",
+    showUrl:  false,
+    actions: [
+      { href: 'javascript:location.reload()', cls: 'btn-primary', label: '↻ Try reconnecting' },
+    ],
+    links: []
+  }
 };
-if (titles[type]) document.title = `NovaCS — ${titles[type]}`;
+
+const cfg = configs[code] || configs['404'];
+
+document.getElementById('card-stripe').className    = 'card-stripe ' + cfg.stripe;
+document.getElementById('error-number').textContent = cfg.number;
+document.getElementById('error-number').className   = 'error-number ' + cfg.numClass;
+document.getElementById('error-icon').textContent   = cfg.icon;
+document.getElementById('error-title').textContent  = cfg.title;
+document.getElementById('error-desc').textContent   = cfg.desc;
+
+if (cfg.showUrl && from) {
+  document.getElementById('url-box').classList.add('visible');
+  document.getElementById('url-val').textContent = from;
+}
+
+document.getElementById('actions').innerHTML = cfg.actions
+  .map(a => `<a href="${a.href}" class="${a.cls}">${a.label}</a>`)
+  .join('');
+
+document.getElementById('quick-links').innerHTML = cfg.links
+  .map(l => `<a class="ql" href="${l.href}">${l.label}</a>`)
+  .join('');
+
+window.addEventListener('offline', () => { location.search = '?code=offline'; });
 </script>
 </body>
 </html>

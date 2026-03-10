@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCS — Assessments</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy-900:#0d1b2a;--navy-800:#1a2e45;--navy-700:#1e3a5f;--navy-600:#2452a0;--navy-500:#2d64c8;--navy-400:#4a7fd4;--navy-100:#dce8f7;--navy-50:#eef4fc;--slate-900:#1c2333;--slate-700:#334155;--slate-600:#475569;--slate-500:#64748b;--slate-400:#94a3b8;--slate-200:#e2e8f0;--slate-100:#f1f5f9;--slate-50:#f8fafc;--white:#fff;--bg:#edf0f7;--success:#0f6b3a;--success-bg:#e6f4ed;--success-border:#a3d4b8;--warning:#854d0e;--warning-bg:#fef9ec;--warning-border:#fcd34d;--danger:#991b1b;--danger-bg:#fef2f2;--danger-border:#fca5a5;--shadow-xs:0 1px 2px rgba(13,27,42,.06);--shadow-sm:0 2px 6px rgba(13,27,42,.08);--shadow-md:0 6px 22px rgba(13,27,42,.09),0 2px 6px rgba(13,27,42,.05);--shadow-xl:0 22px 56px rgba(13,27,42,.15);--r-sm:8px;--r:12px;--r-lg:16px;--r-xl:22px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--slate-900);min-height:100vh;font-size:14px;}
+.hidden{display:none!important;}
+.topbar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--white);border-bottom:1px solid var(--slate-200);box-shadow:var(--shadow-sm);position:sticky;top:0;z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.back-btn{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--slate-500);text-decoration:none;padding:6px 12px;border-radius:var(--r-sm);border:1.5px solid var(--slate-200);background:var(--white);transition:all .15s;}
+.back-btn:hover{border-color:var(--navy-400);color:var(--navy-600);background:var(--navy-50);}
+.topbar-brand{font-family:'Playfair Display',serif;font-weight:700;font-size:18px;color:var(--slate-900);}
+.topbar-brand sup{font-family:'Figtree',sans-serif;font-size:11px;font-weight:700;color:var(--navy-500);vertical-align:super;margin-left:2px;}
+.crumb{font-size:13px;color:var(--slate-400);}
+.crumb span{color:var(--slate-700);font-weight:600;}
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:'Figtree',sans-serif;font-weight:600;font-size:13px;padding:8px 17px;border-radius:var(--r-sm);border:none;cursor:pointer;transition:all .17s;white-space:nowrap;}
+.btn-navy{background:var(--navy-700);color:#fff;box-shadow:0 2px 8px rgba(30,58,95,.28);}
+.btn-navy:hover{background:var(--navy-800);transform:translateY(-1px);}
+.btn-outline{background:var(--white);color:var(--slate-700);border:1.5px solid var(--slate-200);}
+.btn-outline:hover{border-color:var(--navy-400);color:var(--navy-600);background:var(--navy-50);}
+.btn-ghost{background:transparent;color:var(--slate-600);border:1.5px solid transparent;}
+.btn-ghost:hover{background:var(--slate-100);}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border:1.5px solid var(--danger-border);}
+.btn-danger:hover{background:#fde4e4;}
+.btn-sm{padding:5px 11px;font-size:12px;}
+.main{max-width:1200px;margin:0 auto;padding:28px;}
+.pg-head{margin-bottom:22px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.pg-h1{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:3px;}
+.pg-sub{font-size:13px;color:var(--slate-500);}
+.pg-actions{display:flex;align-items:center;gap:9px;}
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r);padding:5px;margin-bottom:24px;box-shadow:var(--shadow-xs);width:fit-content;}
+.tab-btn{padding:7px 18px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;background:transparent;border:none;color:var(--slate-500);font-family:'Figtree',sans-serif;}
+.tab-btn.active{background:var(--navy-700);color:#fff;box-shadow:0 2px 8px rgba(30,58,95,.22);}
+.tab-btn:not(.active):hover{background:var(--slate-100);color:var(--slate-900);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+/* CARD */
+.card{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-lg);box-shadow:var(--shadow-md);overflow:hidden;margin-bottom:18px;}
+.card-head{padding:15px 20px;border-bottom:1px solid var(--slate-100);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.card-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
+.card-badge{background:var(--navy-50);color:var(--navy-600);border:1px solid var(--navy-100);font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;}
+/* TABLE */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--slate-50);}
+th{text-align:left;padding:10px 15px;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--slate-400);white-space:nowrap;border-bottom:1px solid var(--slate-200);}
+td{padding:11px 15px;font-size:13px;border-top:1px solid var(--slate-100);vertical-align:middle;}
+tr:hover td{background:#fafbfc;}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:11.5px;font-weight:600;}
+.pill-active{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border);}
+.pill-expired{background:var(--slate-100);color:var(--slate-500);border:1px solid var(--slate-200);}
+.pill-used{background:var(--navy-50);color:var(--navy-600);border:1px solid var(--navy-100);}
+.pill-revoked{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border);}
+/* CODES */
+.code-mono{font-family:'Courier New',monospace;font-size:14px;font-weight:700;letter-spacing:3px;color:var(--navy-700);}
+/* FILTER */
+.filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.search-wrap{position:relative;}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--slate-400);}
+.search-icon svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;}
+.search-input{background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:7px 12px 7px 30px;font-family:'Figtree',sans-serif;font-size:12.5px;color:var(--slate-900);outline:none;width:180px;transition:all .18s;}
+.search-input:focus{border-color:var(--navy-400);width:210px;background:var(--white);}
+.filt-sel{background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:7px 11px;font-family:'Figtree',sans-serif;font-size:12.5px;color:var(--slate-700);outline:none;cursor:pointer;}
+/* INVITE TABS */
+.invite-tabs{display:flex;gap:9px;margin-bottom:20px;}
+.invite-tab{padding:7px 18px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--slate-200);background:var(--white);color:var(--slate-600);font-family:'Figtree',sans-serif;transition:all .15s;}
+.invite-tab.active{background:var(--navy-700);color:#fff;border-color:var(--navy-700);}
+/* FIELDS */
+.field{margin-bottom:14px;}
+.field-label{display:block;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-500);margin-bottom:6px;}
+.field-input{width:100%;background:var(--white);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:9px 13px;font-family:'Figtree',sans-serif;font-size:14px;color:var(--slate-900);outline:none;transition:all .18s;}
+.field-input:focus{border-color:var(--navy-500);box-shadow:0 0 0 3px rgba(45,100,200,.1);}
+.field-input::placeholder{color:var(--slate-400);}
+/* CAT CARDS */
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
+.cat-card{background:var(--white);border:1.5px solid var(--slate-200);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-md);position:relative;overflow:hidden;}
+.cat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.cc1::before{background:linear-gradient(90deg,#1e3a5f,#4a7fd4);}
+.cc2::before{background:linear-gradient(90deg,#0f6b3a,#22c55e);}
+.cc3::before{background:linear-gradient(90deg,#6d28d9,#a78bfa);}
+.cc4::before{background:linear-gradient(90deg,#0e7490,#67e8f9);}
+.cat-icon{font-size:22px;margin-bottom:10px;}
+.cat-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:4px;}
+.cat-meta{font-size:12px;color:var(--slate-500);margin-bottom:12px;}
+.cat-stat{font-size:11px;color:var(--slate-400);}
+.cat-stat strong{color:var(--slate-700);}
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(13,27,42,.4);backdrop-filter:blur(5px);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.open{display:flex;animation:fadeUp .2s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.modal{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-xl);padding:30px;width:100%;max-width:480px;box-shadow:var(--shadow-xl);position:relative;}
+.modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:var(--r-sm);border:none;background:var(--slate-100);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--slate-500);font-size:13px;transition:all .15s;}
+.modal-close:hover{background:var(--slate-200);}
+.modal h3{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:4px;}
+.modal-sub{color:var(--slate-500);font-size:13px;margin-bottom:20px;}
+.modal-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:16px;}
+.gen-code-box{background:var(--navy-50);border:2px solid var(--navy-100);border-radius:var(--r);padding:20px;text-align:center;margin:16px 0;}
+.gen-code-val{font-family:'Courier New',monospace;font-size:30px;font-weight:700;letter-spacing:7px;color:var(--navy-700);display:block;margin-bottom:5px;}
+.gen-code-hint{font-size:12px;color:var(--slate-500);}
+.empty-state{padding:40px;text-align:center;color:var(--slate-400);font-size:13px;}
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--slate-900);color:#fff;border-radius:var(--r);padding:11px 16px;font-size:13px;font-weight:500;z-index:999;display:flex;align-items:center;gap:8px;transform:translateY(70px);opacity:0;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-xl);max-width:300px;}
+.toast.show{transform:none;opacity:1;}
+@media(max-width:800px){.cat-grid{grid-template-columns:1fr 1fr;}.main{padding:16px;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a class="back-btn" href="../dashboard.html">← Dashboard</a>
+    <div class="topbar-brand">Nova<sup>CS</sup></div>
+    <div class="crumb">/ <span>Assessments</span></div>
+  </div>
+  <div class="pg-actions">
+    <button class="btn btn-outline btn-sm" onclick="switchTab('codes',document.querySelectorAll('.tab-btn')[1])">Manage Codes</button>
+    <button class="btn btn-navy" onclick="openModal('new-code-modal')">+ Issue Access Code</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="pg-head">
+    <div>
+      <h1 class="pg-h1">Assessments</h1>
+      <p class="pg-sub">Manage access codes, invite candidates and configure question categories</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('overview',this)">Overview</button>
+    <button class="tab-btn" onclick="switchTab('codes',this)">Access Codes</button>
+    <button class="tab-btn" onclick="switchTab('invite',this)">Invite Manager</button>
+    <button class="tab-btn" onclick="switchTab('questions',this)">Question Categories</button>
+  </div>
+
+  <!-- ── OVERVIEW TAB ── -->
+  <div class="tab-panel active" id="tab-overview">
+    <div class="cat-grid">
+      <div class="cat-card cc1">
+        <div class="cat-icon">⚖️</div>
+        <div class="cat-name">Judgement & Decision</div>
+        <div class="cat-meta">7 questions · 35% weight</div>
+        <div class="cat-stat">Avg score: <strong>72%</strong> · Pass rate: <strong>75%</strong></div>
+      </div>
+      <div class="cat-card cc2">
+        <div class="cat-icon">🔢</div>
+        <div class="cat-name">Numerical Reasoning</div>
+        <div class="cat-meta">6 questions · 25% weight</div>
+        <div class="cat-stat">Avg score: <strong>68%</strong> · Pass rate: <strong>63%</strong></div>
+      </div>
+      <div class="cat-card cc3">
+        <div class="cat-icon">💬</div>
+        <div class="cat-name">Verbal & Communication</div>
+        <div class="cat-meta">6 questions · 20% weight</div>
+        <div class="cat-stat">Avg score: <strong>74%</strong> · Pass rate: <strong>75%</strong></div>
+      </div>
+      <div class="cat-card cc4">
+        <div class="cat-icon">🧠</div>
+        <div class="cat-name">Situational Scenarios</div>
+        <div class="cat-meta">6 questions · 20% weight</div>
+        <div class="cat-stat">Avg score: <strong>70%</strong> · Pass rate: <strong>75%</strong></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div style="display:flex;align-items:center;gap:10px"><div class="card-title">Recent Batches</div><div class="card-badge" id="batch-count">3</div></div>
+        <button class="btn btn-navy btn-sm" onclick="openModal('new-batch-modal')">+ New Batch</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Batch Name</th><th>Role</th><th>Codes Issued</th><th>Completed</th><th>Pass Rate</th><th>Created</th><th></th></tr></thead>
+          <tbody id="batch-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CODES TAB ── -->
+  <div class="tab-panel" id="tab-codes">
+    <div class="card">
+      <div class="card-head">
+        <div style="display:flex;align-items:center;gap:10px"><div class="card-title">Access Codes</div><div class="card-badge" id="code-count">—</div></div>
+        <div class="filter-row">
+          <div class="search-wrap">
+            <div class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+            <input class="search-input" type="text" id="code-srch" placeholder="Search name or code…" oninput="renderCodes()"/>
+          </div>
+          <select class="filt-sel" id="code-filt" onchange="renderCodes()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="used">Used</option>
+            <option value="expired">Expired</option>
+            <option value="revoked">Revoked</option>
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="exportCodes()">⬇ Export</button>
+          <button class="btn btn-navy btn-sm" onclick="openModal('new-code-modal')">+ Issue Code</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Code</th><th>Candidate</th><th>Role</th><th>Status</th><th>Issued</th><th>Expiry</th><th></th></tr></thead>
+          <tbody id="codes-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── INVITE MANAGER TAB ── -->
+  <div class="tab-panel" id="tab-invite">
+    <div class="card">
+      <div class="card-head"><div class="card-title">Invite Candidates</div></div>
+      <div style="padding:20px">
+        <div class="invite-tabs">
+          <button class="invite-tab active" id="itab-single" onclick="switchInviteTab('single')">Single Invite</button>
+          <button class="invite-tab" id="itab-bulk" onclick="switchInviteTab('bulk')">Bulk / CSV Upload</button>
+        </div>
+        <!-- Single -->
+        <div id="invite-single">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="field"><label class="field-label">Full Name</label><input class="field-input" id="inv-name" placeholder="Jane Smith"/></div>
+            <div class="field"><label class="field-label">Email Address</label><input class="field-input" id="inv-email" type="email" placeholder="jane@company.com"/></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="field">
+              <label class="field-label">Role Applied For</label>
+              <select class="field-input" id="inv-role">
+                <option>Customer Success Manager</option><option>Operations Analyst</option>
+                <option>Project Manager</option><option>Sales Associate</option>
+                <option>HR Coordinator</option><option>Marketing Executive</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field-label">Code Expiry</label>
+              <select class="field-input">
+                <option>24 hours</option><option>48 hours</option><option selected>72 hours</option><option>7 days</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;gap:9px;justify-content:flex-end">
+            <button class="btn btn-outline" onclick="clearInvite()">Clear</button>
+            <button class="btn btn-navy" onclick="sendSingleInvite()">Generate Code & Send →</button>
+          </div>
+        </div>
+        <!-- Bulk -->
+        <div id="invite-bulk" class="hidden">
+          <div style="border:2px dashed var(--slate-200);border-radius:var(--r-lg);padding:36px;text-align:center;background:var(--slate-50);margin-bottom:16px;cursor:pointer" onclick="showToast('CSV upload — coming soon')">
+            <div style="font-size:28px;margin-bottom:10px">📄</div>
+            <div style="font-weight:600;color:var(--slate-700);margin-bottom:5px">Drop a CSV file here or click to browse</div>
+            <div style="font-size:12.5px;color:var(--slate-400)">Required columns: Name, Email, Role · Max 500 rows</div>
+          </div>
+          <div style="background:var(--navy-50);border:1px solid var(--navy-100);border-radius:var(--r-sm);padding:12px 14px;font-size:12.5px;color:var(--navy-700);margin-bottom:14px">
+            <strong>CSV format:</strong> Name, Email, Role<br>
+            <span style="font-family:'Courier New',monospace;font-size:12px;opacity:.8">Jane Smith, jane@co.com, Project Manager</span>
+          </div>
+          <div style="display:flex;justify-content:flex-end">
+            <button class="btn btn-navy" onclick="showToast('Upload a CSV file first')">Process & Send All →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Invite log -->
+    <div class="card">
+      <div class="card-head"><div class="card-title">Invite Log</div><div class="card-badge" id="invite-count">—</div></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Candidate</th><th>Role</th><th>Code</th><th>Sent</th><th>Status</th></tr></thead>
+          <tbody id="invite-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── QUESTIONS TAB ── -->
+  <div class="tab-panel" id="tab-questions">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+      <div class="card">
+        <div class="card-head"><div class="card-title">⚖️ Judgement & Decision Making</div><button class="btn btn-ghost btn-sm" onclick="showToast('Question editor — coming soon')">Edit Questions</button></div>
+        <div style="padding:16px 20px">
+          <div style="font-size:12.5px;color:var(--slate-500);margin-bottom:14px;line-height:1.7">Tests a candidate's ability to weigh up competing priorities, make sound decisions under pressure and evaluate risk. Carries the highest weight at 35%.</div>
+          <div style="display:flex;gap:18px;margin-bottom:14px">
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--navy-700)">7</div><div style="font-size:11px;color:var(--slate-400)">Questions</div></div>
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--navy-700)">35%</div><div style="font-size:11px;color:var(--slate-400)">Weight</div></div>
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--success)">72%</div><div style="font-size:11px;color:var(--slate-400)">Avg Score</div></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--slate-400);margin-bottom:8px">Question Types</div>
+          ${['Scenario-based workplace decisions','Risk vs reward trade-offs','Ethical dilemma resolution','Priority ranking under pressure','Interpersonal conflict scenarios','Data interpretation for decisions'].map(t=>`<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--slate-100);font-size:12.5px;color:var(--slate-600)"><span style="color:var(--success)">✓</span>${t}</div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">🔢 Numerical Reasoning</div><button class="btn btn-ghost btn-sm" onclick="showToast('Question editor — coming soon')">Edit Questions</button></div>
+        <div style="padding:16px 20px">
+          <div style="font-size:12.5px;color:var(--slate-500);margin-bottom:14px;line-height:1.7">Assesses numerical literacy, data interpretation and basic analytical thinking. Essential for roles involving reporting, budgets or data-heavy workflows.</div>
+          <div style="display:flex;gap:18px;margin-bottom:14px">
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--navy-700)">6</div><div style="font-size:11px;color:var(--slate-400)">Questions</div></div>
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--navy-700)">25%</div><div style="font-size:11px;color:var(--slate-400)">Weight</div></div>
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--success)">68%</div><div style="font-size:11px;color:var(--slate-400)">Avg Score</div></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--slate-400);margin-bottom:8px">Question Types</div>
+          ${['Percentage and ratio calculations','Chart and table data reading','Budget and cost analysis','Number series completion','Rate and efficiency problems','Basic statistical interpretation'].map(t=>`<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--slate-100);font-size:12.5px;color:var(--slate-600)"><span style="color:var(--success)">✓</span>${t}</div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">💬 Verbal & Communication</div><button class="btn btn-ghost btn-sm" onclick="showToast('Question editor — coming soon')">Edit Questions</button></div>
+        <div style="padding:16px 20px">
+          <div style="font-size:12.5px;color:var(--slate-500);margin-bottom:14px;line-height:1.7">Evaluates reading comprehension, written clarity and the ability to extract meaning from workplace communications such as emails, reports or policies.</div>
+          <div style="display:flex;gap:18px;margin-bottom:14px">
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--navy-700)">6</div><div style="font-size:11px;color:var(--slate-400)">Questions</div></div>
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--navy-700)">20%</div><div style="font-size:11px;color:var(--slate-400)">Weight</div></div>
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--success)">74%</div><div style="font-size:11px;color:var(--slate-400)">Avg Score</div></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--slate-400);margin-bottom:8px">Question Types</div>
+          ${['Reading comprehension passages','Inference and implication questions','Email tone and clarity assessment','Grammar and sentence correction','Vocabulary in professional context','Summarisation tasks'].map(t=>`<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--slate-100);font-size:12.5px;color:var(--slate-600)"><span style="color:var(--success)">✓</span>${t}</div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">🧠 Situational Scenarios</div><button class="btn btn-ghost btn-sm" onclick="showToast('Question editor — coming soon')">Edit Questions</button></div>
+        <div style="padding:16px 20px">
+          <div style="font-size:12.5px;color:var(--slate-500);margin-bottom:14px;line-height:1.7">Presents real-world workplace situations and asks candidates to choose the most appropriate course of action. Reveals emotional intelligence and professional judgement.</div>
+          <div style="display:flex;gap:18px;margin-bottom:14px">
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--navy-700)">6</div><div style="font-size:11px;color:var(--slate-400)">Questions</div></div>
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--navy-700)">20%</div><div style="font-size:11px;color:var(--slate-400)">Weight</div></div>
+            <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--success)">70%</div><div style="font-size:11px;color:var(--slate-400)">Avg Score</div></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--slate-400);margin-bottom:8px">Question Types</div>
+          ${['Team conflict resolution','Dealing with a difficult customer','Responding to management feedback','Handling competing deadlines','Workplace ethics dilemmas','New employee onboarding scenarios'].map(t=>`<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--slate-100);font-size:12.5px;color:var(--slate-600)"><span style="color:var(--success)">✓</span>${t}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-bg" id="new-code-modal" onclick="closeBg(event,'new-code-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('new-code-modal')">✕</button>
+    <h3>Issue Access Code</h3>
+    <p class="modal-sub">Generate a unique single-use code for a new candidate.</p>
+    <div style="display:grid;gap:12px">
+      <div><label class="field-label">Full Name</label><input class="field-input" id="nc-name" placeholder="Jane Smith"/></div>
+      <div><label class="field-label">Email Address</label><input class="field-input" id="nc-email" type="email" placeholder="jane@company.com"/></div>
+      <div><label class="field-label">Role Applied For</label>
+        <select class="field-input" id="nc-role">
+          <option>Customer Success Manager</option><option>Operations Analyst</option>
+          <option>Project Manager</option><option>Sales Associate</option>
+          <option>HR Coordinator</option><option>Marketing Executive</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('new-code-modal')">Cancel</button>
+      <button class="btn btn-navy" onclick="issueCode()">Generate Code →</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="code-gen-modal" onclick="closeBg(event,'code-gen-modal')">
+  <div class="modal" style="text-align:center">
+    <button class="modal-close" onclick="closeModal('code-gen-modal')">✕</button>
+    <h3 style="margin-bottom:4px">Code Generated</h3>
+    <p class="modal-sub">Share this code with <span id="gen-code-name">—</span>.</p>
+    <div class="gen-code-box">
+      <span class="gen-code-val" id="gen-code-val">——</span>
+      <span class="gen-code-hint">Single-use · expires in 72 hours</span>
+    </div>
+    <div class="modal-actions" style="justify-content:center;gap:12px">
+      <button class="btn btn-outline" onclick="copyCode()">📋 Copy Code</button>
+      <button class="btn btn-navy" onclick="closeModal('code-gen-modal')">Done</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="new-batch-modal" onclick="closeBg(event,'new-batch-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('new-batch-modal')">✕</button>
+    <h3>Create New Batch</h3>
+    <p class="modal-sub">Group a set of candidates under a named batch for easier tracking.</p>
+    <div><label class="field-label">Batch Name</label><input class="field-input" placeholder="e.g. March 2026 — Customer Success"/></div>
+    <div style="margin-top:12px"><label class="field-label">Role</label><select class="field-input"><option>Customer Success Manager</option><option>Operations Analyst</option><option>Project Manager</option><option>Sales Associate</option><option>HR Coordinator</option></select></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('new-batch-modal')">Cancel</button>
+      <button class="btn btn-navy" onclick="closeModal('new-batch-modal');showToast('Batch created')">Create Batch</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../js/db.js"></script>
+<script src="../js/utils.js"></script>
+<script>
+// ── All data comes from window.DB ──
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='codes')renderCodes();
+  if(name==='invite'){renderInviteLog();switchInviteTab('single');}
+  if(name==='batches')renderBatches();
+}
+
+function statusPill(s){
+  const m={active:'pill-active',used:'pill-used',opened:'pill-pending',expired:'pill-expired',revoked:'pill-revoked'};
+  const l={active:'● Active',used:'✓ Used',opened:'⏳ Opened',expired:'Expired',revoked:'✕ Revoked'};
+  return`<span class="pill ${m[s]||'pill-expired'}">${l[s]||s}</span>`;
+}
+
+function renderCodes(){
+  const codes=DB.getAccessCodes();
+  const el=document.getElementById('codes-tbody');
+  const s=(document.getElementById('code-srch')?.value||'').toLowerCase();
+  const f=document.getElementById('code-filt')?.value||'';
+  let list=[...codes];
+  if(s)list=list.filter(c=>c.name.toLowerCase().includes(s)||c.code.toLowerCase().includes(s));
+  if(f)list=list.filter(c=>c.status===f);
+  document.getElementById('code-count').textContent=list.length;
+  el.innerHTML=list.map(c=>`<tr>
+    <td><span class="code-mono">${c.code}</span></td>
+    <td><div style="font-weight:600">${c.name}</div><div style="font-size:11px;color:var(--slate-400)">${c.email}</div></td>
+    <td style="font-size:12px;color:var(--slate-500)">${c.role}</td>
+    <td>${statusPill(c.status)}</td>
+    <td style="color:var(--slate-500);font-size:12px">${c.issued}</td>
+    <td style="color:var(--slate-500);font-size:12px">${c.expires||'—'}</td>
+    <td><div style="display:flex;gap:5px">
+      ${c.status==='active'?`<button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('${c.code}').then(()=>showToast('Code copied'))">Copy</button><button class="btn btn-danger btn-sm" onclick="revokeCode('${c.id}')">Revoke</button>`:
+      `<button class="btn btn-ghost btn-sm" onclick="showToast('Code: ${c.code}')">Details</button>`}
+    </div></td>
+  </tr>`).join('');
+}
+
+function revokeCode(id){
+  DB.revokeCode(id);renderCodes();showToast('Code revoked');
+}
+
+function renderBatches(){
+  const el=document.getElementById('batch-tbody');
+  if(!el)return;
+  el.innerHTML=DB.batches.map(b=>`<tr>
+    <td style="font-weight:600">${b.name}</td>
+    <td style="font-size:12px;color:var(--slate-500)">${b.role}</td>
+    <td style="font-weight:600">${b.total}</td>
+    <td style="font-weight:600;color:var(--success)">${b.completed}</td>
+    <td style="font-weight:600;color:var(--navy-700)">${b.completed?Math.round(b.pass/b.completed*100)+'%':'—'}</td>
+    <td style="font-size:12px;color:var(--slate-500)">${b.date}</td>
+    <td><button class="btn btn-ghost btn-sm" onclick="showToast('Batch detail — coming soon')">View →</button></td>
+  </tr>`).join('');
+}
+
+function renderInviteLog(){
+  const codes=DB.getAccessCodes();
+  const el=document.getElementById('invite-tbody');
+  document.getElementById('invite-count').textContent=codes.length;
+  el.innerHTML=codes.map(c=>`<tr>
+    <td><div style="font-weight:600">${c.name}</div><div style="font-size:11px;color:var(--slate-400)">${c.email}</div></td>
+    <td style="font-size:12px;color:var(--slate-500)">${c.role}</td>
+    <td><span class="code-mono" style="font-size:12px">${c.code}</span></td>
+    <td style="font-size:12px;color:var(--slate-500)">${c.issued}</td>
+    <td>${statusPill(c.status)}</td>
+  </tr>`).join('');
+}
+
+function switchInviteTab(t){
+  document.getElementById('invite-single').classList.toggle('hidden',t!=='single');
+  document.getElementById('invite-bulk').classList.toggle('hidden',t!=='bulk');
+  document.getElementById('itab-single').classList.toggle('active',t==='single');
+  document.getElementById('itab-bulk').classList.toggle('active',t==='bulk');
+}
+
+function clearInvite(){
+  document.getElementById('inv-name').value='';
+  document.getElementById('inv-email').value='';
+}
+
+function sendSingleInvite(){
+  const name=document.getElementById('inv-name').value.trim();
+  const email=document.getElementById('inv-email').value.trim();
+  const role=document.getElementById('inv-role').value;
+  if(!name||!email){showToast('Please fill in all fields','warn');return;}
+  const {code}=DB.issueCode({name,email,role});
+  document.getElementById('gen-code-val').textContent=code;
+  document.getElementById('gen-code-name').textContent=name;
+  openModal('code-gen-modal');
+  clearInvite();
+  renderInviteLog();
+  showToast(`Code issued to ${name}`);
+}
+
+function issueCode(){
+  const name=document.getElementById('nc-name').value.trim();
+  const email=document.getElementById('nc-email').value.trim();
+  if(!name||!email){showToast('Please fill in all fields','warn');return;}
+  const role=document.getElementById('nc-role').value;
+  const {code}=DB.issueCode({name,email,role});
+  closeModal('new-code-modal');
+  document.getElementById('nc-name').value='';document.getElementById('nc-email').value='';
+  document.getElementById('gen-code-val').textContent=code;
+  document.getElementById('gen-code-name').textContent=name;
+  openModal('code-gen-modal');
+  if(document.getElementById('tab-codes').classList.contains('active'))renderCodes();
+}
+
+function copyCode(){navigator.clipboard.writeText(document.getElementById('gen-code-val').textContent).then(()=>showToast('Code copied'));}
+
+function exportCodes(){
+  const codes=DB.getAccessCodes();
+  const csv=['Code,Candidate,Email,Role,Status,Issued',...codes.map(c=>`${c.code},"${c.name}","${c.email}","${c.role}",${c.status},${c.issued}`)].join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='novaCS-access-codes.csv';a.click();
+  showToast('Codes exported');
+}
+
+function openModal(id){document.getElementById(id)?.classList.add('open');}
+function closeModal(id){document.getElementById(id)?.classList.remove('open');}
+function closeBg(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+let toastTimer;
+function showToast(msg,type='ok'){const t=document.getElementById('toast');if(!t)return;const cols={ok:'#1c2333',err:'#991b1b',warn:'#854d0e'};t.style.background=cols[type]||cols.ok;t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2800);}
+
+// Init
+renderBatches();
+renderCodes();
+
+// Deep-link tab from URL ?tab=
+const urlTab=new URLSearchParams(window.location.search).get('tab');
+if(urlTab){
+  const btn=document.querySelector(`.tab-btn[onclick*="'${urlTab}'"]`);
+  if(btn)switchTab(urlTab,btn);
+}
+</script>
+
+</body>
+</html>

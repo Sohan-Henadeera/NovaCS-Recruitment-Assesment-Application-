@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCS — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-900:#0d1b2a;--navy-800:#1a2e45;--navy-700:#1e3a5f;--navy-600:#2452a0;
+  --navy-500:#2d64c8;--navy-400:#4a7fd4;--navy-100:#dce8f7;--navy-50:#eef4fc;
+  --slate-900:#1c2333;--slate-700:#334155;--slate-600:#475569;--slate-500:#64748b;
+  --slate-400:#94a3b8;--slate-300:#cbd5e1;--slate-200:#e2e8f0;--slate-100:#f1f5f9;--slate-50:#f8fafc;
+  --white:#fff;--bg:#edf0f7;
+  --success:#0f6b3a;--success-bg:#e6f4ed;--success-border:#a3d4b8;
+  --warning:#854d0e;--warning-bg:#fef9ec;--warning-border:#fcd34d;
+  --danger:#991b1b;--danger-bg:#fef2f2;--danger-border:#fca5a5;
+  --gold:#92700a;--gold-bg:#fefce8;
+  --shadow-xs:0 1px 2px rgba(13,27,42,.06);
+  --shadow-sm:0 2px 6px rgba(13,27,42,.08);
+  --shadow-md:0 6px 22px rgba(13,27,42,.09),0 2px 6px rgba(13,27,42,.05);
+  --shadow-xl:0 22px 56px rgba(13,27,42,.15);
+  --r-sm:8px;--r:12px;--r-lg:16px;--r-xl:22px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--slate-900);min-height:100vh;font-size:14px;}
+.hidden{display:none!important;}
+
+/* ── TOPBAR ── */
+.topbar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--navy-900);border-bottom:1px solid rgba(255,255,255,.07);position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.4);}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.back-btn{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:rgba(255,255,255,.55);text-decoration:none;padding:6px 12px;border-radius:var(--r-sm);border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);transition:all .15s;}
+.back-btn:hover{border-color:rgba(255,255,255,.22);color:rgba(255,255,255,.88);background:rgba(255,255,255,.08);}
+.tb-brand{font-family:'Playfair Display',serif;font-weight:700;font-size:19px;color:rgba(255,255,255,.9);}
+.tb-brand sup{font-family:'Figtree',sans-serif;font-size:11px;font-weight:700;color:rgba(160,185,230,.9);vertical-align:super;margin-left:2px;}
+.superadmin-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);border-radius:100px;padding:3px 11px;font-size:11px;font-weight:700;color:#fde68a;letter-spacing:.3px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.user-pill{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:var(--r-sm);padding:4px 12px 4px 5px;}
+.user-av{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#2452a0,#4a7fd4);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.user-name{font-size:13px;font-weight:600;color:rgba(255,255,255,.65);}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:calc(100vh - 56px);}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;flex-shrink:0;background:var(--white);border-right:1px solid var(--slate-200);padding:14px 10px;display:flex;flex-direction:column;gap:2px;}
+.sb-lbl{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--slate-400);padding:10px 10px 4px;margin-top:6px;}
+.sb-lbl:first-child{margin-top:0;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r-sm);font-size:13px;font-weight:500;color:var(--slate-600);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:'Figtree',sans-serif;}
+.sb-item:hover{background:var(--slate-100);color:var(--slate-900);}
+.sb-item.active{background:var(--navy-50);color:var(--navy-700);font-weight:600;}
+.sb-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;padding:28px;}
+.pg-head{margin-bottom:22px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.pg-h1{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:3px;}
+.pg-sub{font-size:13px;color:var(--slate-500);}
+.pg-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:'Figtree',sans-serif;font-weight:600;font-size:13px;padding:8px 17px;border-radius:var(--r-sm);border:none;cursor:pointer;transition:all .17s;white-space:nowrap;text-decoration:none;}
+.btn-navy{background:var(--navy-700);color:#fff;box-shadow:0 2px 8px rgba(30,58,95,.28);}
+.btn-navy:hover{background:var(--navy-800);transform:translateY(-1px);}
+.btn-outline{background:var(--white);color:var(--slate-700);border:1.5px solid var(--slate-200);}
+.btn-outline:hover{border-color:var(--navy-400);color:var(--navy-600);background:var(--navy-50);}
+.btn-ghost{background:transparent;color:var(--slate-600);border:1.5px solid transparent;}
+.btn-ghost:hover{background:var(--slate-100);}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border:1.5px solid var(--danger-border);}
+.btn-danger:hover{background:#fde4e4;}
+.btn-success{background:var(--success-bg);color:var(--success);border:1.5px solid var(--success-border);}
+.btn-sm{padding:5px 11px;font-size:12px;}
+
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.stat-card{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-lg);padding:18px 18px 14px;box-shadow:var(--shadow-md);position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r-lg) var(--r-lg) 0 0;}
+.sc-navy::before{background:linear-gradient(90deg,var(--navy-700),var(--navy-400));}
+.sc-green::before{background:linear-gradient(90deg,#0f6b3a,#22c55e);}
+.sc-gold::before{background:linear-gradient(90deg,#92700a,#f59e0b);}
+.sc-danger::before{background:linear-gradient(90deg,#991b1b,#ef4444);}
+.sc-warn::before{background:linear-gradient(90deg,#854d0e,#f59e0b);}
+.stat-lbl{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-400);margin-bottom:4px;}
+.stat-val{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;line-height:1;margin-bottom:3px;}
+.stat-note{font-size:11.5px;color:var(--slate-400);}
+
+/* ── CARD ── */
+.card{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-lg);box-shadow:var(--shadow-md);overflow:hidden;margin-bottom:18px;}
+.card-head{padding:15px 20px;border-bottom:1px solid var(--slate-100);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.card-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
+.card-badge{background:var(--navy-50);color:var(--navy-600);border:1px solid var(--navy-100);font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;}
+.card-body{padding:18px 20px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--slate-50);}
+th{text-align:left;padding:10px 15px;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--slate-400);white-space:nowrap;border-bottom:1px solid var(--slate-200);}
+td{padding:11px 15px;font-size:13px;border-top:1px solid var(--slate-100);vertical-align:middle;}
+tr:hover td{background:#fafbfc;}
+
+/* ── PILLS ── */
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:11.5px;font-weight:600;}
+.pill-active{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border);}
+.pill-suspended{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border);}
+.pill-admin{background:var(--navy-50);color:var(--navy-600);border:1px solid var(--navy-100);}
+.pill-superadmin{background:var(--gold-bg);color:var(--gold);border:1px solid #fde68a;}
+.pill-recruiter{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border);}
+.pill-viewer{background:var(--slate-100);color:var(--slate-600);border:1px solid var(--slate-200);}
+.pill-open{background:var(--warning-bg);color:var(--warning);border:1px solid var(--warning-border);}
+.pill-progress{background:var(--navy-50);color:var(--navy-600);border:1px solid var(--navy-100);}
+.pill-resolved{background:var(--slate-100);color:var(--slate-500);border:1px solid var(--slate-200);}
+
+/* ── SEARCH / FILTER ── */
+.filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.search-wrap{position:relative;}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--slate-400);}
+.search-icon svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;}
+.search-input{background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:7px 12px 7px 30px;font-family:'Figtree',sans-serif;font-size:12.5px;color:var(--slate-900);outline:none;width:200px;transition:all .18s;}
+.search-input:focus{border-color:var(--navy-400);width:230px;background:var(--white);}
+.filt-sel{background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:7px 11px;font-family:'Figtree',sans-serif;font-size:12.5px;color:var(--slate-700);outline:none;cursor:pointer;}
+
+/* ── AUDIT LOG ── */
+.audit-row{display:flex;gap:12px;padding:12px 18px;border-bottom:1px solid var(--slate-100);align-items:flex-start;}
+.audit-row:last-child{border-bottom:none;}
+.audit-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.audit-time{font-size:11.5px;color:var(--slate-400);white-space:nowrap;min-width:100px;flex-shrink:0;padding-top:1px;}
+.audit-actor{font-weight:600;color:var(--slate-800);}
+.audit-msg{font-size:13px;color:var(--slate-600);}
+
+/* ── SERVICE STATUS ── */
+.svc-row{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--slate-100);}
+.svc-row:last-child{border-bottom:none;}
+.svc-left{display:flex;align-items:center;gap:12px;}
+.svc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.svc-dot.ok{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.15);}
+.svc-dot.warn{background:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.15);}
+.svc-dot.err{background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.15);}
+.svc-name{font-size:13.5px;font-weight:600;color:var(--slate-800);}
+.svc-desc{font-size:12px;color:var(--slate-400);margin-top:2px;}
+.svc-val{font-size:12.5px;font-weight:600;color:var(--success);}
+
+/* ── RESPONSE TIME GRID ── */
+.rt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px 20px;}
+.rt-cell{background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-sm);padding:14px;text-align:center;}
+.rt-val{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--success);}
+.rt-lbl{font-size:11px;color:var(--slate-400);margin-top:3px;}
+
+/* ── TOGGLE ── */
+.toggle{width:36px;height:20px;border-radius:10px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--navy-600);}
+.toggle.off{background:var(--slate-300);}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle.on::after{left:18px;}
+.toggle.off::after{left:3px;}
+.flag-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--slate-100);}
+.flag-row:last-child{border-bottom:none;}
+.flag-name{font-size:13px;font-weight:500;color:var(--slate-800);}
+.flag-desc{font-size:11.5px;color:var(--slate-400);margin-top:2px;}
+
+/* ── FIELD ── */
+.field{margin-bottom:14px;}
+.field:last-child{margin-bottom:0;}
+.field-label{display:block;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-500);margin-bottom:6px;}
+.field-hint{font-size:11.5px;color:var(--slate-400);margin-top:4px;}
+.field-input{width:100%;background:var(--white);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:9px 13px;font-family:'Figtree',sans-serif;font-size:14px;color:var(--slate-900);outline:none;transition:all .18s;}
+.field-input:focus{border-color:var(--navy-500);box-shadow:0 0 0 3px rgba(45,100,200,.1);}
+.field-input::placeholder{color:var(--slate-400);}
+
+/* ── TICKET ROWS ── */
+.ticket-row{display:flex;gap:14px;padding:16px 20px;border-bottom:1px solid var(--slate-100);align-items:flex-start;}
+.ticket-row:last-child{border-bottom:none;}
+.ticket-ref{font-family:'Courier New',monospace;font-size:12px;font-weight:700;color:var(--navy-700);background:var(--navy-50);border:1px solid var(--navy-100);border-radius:5px;padding:2px 7px;white-space:nowrap;flex-shrink:0;}
+.ticket-title{font-weight:600;font-size:13px;color:var(--slate-800);margin-bottom:3px;}
+.ticket-meta{font-size:12px;color:var(--slate-400);}
+.ticket-body{font-size:12.5px;color:var(--slate-500);margin-top:5px;line-height:1.65;}
+.ticket-actions{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0;}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(13,27,42,.4);backdrop-filter:blur(5px);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.open{display:flex;animation:fadeUp .2s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.modal{background:var(--white);border-radius:var(--r-xl);padding:30px;width:100%;max-width:480px;box-shadow:var(--shadow-xl);position:relative;border:1px solid var(--slate-200);}
+.modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:var(--r-sm);border:none;background:var(--slate-100);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--slate-500);font-size:13px;transition:all .15s;}
+.modal-close:hover{background:var(--slate-200);}
+.modal h3{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:4px;}
+.modal-sub{color:var(--slate-500);font-size:13px;margin-bottom:20px;}
+.modal-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:16px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--slate-900);color:#fff;border-radius:var(--r);padding:11px 16px;font-size:13px;font-weight:500;z-index:999;display:flex;align-items:center;gap:8px;transform:translateY(70px);opacity:0;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-xl);max-width:300px;}
+.toast.show{transform:none;opacity:1;}
+
+/* ── CHART BAR ── */
+.bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.bar-label{font-size:12.5px;color:var(--slate-600);width:130px;flex-shrink:0;text-align:right;}
+.bar-track{flex:1;height:10px;background:var(--slate-100);border-radius:10px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:10px;transition:width .6s cubic-bezier(.4,0,.2,1);}
+.bar-val{font-size:12px;font-weight:700;color:var(--slate-700);width:36px;flex-shrink:0;}
+
+/* ── SPARKLINE (SVG inline) ── */
+.spark-card{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-lg);padding:18px 20px;box-shadow:var(--shadow-md);margin-bottom:18px;}
+.spark-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.spark-val{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;line-height:1;}
+.spark-lbl{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-400);margin-top:3px;}
+.spark-change{font-size:12px;font-weight:600;padding:3px 8px;border-radius:100px;}
+.chg-up{background:var(--success-bg);color:var(--success);}
+.chg-dn{background:var(--danger-bg);color:var(--danger);}
+
+/* ── BILLING ── */
+.plan-hero{background:linear-gradient(135deg,var(--navy-800),var(--navy-600));border-radius:var(--r-lg);padding:24px 26px;color:#fff;margin-bottom:18px;position:relative;overflow:hidden;}
+.plan-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.05);}
+.plan-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:4px;}
+.plan-desc{font-size:13px;opacity:.7;margin-bottom:16px;}
+.plan-meta{display:flex;gap:24px;flex-wrap:wrap;}
+.plan-m-lbl{font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;opacity:.55;margin-bottom:3px;}
+.plan-m-val{font-size:15px;font-weight:600;}
+.usage-bar{margin-top:6px;height:6px;background:rgba(255,255,255,.15);border-radius:10px;overflow:hidden;}
+.usage-fill{height:100%;background:rgba(255,255,255,.7);border-radius:10px;}
+
+/* ── SESSIONS TABLE ── */
+.session-row{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--slate-100);}
+.session-row:last-child{border-bottom:none;}
+.session-av{width:32px;height:32px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--navy-700),var(--navy-500));color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.session-name{font-weight:600;font-size:13px;color:var(--slate-800);}
+.session-meta{font-size:11.5px;color:var(--slate-400);}
+.session-dot-live{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.18);flex-shrink:0;}
+.session-dot-old{width:8px;height:8px;border-radius:50%;background:var(--slate-300);flex-shrink:0;}
+
+/* ── PERMISSIONS GRID ── */
+.perm-table{width:100%;border-collapse:collapse;}
+.perm-table th{padding:10px 14px;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--slate-400);background:var(--slate-50);border-bottom:1px solid var(--slate-200);text-align:center;}
+.perm-table th:first-child{text-align:left;}
+.perm-table td{padding:11px 14px;font-size:13px;border-top:1px solid var(--slate-100);text-align:center;vertical-align:middle;}
+.perm-table td:first-child{text-align:left;font-weight:500;color:var(--slate-800);}
+.perm-table tr:hover td{background:#fafbfc;}
+.perm-check{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;}
+.perm-yes{background:var(--success-bg);color:var(--success);font-size:13px;}
+.perm-no{background:var(--slate-100);color:var(--slate-300);font-size:13px;}
+.perm-edit{background:var(--warning-bg);color:var(--warning);font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px;cursor:pointer;border:1px solid var(--warning-border);}
+
+/* ── IMPERSONATE ── */
+.imp-card{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:16px;transition:all .18s;cursor:pointer;margin-bottom:12px;}
+.imp-card:hover{border-color:var(--navy-400);box-shadow:0 8px 28px rgba(30,58,95,.12);transform:translateY(-1px);}
+.imp-av{width:44px;height:44px;border-radius:var(--r);background:linear-gradient(135deg,var(--navy-700),var(--navy-500));color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.imp-name{font-weight:700;font-size:15px;color:var(--slate-900);margin-bottom:2px;}
+.imp-meta{font-size:12px;color:var(--slate-400);}
+.imp-arrow{margin-left:auto;color:var(--slate-300);font-size:18px;flex-shrink:0;}
+
+@media(max-width:1100px){.stats-grid{grid-template-columns:1fr 1fr;}.two-col{grid-template-columns:1fr;}.rt-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:720px){.sidebar{display:none;}.main{padding:16px;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a class="back-btn" href="../dashboard.html">← Dashboard</a>
+    <div class="tb-brand">Nova<sup>CS</sup></div>
+    <div class="superadmin-badge">⚡ Superadmin</div>
+  </div>
+  <div class="topbar-right">
+    <div class="user-pill">
+      <div class="user-av">NC</div>
+      <div class="user-name">NovaCS Admin</div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-lbl">Platform</div>
+    <button class="sb-item active" onclick="switchSection('orgs',this)"><span class="sb-icon">🏢</span>Organisations</button>
+    <button class="sb-item" onclick="switchSection('users',this)"><span class="sb-icon">👥</span>All Users</button>
+    <button class="sb-item" onclick="switchSection('audit',this)"><span class="sb-icon">📋</span>Audit Log</button>
+    <button class="sb-item" onclick="switchSection('tickets',this)"><span class="sb-icon">🎫</span>Support Tickets</button>
+    <button class="sb-item" onclick="switchSection('analytics',this)"><span class="sb-icon">📊</span>Analytics</button>
+    <button class="sb-item" onclick="switchSection('billing',this)"><span class="sb-icon">💳</span>Billing</button>
+    <div class="sb-lbl">Security</div>
+    <button class="sb-item" onclick="switchSection('security',this)"><span class="sb-icon">🔐</span>Sessions &amp; Logins</button>
+    <button class="sb-item" onclick="switchSection('roles',this)"><span class="sb-icon">🛡</span>Role Permissions</button>
+    <button class="sb-item" onclick="switchSection('impersonate',this)"><span class="sb-icon">👤</span>Impersonate Org</button>
+    <div class="sb-lbl">System</div>
+    <button class="sb-item" onclick="switchSection('health',this)"><span class="sb-icon">💚</span>System Health</button>
+    <button class="sb-item" onclick="switchSection('config',this)"><span class="sb-icon">⚙️</span>Platform Config</button>
+  </nav>
+
+  <div class="main">
+
+    <!-- ══════════════════════════════════════
+         ORGANISATIONS
+    ══════════════════════════════════════ -->
+    <div id="sec-orgs">
+      <div class="pg-head">
+        <div>
+          <h1 class="pg-h1">Organisations</h1>
+          <p class="pg-sub">Every organisation registered on the NovaCS platform</p>
+        </div>
+        <div class="pg-actions">
+          <button class="btn btn-outline btn-sm" onclick="showToast('Exporting organisation list…')">⬇ Export CSV</button>
+          <button class="btn btn-navy" onclick="openModal('new-org-modal')">+ Add Organisation</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card sc-navy">
+          <div class="stat-lbl">Total Organisations</div>
+          <div class="stat-val" style="color:var(--navy-700)">4</div>
+          <div class="stat-note">Registered on platform</div>
+        </div>
+        <div class="stat-card sc-green">
+          <div class="stat-lbl">Active This Month</div>
+          <div class="stat-val" style="color:var(--success)">4</div>
+          <div class="stat-note">Have run assessments recently</div>
+        </div>
+        <div class="stat-card sc-gold">
+          <div class="stat-lbl">Total Recruiters</div>
+          <div class="stat-val" style="color:var(--gold)">9</div>
+          <div class="stat-note">Across all organisations</div>
+        </div>
+        <div class="stat-card sc-navy">
+          <div class="stat-lbl">Assessments Completed</div>
+          <div class="stat-val" style="color:var(--navy-700)">40</div>
+          <div class="stat-note">Platform-wide total</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="card-title">All Organisations</div>
+            <div class="card-badge">4</div>
+          </div>
+          <div class="search-wrap">
+            <div class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+            <input class="search-input" type="text" placeholder="Search organisations…"/>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Organisation</th>
+                <th>Plan</th>
+                <th>Recruiters</th>
+                <th>Candidates</th>
+                <th>Assessments Done</th>
+                <th>Status</th>
+                <th>Member Since</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="orgs-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         ALL USERS
+    ══════════════════════════════════════ -->
+    <div id="sec-users" class="hidden">
+      <div class="pg-head">
+        <div>
+          <h1 class="pg-h1">All Users</h1>
+          <p class="pg-sub">Every recruiter account across all organisations</p>
+        </div>
+        <div class="pg-actions">
+          <select class="filt-sel" id="user-filt-org" onchange="renderUsers()">
+            <option value="">All Organisations</option>
+          </select>
+          <select class="filt-sel" id="user-filt-role" onchange="renderUsers()">
+            <option value="">All Roles</option>
+            <option>superadmin</option>
+            <option>admin</option>
+            <option>recruiter</option>
+            <option>viewer</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="card-title">Recruiter Accounts</div>
+            <div class="card-badge" id="user-count">—</div>
+          </div>
+          <div class="search-wrap">
+            <div class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+            <input class="search-input" type="text" id="user-srch" placeholder="Search by name or email…" oninput="renderUsers()"/>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Organisation</th>
+                <th>Role</th>
+                <th>Account Status</th>
+                <th>Last Active</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         AUDIT LOG
+    ══════════════════════════════════════ -->
+    <div id="sec-audit" class="hidden">
+      <div class="pg-head">
+        <div>
+          <h1 class="pg-h1">Audit Log</h1>
+          <p class="pg-sub">A full record of every action taken across the platform</p>
+        </div>
+        <div class="pg-actions">
+          <select class="filt-sel">
+            <option value="">All Organisations</option>
+            <option>Acme Corp</option>
+            <option>NexGen Talent</option>
+            <option>Vertex Consulting</option>
+            <option>ClearPath</option>
+          </select>
+          <select class="filt-sel">
+            <option value="">All Action Types</option>
+            <option>Login</option>
+            <option>Code Issued</option>
+            <option>Assessment Completed</option>
+            <option>Settings Changed</option>
+            <option>Candidate Invited</option>
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="showToast('Audit log exported')">⬇ Export Log</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Recent Activity</div>
+          <div class="card-badge" id="audit-count">—</div>
+        </div>
+        <div id="audit-list"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SUPPORT TICKETS
+    ══════════════════════════════════════ -->
+    <div id="sec-tickets" class="hidden">
+      <div class="pg-head">
+        <div>
+          <h1 class="pg-h1">Support Tickets</h1>
+          <p class="pg-sub">Incoming support requests and access enquiries from all organisations</p>
+        </div>
+        <div class="pg-actions">
+          <select class="filt-sel">
+            <option value="">All Statuses</option>
+            <option>Open</option>
+            <option>In Progress</option>
+            <option>Resolved</option>
+          </select>
+          <select class="filt-sel">
+            <option value="">All Types</option>
+            <option>Access Issue</option>
+            <option>General Enquiry</option>
+            <option>Bug Report</option>
+          </select>
+        </div>
+      </div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card sc-warn">
+          <div class="stat-lbl">Open</div>
+          <div class="stat-val" style="color:var(--warning)">2</div>
+          <div class="stat-note">Waiting for a response</div>
+        </div>
+        <div class="stat-card sc-navy">
+          <div class="stat-lbl">In Progress</div>
+          <div class="stat-val" style="color:var(--navy-700)">1</div>
+          <div class="stat-note">Currently being handled</div>
+        </div>
+        <div class="stat-card sc-green">
+          <div class="stat-lbl">Resolved This Month</div>
+          <div class="stat-val" style="color:var(--success)">7</div>
+          <div class="stat-note">Closed tickets</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">All Tickets</div>
+          <div class="card-badge">10</div>
+        </div>
+        <div id="tickets-list"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SYSTEM HEALTH
+    ══════════════════════════════════════ -->
+    <div id="sec-health" class="hidden">
+      <div class="pg-head">
+        <div>
+          <h1 class="pg-h1">System Health</h1>
+          <p class="pg-sub">Live status of all NovaCS platform services</p>
+        </div>
+        <div class="pg-actions">
+          <button class="btn btn-outline btn-sm" onclick="showToast('Status refreshed — all systems operational')">↻ Refresh Status</button>
+        </div>
+      </div>
+
+      <!-- Service status list -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head">
+          <div class="card-title">Service Status</div>
+          <span class="pill pill-active" style="font-size:12px">● All Systems Operational</span>
+        </div>
+        <div class="svc-row">
+          <div class="svc-left">
+            <div class="svc-dot ok"></div>
+            <div>
+              <div class="svc-name">API</div>
+              <div class="svc-desc">All endpoints are responding normally</div>
+            </div>
+          </div>
+          <div class="svc-val">Operational · 142ms avg</div>
+        </div>
+        <div class="svc-row">
+          <div class="svc-left">
+            <div class="svc-dot ok"></div>
+            <div>
+              <div class="svc-name">Database (Supabase)</div>
+              <div class="svc-desc">All read and write operations are working normally</div>
+            </div>
+          </div>
+          <div class="svc-val">Operational · 38ms avg</div>
+        </div>
+        <div class="svc-row">
+          <div class="svc-left">
+            <div class="svc-dot ok"></div>
+            <div>
+              <div class="svc-name">Authentication</div>
+              <div class="svc-desc">Sign-in and session management are working normally</div>
+            </div>
+          </div>
+          <div class="svc-val">Operational · 201ms avg</div>
+        </div>
+        <div class="svc-row">
+          <div class="svc-left">
+            <div class="svc-dot ok"></div>
+            <div>
+              <div class="svc-name">File Storage</div>
+              <div class="svc-desc">Logo uploads and file access are available</div>
+            </div>
+          </div>
+          <div class="svc-val">Operational · 88ms avg</div>
+        </div>
+        <div class="svc-row">
+          <div class="svc-left">
+            <div class="svc-dot ok"></div>
+            <div>
+              <div class="svc-name">Email Delivery</div>
+              <div class="svc-desc">Candidate invite and notification emails are sending correctly</div>
+            </div>
+          </div>
+          <div class="svc-val">Operational · 100% delivered</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Uptime bar chart -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Uptime — Last 30 Days</div></div>
+          <div class="card-body">
+            <div style="display:flex;gap:3px;margin-bottom:10px" id="uptime-bars"></div>
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--slate-400);margin-bottom:14px">
+              <span>30 days ago</span>
+              <span>Today</span>
+            </div>
+            <div style="font-size:13.5px;font-weight:700;color:var(--success)">✓ 99.98% uptime over the last 30 days</div>
+            <div style="font-size:12px;color:var(--slate-400);margin-top:4px">1 minor incident — resolved within 8 minutes</div>
+          </div>
+        </div>
+
+        <!-- Response time stats — static HTML, no template literals -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Average Response Times</div></div>
+          <div class="rt-grid">
+            <div class="rt-cell">
+              <div class="rt-val">142ms</div>
+              <div class="rt-lbl">API average</div>
+            </div>
+            <div class="rt-cell">
+              <div class="rt-val">38ms</div>
+              <div class="rt-lbl">Database query</div>
+            </div>
+            <div class="rt-cell">
+              <div class="rt-val">201ms</div>
+              <div class="rt-lbl">Authentication</div>
+            </div>
+            <div class="rt-cell">
+              <div class="rt-val">88ms</div>
+              <div class="rt-lbl">File storage</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         PLATFORM CONFIG
+    ══════════════════════════════════════ -->
+    <div id="sec-config" class="hidden">
+      <div class="pg-head">
+        <div>
+          <h1 class="pg-h1">Platform Configuration</h1>
+          <p class="pg-sub">Global defaults that apply to all organisations unless they have configured their own overrides</p>
+        </div>
+        <div class="pg-actions">
+          <button class="btn btn-navy" onclick="showToast('✓ Platform configuration saved')">Save Changes</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Global default values -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Global Defaults</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
+            <div class="field">
+              <label class="field-label">Default Pass Threshold (%)</label>
+              <input class="field-input" type="number" value="65" min="40" max="90"/>
+              <div class="field-hint">The minimum weighted score a candidate needs to receive a Pass result.</div>
+            </div>
+            <div class="field">
+              <label class="field-label">Default Time Limit (minutes)</label>
+              <input class="field-input" type="number" value="25"/>
+              <div class="field-hint">How long each candidate has to complete their assessment.</div>
+            </div>
+            <div class="field">
+              <label class="field-label">Default Number of Questions</label>
+              <input class="field-input" type="number" value="25"/>
+              <div class="field-hint">Total questions drawn across all four categories per assessment.</div>
+            </div>
+            <div class="field">
+              <label class="field-label">Access Code Expiry (hours)</label>
+              <input class="field-input" type="number" value="72"/>
+              <div class="field-hint">How long an unused access code stays valid after it is issued.</div>
+            </div>
+            <div class="field">
+              <label class="field-label">Maximum Organisations Allowed</label>
+              <input class="field-input" type="number" value="100"/>
+              <div class="field-hint">Hard cap on the total number of organisations that can register on the platform.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature flags — written as plain static HTML rows, no template literals -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Feature Flags</div></div>
+          <div style="padding:6px 20px">
+
+            <div class="flag-row">
+              <div>
+                <div class="flag-name">AI Question Generation</div>
+                <div class="flag-desc">Automatically generate role-specific assessment questions from a job description</div>
+              </div>
+              <button class="toggle off" onclick="flipToggle(this);showToast('Feature flag updated')"></button>
+            </div>
+
+            <div class="flag-row">
+              <div>
+                <div class="flag-name">ATS Integrations</div>
+                <div class="flag-desc">Push candidate scores directly into Workable, Greenhouse and Lever</div>
+              </div>
+              <button class="toggle off" onclick="flipToggle(this);showToast('Feature flag updated')"></button>
+            </div>
+
+            <div class="flag-row">
+              <div>
+                <div class="flag-name">Video Response Questions</div>
+                <div class="flag-desc">Allow short video answers to be included as part of an assessment</div>
+              </div>
+              <button class="toggle off" onclick="flipToggle(this);showToast('Feature flag updated')"></button>
+            </div>
+
+            <div class="flag-row">
+              <div>
+                <div class="flag-name">Multi-language Assessments</div>
+                <div class="flag-desc">Deliver assessments in Spanish, French, Mandarin and Arabic</div>
+              </div>
+              <button class="toggle off" onclick="flipToggle(this);showToast('Feature flag updated')"></button>
+            </div>
+
+            <div class="flag-row">
+              <div>
+                <div class="flag-name">Bulk CSV Candidate Invites</div>
+                <div class="flag-desc">Upload a CSV file to issue access codes to many candidates at once</div>
+              </div>
+              <button class="toggle on" onclick="flipToggle(this);showToast('Feature flag updated')"></button>
+            </div>
+
+            <div class="flag-row">
+              <div>
+                <div class="flag-name">Tab-Switch Detection</div>
+                <div class="flag-desc">Automatically flag candidates who navigate away from the assessment window</div>
+              </div>
+              <button class="toggle on" onclick="flipToggle(this);showToast('Feature flag updated')"></button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="card" style="border:1.5px solid var(--danger-border)">
+        <div class="card-head">
+          <div class="card-title" style="color:var(--danger)">⚠ Platform Danger Zone</div>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--danger-bg);border-radius:var(--r-sm);gap:12px">
+            <div>
+              <div style="font-weight:600;font-size:13px">Purge All Assessment Data</div>
+              <div style="font-size:12px;color:var(--slate-500);margin-top:2px">Permanently deletes every assessment result across all organisations. This action cannot be undone.</div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="confirmDanger('This will permanently delete all assessment data across all organisations. This cannot be undone.')">Purge Data</button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--danger-bg);border-radius:var(--r-sm);gap:12px">
+            <div>
+              <div style="font-weight:600;font-size:13px">Take Platform Offline</div>
+              <div style="font-size:12px;color:var(--slate-500);margin-top:2px">Switches NovaCS into maintenance mode. All users will see a maintenance page until you bring the platform back online.</div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="confirmDanger('This will take the platform offline for all users immediately.')">Take Offline</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         PLATFORM ANALYTICS
+    ══════════════════════════════════════ -->
+    <div id="sec-analytics" class="hidden">
+      <div class="pg-head">
+        <div>
+          <h1 class="pg-h1">Platform Analytics</h1>
+          <p class="pg-sub">Assessment activity, pass rates and candidate trends across all organisations</p>
+        </div>
+        <div class="pg-actions">
+          <select class="filt-sel">
+            <option>Last 30 days</option>
+            <option>Last 90 days</option>
+            <option>Last 12 months</option>
+            <option>All time</option>
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="showToast('Analytics report exported')">⬇ Export Report</button>
+        </div>
+      </div>
+
+      <!-- Top-line metrics -->
+      <div class="stats-grid">
+        <div class="stat-card sc-navy">
+          <div class="stat-lbl">Assessments This Month</div>
+          <div class="stat-val" style="color:var(--navy-700)">40</div>
+          <div class="stat-note">↑ 18% vs last month</div>
+        </div>
+        <div class="stat-card sc-green">
+          <div class="stat-lbl">Platform Pass Rate</div>
+          <div class="stat-val" style="color:var(--success)">62%</div>
+          <div class="stat-note">↑ 4pp vs last month</div>
+        </div>
+        <div class="stat-card sc-gold">
+          <div class="stat-lbl">Avg Score</div>
+          <div class="stat-val" style="color:var(--gold)">68</div>
+          <div class="stat-note">Out of 100 weighted</div>
+        </div>
+        <div class="stat-card sc-navy">
+          <div class="stat-lbl">Avg Completion Time</div>
+          <div class="stat-val" style="color:var(--navy-700)">19m</div>
+          <div class="stat-note">Limit is 25 min</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Assessments per org -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Assessments by Organisation</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+            <div class="bar-row">
+              <div class="bar-label">Vertex Consulting</div>
+              <div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--navy-600)"></div></div>
+              <div class="bar-val">12</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">NexGen Talent</div>
+              <div class="bar-track"><div class="bar-fill" style="width:87%;background:var(--navy-500)"></div></div>
+              <div class="bar-val">10</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Acme Corp</div>
+              <div class="bar-track"><div class="bar-fill" style="width:70%;background:var(--navy-400)"></div></div>
+              <div class="bar-val">8</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">ClearPath</div>
+              <div class="bar-track"><div class="bar-fill" style="width:52%;background:var(--navy-200)"></div></div>
+              <div class="bar-val">6</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pass rate by org -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Pass Rate by Organisation</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+            <div class="bar-row">
+              <div class="bar-label">Acme Corp</div>
+              <div class="bar-track"><div class="bar-fill" style="width:75%;background:#0f6b3a"></div></div>
+              <div class="bar-val">75%</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">ClearPath</div>
+              <div class="bar-track"><div class="bar-fill" style="width:67%;background:#22a862"></div></div>
+              <div class="bar-val">67%</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">NexGen Talent</div>
+              <div class="bar-track"><div class="bar-fill" style="width:57%;background:#4aba80"></div></div>
+              <div class="bar-val">57%</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">Vertex Consulting</div>
+              <div class="bar-track"><div class="bar-fill" style="width:50%;background:#94a3b8"></div></div>
+              <div class="bar-val">50%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category scores -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">Average Score by Category — All Orgs</div></div>
+        <div class="card-body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+          <div style="text-align:center;padding:16px;background:var(--slate-50);border-radius:var(--r-sm);border:1px solid var(--slate-200)">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-400);margin-bottom:6px">Judgement</div>
+            <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy-700)">71</div>
+            <div style="font-size:11px;color:var(--slate-400);margin-top:3px">Weight: 35%</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--slate-50);border-radius:var(--r-sm);border:1px solid var(--slate-200)">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-400);margin-bottom:6px">Numerical</div>
+            <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy-700)">64</div>
+            <div style="font-size:11px;color:var(--slate-400);margin-top:3px">Weight: 25%</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--slate-50);border-radius:var(--r-sm);border:1px solid var(--slate-200)">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-400);margin-bottom:6px">Verbal</div>
+            <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy-700)">69</div>
+            <div style="font-size:11px;color:var(--slate-400);margin-top:3px">Weight: 20%</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--slate-50);border-radius:var(--r-sm);border:1px solid var(--slate-200)">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-400);margin-bottom:6px">Situational</div>
+            <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy-700)">66</div>
+            <div style="font-size:11px;color:var(--slate-400);margin-top:3px">Weight: 20%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly volume table -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">Weekly Assessment Volume</div></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Week</th><th>Assessments</th><th>Passed</th><th>Failed</th><th>Pass Rate</th><th>Avg Score</th><th>Avg Time</th></tr></thead>
+            <tbody>
+              <tr><td>Mar 3 – Mar 9</td><td style="font-weight:600">14</td><td style="color:var(--success);font-weight:600">9</td><td style="color:var(--danger);font-weight:600">5</td><td>64%</td><td>69</td><td>18m 42s</td></tr>
+              <tr><td>Feb 24 – Mar 2</td><td style="font-weight:600">12</td><td style="color:var(--success);font-weight:600">7</td><td style="color:var(--danger);font-weight:600">5</td><td>58%</td><td>66</td><td>20m 10s</td></tr>
+              <tr><td>Feb 17 – Feb 23</td><td style="font-weight:600">9</td><td style="color:var(--success);font-weight:600">6</td><td style="color:var(--danger);font-weight:600">3</td><td>67%</td><td>71</td><td>19m 05s</td></tr>
+              <tr><td>Feb 10 – Feb 16</td><td style="font-weight:600">5</td><td style="color:var(--success);font-weight:600">3</td><td style="color:var(--danger);font-weight:600">2</td><td>60%</td><td>65</td><td>21m 30s</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         BILLING & SUBSCRIPTIONS
+    ══════════════════════════════════════ -->
+    <div id="sec-billing" class="hidden">
+      <div class="pg-head">
+        <div>
+          <h1 class="pg-h1">Billing &amp; Subscriptions</h1>
+          <p class="pg-sub">Platform-level billing, plan allocations and per-organisation subscription details</p>
+        </div>
+        <div class="pg-actions">
+          <button class="btn btn-outline btn-sm" onclick="showToast('Opening billing portal…')">Billing Portal ↗</button>
+        </div>
+      </div>
+
+      <!-- Platform plan hero -->
+      <div class="plan-hero">
+        <div style="position:relative;z-index:1">
+          <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:.55;margin-bottom:6px">NovaCS Platform Account</div>
+          <div class="plan-name">Enterprise SaaS Plan</div>
+          <div class="plan-desc">Multi-tenancy enabled · Unlimited organisations · Priority support · Custom domain</div>
+          <div class="plan-meta">
+            <div><div class="plan-m-lbl">Monthly Cost</div><div class="plan-m-val">$1,200 / mo</div></div>
+            <div><div class="plan-m-lbl">Next Renewal</div><div class="plan-m-val">Apr 1, 2026</div></div>
+            <div><div class="plan-m-lbl">Organisations</div><div class="plan-m-val">4 / 100 used</div></div>
+            <div><div class="plan-m-lbl">Assessments This Month</div><div class="plan-m-val">40 / unlimited</div></div>
+          </div>
+          <div style="margin-top:14px">
+            <div style="font-size:11px;opacity:.55;margin-bottom:5px">Organisation slots used (4 of 100)</div>
+            <div class="usage-bar"><div class="usage-fill" style="width:4%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Per-org subscriptions -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Organisation Subscriptions</div>
+          <div class="card-badge">4 orgs</div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Organisation</th>
+                <th>Plan</th>
+                <th>Monthly Value</th>
+                <th>Assessments Used</th>
+                <th>Recruiter Seats</th>
+                <th>Renewal Date</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div style="font-weight:600">Acme Corp</div><div style="font-size:11px;color:var(--slate-400)">org-001</div></td>
+                <td><span style="display:inline-flex;padding:2px 9px;border-radius:100px;font-size:11.5px;font-weight:700;background:var(--navy-50);color:var(--navy-600);border:1px solid var(--navy-100)">Professional</span></td>
+                <td style="font-weight:600">$299 / mo</td>
+                <td>8 / 50</td>
+                <td>3 / 5</td>
+                <td style="font-size:12px;color:var(--slate-400)">Apr 14, 2026</td>
+                <td><span class="pill pill-active">● Active</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="showToast('Managing Acme Corp billing')">Manage</button></td>
+              </tr>
+              <tr>
+                <td><div style="font-weight:600">NexGen Talent</div><div style="font-size:11px;color:var(--slate-400)">org-002</div></td>
+                <td><span style="display:inline-flex;padding:2px 9px;border-radius:100px;font-size:11.5px;font-weight:700;background:var(--slate-100);color:var(--slate-600);border:1px solid var(--slate-200)">Starter</span></td>
+                <td style="font-weight:600">$79 / mo</td>
+                <td>14 / 20</td>
+                <td>2 / 3</td>
+                <td style="font-size:12px;color:var(--slate-400)">Apr 28, 2026</td>
+                <td><span class="pill pill-active">● Active</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="showToast('Managing NexGen Talent billing')">Manage</button></td>
+              </tr>
+              <tr>
+                <td><div style="font-weight:600">Vertex Consulting</div><div style="font-size:11px;color:var(--slate-400)">org-003</div></td>
+                <td><span style="display:inline-flex;padding:2px 9px;border-radius:100px;font-size:11.5px;font-weight:700;background:var(--gold-bg);color:var(--gold);border:1px solid #fde68a">Enterprise</span></td>
+                <td style="font-weight:600">$599 / mo</td>
+                <td>12 / unlimited</td>
+                <td>3 / 15</td>
+                <td style="font-size:12px;color:var(--slate-400)">May 1, 2026</td>
+                <td><span class="pill pill-active">● Active</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="showToast('Managing Vertex Consulting billing')">Manage</button></td>
+              </tr>
+              <tr>
+                <td><div style="font-weight:600">ClearPath</div><div style="font-size:11px;color:var(--slate-400)">org-004</div></td>
+                <td><span style="display:inline-flex;padding:2px 9px;border-radius:100px;font-size:11.5px;font-weight:700;background:var(--slate-100);color:var(--slate-600);border:1px solid var(--slate-200)">Starter</span></td>
+                <td style="font-weight:600">$79 / mo</td>
+                <td>6 / 20</td>
+                <td>1 / 3</td>
+                <td style="font-size:12px;color:var(--slate-400)">May 12, 2026</td>
+                <td><span class="pill pill-active">● Active</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="showToast('Managing ClearPath billing')">Manage</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Revenue summary -->
+      <div class="two-col">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Monthly Revenue Summary</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:var(--slate-50);border-radius:var(--r-sm)">
+              <div style="font-size:13px;color:var(--slate-600)">Starter plans (×2)</div>
+              <div style="font-weight:700">$158 / mo</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:var(--slate-50);border-radius:var(--r-sm)">
+              <div style="font-size:13px;color:var(--slate-600)">Professional plans (×1)</div>
+              <div style="font-weight:700">$299 / mo</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:var(--slate-50);border-radius:var(--r-sm)">
+              <div style="font-size:13px;color:var(--slate-600)">Enterprise plans (×1)</div>
+              <div style="font-weight:700">$599 / mo</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 14px;background:var(--navy-50);border-radius:var(--r-sm);border:1px solid var(--navy-100)">
+              <div style="font-size:13.5px;font-weight:700;color:var(--navy-700)">Total MRR</div>
+              <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--navy-700)">$1,056</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Upcoming Renewals</div></div>
+          <div style="padding:6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid var(--slate-100)">
+              <div><div style="font-weight:600;font-size:13px">Acme Corp</div><div style="font-size:12px;color:var(--slate-400)">Professional · $299/mo</div></div>
+              <div style="text-align:right"><div style="font-size:12.5px;font-weight:700;color:var(--warning)">In 35 days</div><div style="font-size:11.5px;color:var(--slate-400)">Apr 14</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid var(--slate-100)">
+              <div><div style="font-weight:600;font-size:13px">NexGen Talent</div><div style="font-size:12px;color:var(--slate-400)">Starter · $79/mo</div></div>
+              <div style="text-align:right"><div style="font-size:12.5px;font-weight:700;color:var(--slate-500)">In 49 days</div><div style="font-size:11.5px;color:var(--slate-400)">Apr 28</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid var(--slate-100)">
+              <div><div style="font-weight:600;font-size:13px">Vertex Consulting</div><div style="font-size:12px;color:var(--slate-400)">Enterprise · $599/mo</div></div>
+              <div style="text-align:right"><div style="font-size:12.5px;font-weight:700;color:var(--slate-500)">In 52 days</div><div style="font-size:11.5px;color:var(--slate-400)">May 1</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px">
+              <div><div style="font-weight:600;font-size:13px">ClearPath</div><div style="font-size:12px;color:var(--slate-400)">Starter · $79/mo</div></div>
+              <div style="text-align:right"><div style="font-size:12.5px;font-weight:700;color:var(--slate-500)">In 63 days</div><div style="font-size:11.5px;color:var(--slate-400)">May 12</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SECURITY & SESSIONS
+    ══════════════════════════════════════ -->
+    <div id="sec-security" class="hidden">
+      <div class="pg-head">
+        <div>
+          <h1 class="pg-h1">Sessions &amp; Login History</h1>
+          <p class="pg-sub">All active sessions and recent sign-in activity across the platform</p>
+        </div>
+        <div class="pg-actions">
+          <button class="btn btn-danger btn-sm" onclick="showToast('All sessions terminated — users must sign in again')">Force Sign-out All</button>
+        </div>
+      </div>
+
+      <!-- Active sessions -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="card-title">Currently Active Sessions</div>
+            <span class="pill pill-active" style="font-size:12px">4 online now</span>
+          </div>
+        </div>
+        <div class="session-row">
+          <div class="session-dot-live"></div>
+          <div class="session-av">SM</div>
+          <div style="flex:1">
+            <div class="session-name">Sarah Mitchell</div>
+            <div class="session-meta">Acme Corp · Admin · Chrome on macOS · Sydney, AU · Last active 2 min ago</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="showToast('Session terminated for Sarah Mitchell')">End Session</button>
+        </div>
+        <div class="session-row">
+          <div class="session-dot-live"></div>
+          <div class="session-av">TK</div>
+          <div style="flex:1">
+            <div class="session-name">Tobias Kraft</div>
+            <div class="session-meta">NexGen Talent · Admin · Firefox on Windows · Berlin, DE · Last active 11 min ago</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="showToast('Session terminated for Tobias Kraft')">End Session</button>
+        </div>
+        <div class="session-row">
+          <div class="session-dot-live"></div>
+          <div class="session-av">CW</div>
+          <div style="flex:1">
+            <div class="session-name">Chris Walton</div>
+            <div class="session-meta">Vertex Consulting · Admin · Safari on iPhone · London, UK · Last active 24 min ago</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="showToast('Session terminated for Chris Walton')">End Session</button>
+        </div>
+        <div class="session-row">
+          <div class="session-dot-live"></div>
+          <div class="session-av">NC</div>
+          <div style="flex:1">
+            <div class="session-name">NovaCS Admin</div>
+            <div class="session-meta">Platform · Superadmin · Chrome on macOS · Sydney, AU · Active now (this session)</div>
+          </div>
+          <span style="font-size:12px;color:var(--slate-400);padding:5px 11px">This session</span>
+        </div>
+      </div>
+
+      <!-- Login history -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Recent Login History</div>
+          <div style="display:flex;gap:8px">
+            <select class="filt-sel">
+              <option>All Organisations</option>
+              <option>Acme Corp</option>
+              <option>NexGen Talent</option>
+              <option>Vertex Consulting</option>
+              <option>ClearPath</option>
+            </select>
+            <select class="filt-sel">
+              <option>All Results</option>
+              <option>Successful</option>
+              <option>Failed</option>
+            </select>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr><th>User</th><th>Organisation</th><th>Time</th><th>Device &amp; Browser</th><th>Location</th><th>Result</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><div style="font-weight:600">Sarah Mitchell</div></td><td style="font-size:12px;color:var(--slate-500)">Acme Corp</td><td style="font-size:12px;color:var(--slate-400)">Today 14:01</td><td style="font-size:12px;color:var(--slate-500)">Chrome · macOS</td><td style="font-size:12px;color:var(--slate-400)">Sydney, AU</td><td><span class="pill pill-active" style="font-size:11px">✓ Success</span></td></tr>
+              <tr><td><div style="font-weight:600">Tobias Kraft</div></td><td style="font-size:12px;color:var(--slate-500)">NexGen Talent</td><td style="font-size:12px;color:var(--slate-400)">Today 10:48</td><td style="font-size:12px;color:var(--slate-500)">Firefox · Windows</td><td style="font-size:12px;color:var(--slate-400)">Berlin, DE</td><td><span class="pill pill-active" style="font-size:11px">✓ Success</span></td></tr>
+              <tr><td><div style="font-weight:600">James Porter</div></td><td style="font-size:12px;color:var(--slate-500)">Acme Corp</td><td style="font-size:12px;color:var(--slate-400)">Today 09:20</td><td style="font-size:12px;color:var(--slate-500)">Chrome · Windows</td><td style="font-size:12px;color:var(--slate-400)">Melbourne, AU</td><td><span class="pill pill-active" style="font-size:11px">✓ Success</span></td></tr>
+              <tr><td><div style="font-weight:600">Unknown</div></td><td style="font-size:12px;color:var(--slate-500)">Acme Corp</td><td style="font-size:12px;color:var(--slate-400)">Mar 9  23:14</td><td style="font-size:12px;color:var(--slate-500)">Chrome · Android</td><td style="font-size:12px;color:var(--slate-400)">Lagos, NG</td><td><span class="pill pill-suspended" style="font-size:11px">✗ Failed</span></td></tr>
+              <tr><td><div style="font-weight:600">Unknown</div></td><td style="font-size:12px;color:var(--slate-500)">Acme Corp</td><td style="font-size:12px;color:var(--slate-400)">Mar 9  23:13</td><td style="font-size:12px;color:var(--slate-500)">Chrome · Android</td><td style="font-size:12px;color:var(--slate-400)">Lagos, NG</td><td><span class="pill pill-suspended" style="font-size:11px">✗ Failed</span></td></tr>
+              <tr><td><div style="font-weight:600">Lena Fischer</div></td><td style="font-size:12px;color:var(--slate-500)">ClearPath</td><td style="font-size:12px;color:var(--slate-400)">Mar 9  17:30</td><td style="font-size:12px;color:var(--slate-500)">Safari · iPhone</td><td style="font-size:12px;color:var(--slate-400)">Hamburg, DE</td><td><span class="pill pill-active" style="font-size:11px">✓ Success</span></td></tr>
+              <tr><td><div style="font-weight:600">Chris Walton</div></td><td style="font-size:12px;color:var(--slate-500)">Vertex Consulting</td><td style="font-size:12px;color:var(--slate-400)">Mar 9  09:05</td><td style="font-size:12px;color:var(--slate-500)">Safari · iPhone</td><td style="font-size:12px;color:var(--slate-400)">London, UK</td><td><span class="pill pill-active" style="font-size:11px">✓ Success</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:12px 18px;background:var(--warning-bg);border-top:1px solid var(--warning-border);display:flex;align-items:center;gap:10px">
+          <span style="font-size:18px">⚠️</span>
+          <div>
+            <div style="font-weight:700;font-size:13px;color:var(--warning)">2 failed login attempts detected on Acme Corp</div>
+            <div style="font-size:12px;color:var(--slate-500)">Both from the same IP address in Lagos, Nigeria. You may want to notify the Acme Corp admin.</div>
+          </div>
+          <button class="btn btn-outline btn-sm" style="margin-left:auto;flex-shrink:0" onclick="showToast('Alert sent to Acme Corp admin')">Notify Admin</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         ROLE PERMISSIONS
+    ══════════════════════════════════════ -->
+    <div id="sec-roles" class="hidden">
+      <div class="pg-head">
+        <div>
+          <h1 class="pg-h1">Role Permissions</h1>
+          <p class="pg-sub">Define exactly what each role can see and do within an organisation's account</p>
+        </div>
+        <div class="pg-actions">
+          <button class="btn btn-outline btn-sm" onclick="showToast('Permissions reset to platform defaults')">Reset to Defaults</button>
+          <button class="btn btn-navy" onclick="showToast('✓ Permissions saved')">Save Changes</button>
+        </div>
+      </div>
+
+      <div style="background:var(--warning-bg);border:1.5px solid var(--warning-border);border-radius:var(--r-lg);padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px">
+        <span style="font-size:20px">ℹ️</span>
+        <div style="font-size:13px;color:var(--warning)">These permissions apply globally across all organisations. Individual orgs cannot override them. Changes take effect immediately for all users.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Permissions Matrix</div>
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--slate-400);align-items:center">
+            <span style="display:flex;align-items:center;gap:4px"><span class="perm-check perm-yes">✓</span> Allowed</span>
+            <span style="display:flex;align-items:center;gap:4px"><span class="perm-check perm-no">✗</span> Not allowed</span>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="perm-table">
+            <thead>
+              <tr>
+                <th style="min-width:220px">Permission</th>
+                <th>Admin</th>
+                <th>Recruiter</th>
+                <th>Viewer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="4" style="background:var(--slate-50);font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-400);padding:8px 14px">Candidates</td></tr>
+              <tr><td>View all candidates</td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-yes">✓</span></td></tr>
+              <tr><td>Issue access codes</td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-no">✗</span></td></tr>
+              <tr><td>Shortlist / reject candidates</td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-no">✗</span></td></tr>
+              <tr><td>Export candidate CSV</td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-no">✗</span></td></tr>
+              <tr><td colspan="4" style="background:var(--slate-50);font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-400);padding:8px 14px">Assessments</td></tr>
+              <tr><td>View assessment results</td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-yes">✓</span></td></tr>
+              <tr><td>Edit questions &amp; categories</td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-no">✗</span></td><td><span class="perm-check perm-no">✗</span></td></tr>
+              <tr><td>Manage invite batches</td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-no">✗</span></td></tr>
+              <tr><td colspan="4" style="background:var(--slate-50);font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-400);padding:8px 14px">Settings &amp; Admin</td></tr>
+              <tr><td>View organisation settings</td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-no">✗</span></td><td><span class="perm-check perm-no">✗</span></td></tr>
+              <tr><td>Edit organisation settings</td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-no">✗</span></td><td><span class="perm-check perm-no">✗</span></td></tr>
+              <tr><td>Invite / remove team members</td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-no">✗</span></td><td><span class="perm-check perm-no">✗</span></td></tr>
+              <tr><td>Change scoring weights</td><td><span class="perm-check perm-yes">✓</span></td><td><span class="perm-check perm-no">✗</span></td><td><span class="perm-check perm-no">✗</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:14px 20px;border-top:1px solid var(--slate-100);font-size:12.5px;color:var(--slate-500)">
+          To change a permission, click the cell. Changes are saved when you click <strong>Save Changes</strong> above.
+          The <strong>Superadmin</strong> role always has full access to everything and cannot be restricted.
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         IMPERSONATE ORG
+    ══════════════════════════════════════ -->
+    <div id="sec-impersonate" class="hidden">
+      <div class="pg-head">
+        <div>
+          <h1 class="pg-h1">Impersonate Organisation</h1>
+          <p class="pg-sub">Log in as an organisation's admin to troubleshoot issues on their behalf. All actions taken while impersonating are recorded in the audit log.</p>
+        </div>
+      </div>
+
+      <div style="background:var(--danger-bg);border:1.5px solid var(--danger-border);border-radius:var(--r-lg);padding:14px 18px;margin-bottom:22px;display:flex;align-items:center;gap:12px">
+        <span style="font-size:20px">⚠️</span>
+        <div>
+          <div style="font-weight:700;font-size:13px;color:var(--danger);margin-bottom:2px">Use with caution</div>
+          <div style="font-size:12.5px;color:var(--slate-600)">While impersonating, you will see and be able to act on behalf of that organisation's admin. Every action you take will be attributed to you (NovaCS Admin) in the audit log, not to the organisation's users.</div>
+        </div>
+      </div>
+
+      <div id="imp-list"></div>
+    </div>
+
+  </div><!-- /.main -->
+</div><!-- /.layout -->
+
+
+<!-- ══ MODALS ══ -->
+<div class="modal-bg" id="new-org-modal" onclick="closeBg(event,'new-org-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('new-org-modal')">✕</button>
+    <h3>Add Organisation</h3>
+    <p class="modal-sub">Register a new organisation on the NovaCS platform. An admin welcome email will be sent automatically.</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="field">
+        <label class="field-label">Organisation Name</label>
+        <input class="field-input" placeholder="e.g. Acme Corp"/>
+      </div>
+      <div class="field">
+        <label class="field-label">Administrator Email</label>
+        <input class="field-input" type="email" placeholder="admin@organisation.com"/>
+      </div>
+      <div class="field">
+        <label class="field-label">Plan</label>
+        <select class="field-input">
+          <option>Starter</option>
+          <option selected>Professional</option>
+          <option>Enterprise</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">Industry</label>
+        <select class="field-input">
+          <option>Technology</option>
+          <option>Professional Services</option>
+          <option>Finance</option>
+          <option>Healthcare</option>
+          <option>Retail</option>
+          <option>Government</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('new-org-modal')">Cancel</button>
+      <button class="btn btn-navy" onclick="closeModal('new-org-modal');showToast('Organisation created — welcome email sent')">Create Organisation</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="edit-user-modal" onclick="closeBg(event,'edit-user-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('edit-user-modal')">✕</button>
+    <h3 id="edit-modal-title">Edit User</h3>
+    <p class="modal-sub" id="edit-modal-sub">Update this user's role or account status.</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="field">
+        <label class="field-label">Role</label>
+        <select class="field-input" id="edit-role-sel">
+          <option>admin</option>
+          <option>recruiter</option>
+          <option>viewer</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">Account Status</label>
+        <select class="field-input">
+          <option>Active</option>
+          <option>Suspended</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('edit-user-modal')">Cancel</button>
+      <button class="btn btn-navy" onclick="closeModal('edit-user-modal');showToast('User updated successfully')">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="imp-confirm-modal" onclick="closeBg(event,'imp-confirm-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('imp-confirm-modal')">✕</button>
+    <h3>Impersonate Organisation</h3>
+    <p class="modal-sub" id="imp-admin">Signing in as Admin</p>
+    <div style="background:var(--warning-bg);border:1px solid var(--warning-border);border-radius:var(--r-sm);padding:12px 14px;font-size:12.5px;color:var(--warning);margin-bottom:8px">
+      You are about to view <strong id="imp-target">this organisation</strong>'s dashboard as their admin. This session will be recorded in the audit log.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('imp-confirm-modal')">Cancel</button>
+      <button class="btn btn-navy" onclick="closeModal('imp-confirm-modal');showToast('Impersonation session started — audit log updated')">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../js/db.js"></script>
+<script src="../js/utils.js"></script>
+<script>
+/* ── All data from window.DB ── */
+const ORGS    = DB.orgs;
+const USERS   = DB.users;
+const AUDIT   = DB.auditLog;
+const TICKETS = DB.supportTickets;
+
+/* ── NAVIGATION ── */
+const SECS = ['orgs','users','audit','tickets','analytics','billing','security','roles','impersonate','health','config'];
+function switchSection(name, el) {
+  SECS.forEach(s => document.getElementById('sec-' + s).classList.toggle('hidden', s !== name));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  if (name === 'tickets')     renderTickets();
+  if (name === 'impersonate') renderImpersonate();
+}
+
+/* ── RENDER ORGANISATIONS ── */
+function planBadge(p) {
+  const styles = {
+    'Starter':      'background:var(--slate-100);color:var(--slate-600);border:1px solid var(--slate-200)',
+    'Professional': 'background:var(--navy-50);color:var(--navy-600);border:1px solid var(--navy-100)',
+    'Enterprise':   'background:var(--gold-bg);color:var(--gold);border:1px solid #fde68a',
+  };
+  const s = styles[p] || styles['Starter'];
+  return `<span style="display:inline-flex;padding:2px 9px;border-radius:100px;font-size:11.5px;font-weight:700;${s}">${p}</span>`;
+}
+
+function renderOrgs() {
+  document.getElementById('orgs-tbody').innerHTML = ORGS.map(o => `<tr>
+    <td>
+      <div style="font-weight:600">${o.name}</div>
+      <div style="font-size:11px;color:var(--slate-400)">${o.id}</div>
+    </td>
+    <td>${planBadge(o.plan)}</td>
+    <td style="font-weight:600;text-align:center">${o.users}</td>
+    <td style="font-weight:600;text-align:center">${o.candidates}</td>
+    <td style="font-weight:600;text-align:center">${o.assessments}</td>
+    <td><span class="pill pill-active">● Active</span></td>
+    <td style="color:var(--slate-400);font-size:12px">${o.created}</td>
+    <td>
+      <div style="display:flex;gap:5px">
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Viewing ${o.name}')">View</button>
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Edit organisation — coming soon')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="showToast('Contact NovaCS support to suspend an organisation')">Suspend</button>
+      </div>
+    </td>
+  </tr>`).join('');
+}
+
+/* ── RENDER USERS ── */
+function roleBadge(r) {
+  const map = {
+    superadmin: 'pill-superadmin',
+    admin:      'pill-admin',
+    recruiter:  'pill-recruiter',
+    viewer:     'pill-viewer',
+  };
+  const labels = {
+    superadmin: '⚡ Superadmin',
+    admin:      'Admin',
+    recruiter:  'Recruiter',
+    viewer:     'Viewer',
+  };
+  return `<span class="pill ${map[r] || 'pill-viewer'}">${labels[r] || r}</span>`;
+}
+
+function renderUsers() {
+  const search = (document.getElementById('user-srch')?.value || '').toLowerCase();
+  const orgFilter  = document.getElementById('user-filt-org')?.value  || '';
+  const roleFilter = document.getElementById('user-filt-role')?.value || '';
+  let list = [...USERS];
+  if (search)     list = list.filter(u => u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search));
+  if (orgFilter)  list = list.filter(u => u.org  === orgFilter);
+  if (roleFilter) list = list.filter(u => u.role === roleFilter);
+  document.getElementById('user-count').textContent = list.length;
+  document.getElementById('users-tbody').innerHTML = list.map(u => `<tr>
+    <td>
+      <div style="font-weight:600">${u.name}</div>
+      <div style="font-size:11px;color:var(--slate-400)">${u.email}</div>
+    </td>
+    <td style="font-size:12px;color:var(--slate-500)">${u.org}</td>
+    <td>${roleBadge(u.role)}</td>
+    <td><span class="pill pill-active">● Active</span></td>
+    <td style="color:var(--slate-400);font-size:12px">${u.last}</td>
+    <td>
+      ${u.role === 'superadmin'
+        ? '<span style="font-size:12px;color:var(--slate-400)">Protected account</span>'
+        : `<div style="display:flex;gap:5px">
+             <button class="btn btn-ghost btn-sm" onclick="openEditUser('${u.name}','${u.role}')">Edit</button>
+             <button class="btn btn-danger btn-sm" onclick="showToast('Suspend user — coming soon')">Suspend</button>
+           </div>`}
+    </td>
+  </tr>`).join('');
+}
+
+function populateOrgFilter() {
+  const sel = document.getElementById('user-filt-org');
+  DB.orgs.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o.name;
+    opt.textContent = o.name;
+    sel.appendChild(opt);
+  });
+}
+
+function openEditUser(name, role) {
+  document.getElementById('edit-modal-title').textContent = 'Edit: ' + name;
+  document.getElementById('edit-modal-sub').textContent   = 'Update ' + name + "'s role or account status.";
+  document.getElementById('edit-role-sel').value = role;
+  openModal('edit-user-modal');
+}
+
+/* ── RENDER AUDIT ── */
+function renderAudit() {
+  document.getElementById('audit-count').textContent = AUDIT.length;
+  document.getElementById('audit-list').innerHTML = AUDIT.map(a => `
+    <div class="audit-row">
+      <div class="audit-dot" style="background:${a.dot}"></div>
+      <div class="audit-time">${a.time}</div>
+      <div>
+        <span class="audit-actor">${a.actor}</span>
+        <span class="audit-msg"> — ${a.action}</span>
+        <span style="margin-left:8px;font-size:11px;color:var(--slate-400)">${a.org}</span>
+      </div>
+    </div>`).join('');
+}
+
+/* ── RENDER TICKETS ── */
+function renderTickets() {
+  const statusMap   = { open:'pill-open', in_progress:'pill-progress', progress:'pill-progress', resolved:'pill-resolved' };
+  const statusLabel = { open:'Open', in_progress:'In Progress', progress:'In Progress', resolved:'Resolved' };
+  document.getElementById('tickets-list').innerHTML = TICKETS.map(t => `
+    <div class="ticket-row">
+      <div><span class="ticket-ref">${t.id}</span></div>
+      <div style="flex:1">
+        <div class="ticket-title">${t.title}</div>
+        <div class="ticket-meta">${t.org} · ${t.type} · Submitted ${t.date}</div>
+        <div class="ticket-body">${t.title}</div>
+      </div>
+      <div class="ticket-actions">
+        <span class="pill ${statusMap[t.status]}">${statusLabel[t.status]}</span>
+        ${t.status !== 'resolved'
+          ? `<button class="btn btn-navy btn-sm" onclick="showToast('Opening ticket ${t.id}')">Respond</button>`
+          : `<button class="btn btn-ghost btn-sm" onclick="showToast('Viewing ticket ${t.id}')">View →</button>`}
+      </div>
+    </div>`).join('');
+}
+
+/* ── RENDER UPTIME BARS ── */
+function renderUptime() {
+  const el = document.getElementById('uptime-bars');
+  if (!el) return;
+  // Mostly green with one incident bar to reflect the 99.98% claim
+  el.innerHTML = Array.from({length: 30}, (_, i) => {
+    const hasIncident = (i === 14); // one incident 16 days ago
+    return `<div style="flex:1;height:32px;border-radius:3px;background:${hasIncident ? 'var(--danger)' : 'var(--success)'};opacity:.85;cursor:pointer" title="${hasIncident ? 'Incident — resolved in 8 min' : 'Fully operational'} — ${30 - i} days ago"></div>`;
+  }).join('');
+}
+
+/* ── TOGGLES ── */
+function flipToggle(btn) {
+  btn.classList.toggle('on');
+  btn.classList.toggle('off');
+  btn.style.background = btn.classList.contains('on') ? 'var(--navy-600)' : 'var(--slate-300)';
+}
+
+/* ── CONFIRM DANGER ── */
+function confirmDanger(msg) {
+  if (window.confirm(msg + '\n\nTo perform this action, please contact NovaCS support directly.')) {
+    showToast('Contact support@novacs.io to complete this action');
+  }
+}
+
+/* ── MODALS ── */
+function openModal(id)  { document.getElementById(id).classList.add('open');    }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeBg(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+/* ── TOAST ── */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ── RENDER IMPERSONATE ── */
+function renderImpersonate() {
+  const el = document.getElementById('imp-list');
+  if (!el || el.innerHTML) return; // only render once
+  el.innerHTML = ORGS.map(o => {
+    const initials = o.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    const adminUser = USERS.find(u => u.org === o.name && u.role === 'admin');
+    const adminName = adminUser ? adminUser.name : 'Admin';
+    return `<div class="imp-card" onclick="openModal('imp-confirm-modal');document.getElementById('imp-target').textContent='${o.name}';document.getElementById('imp-admin').textContent='Signing in as ${adminName}';">
+      <div class="imp-av">${initials}</div>
+      <div style="flex:1">
+        <div class="imp-name">${o.name}</div>
+        <div class="imp-meta">${o.plan} · ${o.users} recruiter${o.users !== 1 ? 's' : ''} · ${o.candidates} candidates · Admin: ${adminName}</div>
+      </div>
+      <div class="imp-arrow">→</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── INIT ── */
+renderOrgs();
+populateOrgFilter();
+renderUsers();
+renderAudit();
+renderUptime();
+</script>
+</body>
+</html>

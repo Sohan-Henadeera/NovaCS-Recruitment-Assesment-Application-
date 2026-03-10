@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCS — Candidates</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy-900:#0d1b2a;--navy-800:#1a2e45;--navy-700:#1e3a5f;--navy-600:#2452a0;--navy-500:#2d64c8;--navy-400:#4a7fd4;--navy-100:#dce8f7;--navy-50:#eef4fc;--slate-900:#1c2333;--slate-700:#334155;--slate-600:#475569;--slate-500:#64748b;--slate-400:#94a3b8;--slate-200:#e2e8f0;--slate-100:#f1f5f9;--slate-50:#f8fafc;--white:#fff;--bg:#edf0f7;--success:#0f6b3a;--success-bg:#e6f4ed;--success-border:#a3d4b8;--warning:#854d0e;--warning-bg:#fef9ec;--warning-border:#fcd34d;--danger:#991b1b;--danger-bg:#fef2f2;--danger-border:#fca5a5;--gold:#92700a;--gold-bg:#fefce8;--shadow-xs:0 1px 2px rgba(13,27,42,.06);--shadow-sm:0 2px 6px rgba(13,27,42,.08);--shadow-md:0 6px 22px rgba(13,27,42,.09),0 2px 6px rgba(13,27,42,.05);--shadow-xl:0 22px 56px rgba(13,27,42,.15);--r-sm:8px;--r:12px;--r-lg:16px;--r-xl:22px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--slate-900);min-height:100vh;font-size:14px;}
+.hidden{display:none!important;}
+.serif{font-family:'Playfair Display',serif;}
+/* TOPBAR */
+.topbar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--white);border-bottom:1px solid var(--slate-200);box-shadow:var(--shadow-sm);position:sticky;top:0;z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.back-btn{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--slate-500);text-decoration:none;padding:6px 12px;border-radius:var(--r-sm);border:1.5px solid var(--slate-200);background:var(--white);transition:all .15s;cursor:pointer;}
+.back-btn:hover{border-color:var(--navy-400);color:var(--navy-600);background:var(--navy-50);}
+.topbar-brand{font-family:'Playfair Display',serif;font-weight:700;font-size:18px;color:var(--slate-900);letter-spacing:-.3px;}
+.topbar-brand sup{font-family:'Figtree',sans-serif;font-size:11px;font-weight:700;color:var(--navy-500);vertical-align:super;margin-left:2px;}
+.crumb{font-size:13px;color:var(--slate-400);}
+.crumb span{color:var(--slate-700);font-weight:600;}
+.topbar-right{display:flex;align-items:center;gap:9px;}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:'Figtree',sans-serif;font-weight:600;font-size:13px;padding:8px 17px;border-radius:var(--r-sm);border:none;cursor:pointer;transition:all .17s;white-space:nowrap;}
+.btn-navy{background:var(--navy-700);color:#fff;box-shadow:0 2px 8px rgba(30,58,95,.28);}
+.btn-navy:hover{background:var(--navy-800);transform:translateY(-1px);}
+.btn-outline{background:var(--white);color:var(--slate-700);border:1.5px solid var(--slate-200);box-shadow:var(--shadow-xs);}
+.btn-outline:hover{border-color:var(--navy-400);color:var(--navy-600);background:var(--navy-50);}
+.btn-ghost{background:transparent;color:var(--slate-600);border:1.5px solid transparent;}
+.btn-ghost:hover{background:var(--slate-100);color:var(--slate-900);}
+.btn-success{background:var(--success-bg);color:var(--success);border:1.5px solid var(--success-border);}
+.btn-success:hover{background:#cfe8db;}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border:1.5px solid var(--danger-border);}
+.btn-danger:hover{background:#fde4e4;}
+.btn-sm{padding:5px 11px;font-size:12px;}
+/* MAIN */
+.main{max-width:1200px;margin:0 auto;padding:28px 28px;}
+.pg-head{margin-bottom:22px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.pg-h1{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:3px;}
+.pg-sub{font-size:13px;color:var(--slate-500);}
+.pg-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px;}
+.stat-card{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-lg);padding:18px 18px 14px;box-shadow:var(--shadow-md);position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r-lg) var(--r-lg) 0 0;}
+.sc-navy::before{background:linear-gradient(90deg,var(--navy-700),var(--navy-400));}
+.sc-green::before{background:linear-gradient(90deg,#0f6b3a,#22c55e);}
+.sc-warn::before{background:linear-gradient(90deg,#854d0e,#f59e0b);}
+.sc-danger::before{background:linear-gradient(90deg,#991b1b,#ef4444);}
+.sc-gold::before{background:linear-gradient(90deg,#92700a,#f59e0b);}
+.stat-lbl{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-400);margin-bottom:4px;}
+.stat-val{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;line-height:1;margin-bottom:3px;}
+.stat-note{font-size:11.5px;color:var(--slate-400);}
+/* CARD */
+.card{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-lg);box-shadow:var(--shadow-md);overflow:hidden;margin-bottom:18px;}
+.card-head{padding:15px 20px;border-bottom:1px solid var(--slate-100);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.card-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
+.card-badge{background:var(--navy-50);color:var(--navy-600);border:1px solid var(--navy-100);font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;}
+/* FILTER ROW */
+.filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.search-wrap{position:relative;}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--slate-400);}
+.search-icon svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;}
+.search-input{background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:7px 12px 7px 30px;font-family:'Figtree',sans-serif;font-size:12.5px;color:var(--slate-900);outline:none;width:200px;transition:all .18s;box-shadow:var(--shadow-xs);}
+.search-input:focus{border-color:var(--navy-400);width:230px;background:var(--white);}
+.filt-sel{background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:7px 11px;font-family:'Figtree',sans-serif;font-size:12.5px;color:var(--slate-700);outline:none;cursor:pointer;box-shadow:var(--shadow-xs);}
+.filt-sel:focus{border-color:var(--navy-400);}
+/* TABLE */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--slate-50);}
+th{text-align:left;padding:10px 15px;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--slate-400);white-space:nowrap;border-bottom:1px solid var(--slate-200);cursor:pointer;user-select:none;transition:color .15s;}
+th:hover{color:var(--slate-700);}
+th.sort-asc::after{content:' ↑';color:var(--navy-500);}
+th.sort-desc::after{content:' ↓';color:var(--navy-500);}
+td{padding:11px 15px;font-size:13px;border-top:1px solid var(--slate-100);vertical-align:middle;}
+tr:hover td{background:#fafbfc;}
+.cand-cell{display:flex;align-items:center;gap:10px;}
+.cand-av{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;cursor:pointer;transition:opacity .15s;}
+.cand-av:hover{opacity:.8;}
+.cand-name{font-weight:600;font-size:13px;cursor:pointer;transition:color .15s;}
+.cand-name:hover{color:var(--navy-600);}
+.cand-email{font-size:11px;color:var(--slate-400);}
+.score-cell{display:flex;align-items:center;gap:8px;}
+.score-bar{width:62px;height:5px;background:var(--slate-200);border-radius:3px;overflow:hidden;flex-shrink:0;}
+.score-fill{height:100%;border-radius:3px;}
+.score-num{font-weight:700;font-size:13px;min-width:36px;}
+.rank-chip{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.r1{background:var(--gold-bg);color:var(--gold);}.r2{background:#f1f5f9;color:#64748b;}.r3{background:#fff7ed;color:#c2621f;}.rn{background:var(--slate-100);color:var(--slate-500);}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:11.5px;font-weight:600;}
+.pill-done{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border);}
+.pill-pending{background:var(--warning-bg);color:var(--warning);border:1px solid var(--warning-border);}
+.pill-invited{background:var(--navy-50);color:var(--navy-600);border:1px solid var(--navy-100);}
+.pill-pass{background:var(--success-bg);color:var(--success);}
+.pill-fail{background:var(--danger-bg);color:var(--danger);}
+.pill-shortlisted{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border);}
+.pill-rejected{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border);}
+.stage-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:700;background:var(--navy-50);color:var(--navy-700);border:1px solid var(--navy-100);}
+.empty-state{padding:48px 20px;text-align:center;color:var(--slate-400);font-size:13px;}
+/* DETAIL MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(13,27,42,.4);backdrop-filter:blur(5px);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.open{display:flex;animation:fadeUp .2s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.modal{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-xl);padding:30px;width:100%;max-width:520px;box-shadow:var(--shadow-xl);position:relative;max-height:90vh;overflow-y:auto;}
+.modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:var(--r-sm);border:none;background:var(--slate-100);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--slate-500);font-size:13px;transition:all .15s;}
+.modal-close:hover{background:var(--slate-200);}
+.modal h3{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:4px;}
+.modal-sub{color:var(--slate-500);font-size:13px;margin-bottom:20px;}
+.det-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:15px;border-bottom:1px solid var(--slate-100);}
+.det-av{width:46px;height:46px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0;}
+.det-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.det-stat{background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-sm);padding:11px;text-align:center;}
+.det-stat-val{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
+.det-stat-lbl{font-size:11px;color:var(--slate-400);margin-top:2px;}
+.cat-row{margin-bottom:9px;}
+.cat-row-head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+.notes-field{width:100%;background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:9px 12px;font-family:'Figtree',sans-serif;font-size:13px;color:var(--slate-900);outline:none;resize:vertical;min-height:66px;transition:border-color .18s;}
+.notes-field:focus{border-color:var(--navy-400);}
+.stage-sel{width:100%;background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:8px 11px;font-family:'Figtree',sans-serif;font-size:13px;color:var(--slate-700);outline:none;cursor:pointer;margin-bottom:11px;}
+.field-label{display:block;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-500);margin-bottom:6px;}
+.field-input{width:100%;background:var(--white);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:9px 13px;font-family:'Figtree',sans-serif;font-size:14px;color:var(--slate-900);outline:none;transition:all .18s;}
+.field-input:focus{border-color:var(--navy-500);box-shadow:0 0 0 3px rgba(45,100,200,.1);}
+.modal-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:16px;}
+.gen-code-box{background:var(--navy-50);border:2px solid var(--navy-100);border-radius:var(--r);padding:20px;text-align:center;margin:16px 0;}
+.gen-code-val{font-family:'Courier New',monospace;font-size:30px;font-weight:700;letter-spacing:7px;color:var(--navy-700);display:block;margin-bottom:5px;}
+.gen-code-hint{font-size:12px;color:var(--slate-500);}
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--slate-900);color:#fff;border-radius:var(--r);padding:11px 16px;font-size:13px;font-weight:500;z-index:999;display:flex;align-items:center;gap:8px;transform:translateY(70px);opacity:0;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-xl);max-width:300px;}
+.toast.show{transform:none;opacity:1;}
+@media(max-width:900px){.stats-row{grid-template-columns:1fr 1fr 1fr;}.main{padding:16px;}}
+@media(max-width:600px){.stats-row{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a class="back-btn" href="../dashboard.html">← Dashboard</a>
+    <div class="topbar-brand">Nova<sup>CS</sup></div>
+    <div class="crumb">/ <span>Candidates</span></div>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="btn btn-navy" onclick="openModal('new-code-modal')">+ Issue Access Code</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="pg-head">
+    <div>
+      <h1 class="pg-h1">All Candidates</h1>
+      <p class="pg-sub">Full candidate list · search, filter and take action</p>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card sc-navy">
+      <div class="stat-lbl">Total</div>
+      <div class="stat-val" style="color:var(--navy-700)" id="st-total">—</div>
+      <div class="stat-note">All candidates</div>
+    </div>
+    <div class="stat-card sc-green">
+      <div class="stat-lbl">Completed</div>
+      <div class="stat-val" style="color:var(--success)" id="st-done">—</div>
+      <div class="stat-note">Assessments done</div>
+    </div>
+    <div class="stat-card sc-warn">
+      <div class="stat-lbl">Pending</div>
+      <div class="stat-val" style="color:var(--warning)" id="st-pend">—</div>
+      <div class="stat-note">Yet to complete</div>
+    </div>
+    <div class="stat-card sc-gold">
+      <div class="stat-lbl">Pass Rate</div>
+      <div class="stat-val" style="color:var(--gold)" id="st-pass">—</div>
+      <div class="stat-note">Above threshold</div>
+    </div>
+    <div class="stat-card sc-green">
+      <div class="stat-lbl">Shortlisted</div>
+      <div class="stat-val" style="color:var(--success)" id="st-short">—</div>
+      <div class="stat-note">Marked for review</div>
+    </div>
+  </div>
+
+  <!-- TABLE CARD -->
+  <div class="card">
+    <div class="card-head">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="card-title">Candidates</div>
+        <div class="card-badge" id="cand-count">—</div>
+      </div>
+      <div class="filter-row">
+        <div class="search-wrap">
+          <div class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+          <input class="search-input" type="text" id="srch" placeholder="Search name or email…" oninput="renderAll()"/>
+        </div>
+        <select class="filt-sel" id="filt-status" onchange="renderAll()">
+          <option value="">All Status</option>
+          <option value="completed">Completed</option>
+          <option value="pending">Pending</option>
+          <option value="invited">Invited</option>
+        </select>
+        <select class="filt-sel" id="filt-dec" onchange="renderAll()">
+          <option value="">All Decisions</option>
+          <option value="shortlisted">Shortlisted</option>
+          <option value="rejected">Rejected</option>
+          <option value="none">Undecided</option>
+        </select>
+        <select class="filt-sel" id="filt-role" onchange="renderAll()">
+          <option value="">All Roles</option>
+        </select>
+        <select class="filt-sel" id="filt-sort" onchange="renderAll()">
+          <option value="rank">Rank</option>
+          <option value="score_desc">Score ↓</option>
+          <option value="score_asc">Score ↑</option>
+          <option value="name">Name A–Z</option>
+          <option value="date">Date</option>
+        </select>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Candidate</th>
+            <th>Role</th>
+            <th>Score</th>
+            <th>Pass/Fail</th>
+            <th>Status</th>
+            <th>Decision</th>
+            <th>Stage</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="all-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-bg" id="detail-modal" onclick="closeBg(event,'detail-modal')">
+  <div class="modal"><button class="modal-close" onclick="closeModal('detail-modal')">✕</button><div id="detail-content"></div></div>
+</div>
+
+<!-- NEW CODE MODAL -->
+<div class="modal-bg" id="new-code-modal" onclick="closeBg(event,'new-code-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('new-code-modal')">✕</button>
+    <h3>Issue Access Code</h3>
+    <p class="modal-sub">Generate a unique single-use code for a new candidate.</p>
+    <div style="display:grid;gap:12px">
+      <div><label class="field-label">Full Name</label><input class="field-input" id="nc-name" placeholder="Jane Smith"/></div>
+      <div><label class="field-label">Email Address</label><input class="field-input" id="nc-email" type="email" placeholder="jane@company.com"/></div>
+      <div><label class="field-label">Role Applied For</label>
+        <select class="field-input" id="nc-role">
+          <option>Customer Success Manager</option><option>Operations Analyst</option>
+          <option>Project Manager</option><option>Sales Associate</option>
+          <option>HR Coordinator</option><option>Marketing Executive</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('new-code-modal')">Cancel</button>
+      <button class="btn btn-navy" onclick="issueCode()">Generate Code →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CODE GEN MODAL -->
+<div class="modal-bg" id="code-gen-modal" onclick="closeBg(event,'code-gen-modal')">
+  <div class="modal" style="text-align:center">
+    <button class="modal-close" onclick="closeModal('code-gen-modal')">✕</button>
+    <h3 style="margin-bottom:4px">Code Generated</h3>
+    <p class="modal-sub">Share this code with <span id="gen-code-name">—</span> for the <span id="gen-code-role">—</span> role.</p>
+    <div class="gen-code-box">
+      <span class="gen-code-val" id="gen-code-val">——</span>
+      <span class="gen-code-hint">Single-use · expires on submission</span>
+    </div>
+    <div class="modal-actions" style="justify-content:center;gap:12px">
+      <button class="btn btn-outline" onclick="copyCode()">📋 Copy Code</button>
+      <button class="btn btn-navy" onclick="closeModal('code-gen-modal')">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../js/db.js"></script>
+<script src="../js/utils.js"></script>
+<script>
+// ── All data comes from window.DB (js/db.js) ──
+const threshold = DB.config.passThreshold;
+// Aliases to DB helpers
+function wScore(s)   { return DB.wScore(s); }
+function sColor(s)   { return DB.scoreColor(s); }
+function rankOf(id)  { return DB.getRankOf(id); }
+function statusPill(s){ return window.statusPill ? window.statusPill(s) : `<span class="pill pill-${s==='completed'?'done':s}">${s==='completed'?'✓ Done':s==='pending'?'⏳ Pending':'📧 Invited'}</span>`; }
+function passFail(s)  { if(s===null||s===undefined)return''; return s>=threshold?'<span class="pill pill-pass">✓ Pass</span>':'<span class="pill pill-fail">✗ Fail</span>'; }
+function decPill(d)   { if(d==='shortlisted')return'<span class="pill pill-shortlisted">★ Shortlisted</span>';if(d==='rejected')return'<span class="pill pill-rejected">✗ Rejected</span>';return'<span style="color:var(--slate-300);font-size:12px">—</span>'; }
+function stagePill(id){ const c=DB.getCandidateById(id);const s=c?.stage||'';return s?`<span class="stage-tag">→ ${s}</span>`:'<span style="color:var(--slate-300);font-size:12px">—</span>'; }
+
+function updateStats(){
+  const st=DB.getDashboardStats();
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('st-total', st.total);
+  set('st-done',  st.completed);
+  set('st-pend',  st.pending + st.invited);
+  set('st-pass',  st.passRate+'%');
+  set('st-short', st.shortlisted);
+  set('cand-count', st.total);
+}
+
+function populateRoleFilter(){
+  const sel=document.getElementById('filt-role');
+  if(!sel)return;
+  const roles=[...new Set(DB.getCandidates().map(c=>c.role))].sort();
+  roles.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;sel.appendChild(o);});
+}
+
+function rankChip(r){if(!r)return'<span class="rank-chip rn">—</span>';if(r===1)return'<span class="rank-chip r1">🥇</span>';if(r===2)return'<span class="rank-chip r2">🥈</span>';if(r===3)return'<span class="rank-chip r3">🥉</span>';return`<span class="rank-chip rn">#${r}</span>`;}
+  const ws=wScore(c.scores);const col=sColor(ws);const r=rankOf(c.id);
+  return`<tr>
+    <td>${rankChip(r)}</td>
+    <td><div class="cand-cell">
+      <div class="cand-av" style="background:${c.color}18;color:${c.color}" onclick="window.location.href='candidate-profile.html?id=${c.id}'">${c.initials}</div>
+      <div>
+        <div class="cand-name" onclick="window.location.href='candidate-profile.html?id=${c.id}'">${c.name}${c.flagged?'<span style="margin-left:4px;font-size:10px;color:var(--warning)">⚠ Flagged</span>':''}</div>
+        <div class="cand-email">${c.email}</div>
+      </div>
+    </div></td>
+    <td style="color:var(--slate-500);font-size:12px">${c.role}</td>
+    <td>${ws!==null?`<div class="score-cell"><div class="score-bar"><div class="score-fill" style="width:${ws}%;background:${col}"></div></div><div class="score-num" style="color:${col}">${ws}%</div></div>`:'<span style="color:var(--slate-300)">—</span>'}</td>
+    <td>${passFail(ws)}</td>
+    <td>${statusPill(c.status)}</td>
+    <td>${decPill(c.decision)}</td>
+    <td>${stagePill(c.id)}</td>
+    <td>${c.status==='completed'?`<div style="display:flex;gap:5px"><a href="candidate-profile.html?id=${c.id}" class="btn btn-ghost btn-sm">View →</a><button class="btn btn-ghost btn-sm" onclick="openDetail(${c.id})">Quick ⌄</button></div>`:''}</td>
+  </tr>`;
+
+
+function renderAll(){
+  const el=document.getElementById('all-tbody');
+  const s=(document.getElementById('srch')?.value||'').toLowerCase();
+  const fs=document.getElementById('filt-status')?.value||'';
+  const fd=document.getElementById('filt-dec')?.value||'';
+  const fr=document.getElementById('filt-role')?.value||'';
+  const fsort=document.getElementById('filt-sort')?.value||'rank';
+  const list=DB.getCandidates({search:s,status:fs||undefined,decision:fd||undefined,role:fr||undefined,sort:fsort});
+  el.innerHTML=list.length?list.map(buildRow).join(''):`<tr><td colspan="9"><div class="empty-state">No candidates match your filters.</div></td></tr>`;
+}
+
+function openDetail(id){
+  const c=DB.getCandidateById(id);if(!c||!c.scores)return;
+  const ws=wScore(c.scores);const note=candNotes[id]||'';const stage=candStages[id]||'';
+  document.getElementById('detail-content').innerHTML=`
+    <div class="det-header">
+      <div class="det-av" style="background:${c.color}18;color:${c.color}">${c.initials}</div>
+      <div style="flex:1"><div class="serif" style="font-size:19px;font-weight:700">${c.name}</div><div style="font-size:12px;color:var(--slate-500)">${c.role} · ${c.email}</div></div>
+      ${passFail(ws)}
+    </div>
+    <div class="det-stats">
+      <div class="det-stat"><div class="det-stat-val" style="color:${sColor(ws)}">${ws}%</div><div class="det-stat-lbl">Weighted Score</div></div>
+      <div class="det-stat"><div class="det-stat-val">${c.answered}/25</div><div class="det-stat-lbl">Answered</div></div>
+      <div class="det-stat"><div class="det-stat-val">${c.time}</div><div class="det-stat-lbl">Time (min)</div></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--slate-400);margin-bottom:10px">Category Breakdown</div>
+    ${[{l:'Judgement & Decision (35%)',k:'judgement'},{l:'Numerical Reasoning (25%)',k:'numerical'},{l:'Verbal & Communication (20%)',k:'verbal'},{l:'Situational Scenarios (20%)',k:'situational'}].map(cat=>{
+      const sc=c.scores[cat.k];
+      return`<div class="cat-row"><div class="cat-row-head"><span style="color:var(--slate-500)">${cat.l}</span><span style="font-weight:700;color:${sColor(sc)}">${sc}%</span></div><div class="score-bar" style="height:6px;width:100%"><div class="score-fill" style="width:${sc}%;background:${sColor(sc)}"></div></div></div>`;
+    }).join('')}
+    <div style="margin:14px 0 10px"><label class="field-label">Next Stage</label>
+    <select class="stage-sel" onchange="setStage(${id},this.value)">
+      <option value="">— Not set —</option>
+      ${['Phone Screen','1st Interview','2nd Interview','Assessment Centre','Offer Extended'].map(s=>`<option ${stage===s?'selected':''}>${s}</option>`).join('')}
+    </select></div>
+    <div style="margin-bottom:16px"><label class="field-label">Recruiter Notes</label><textarea class="notes-field" onchange="candNotes[${id}]=this.value">${note}</textarea></div>
+    <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-success btn-sm" onclick="setDec(${id},'shortlisted')">★ Shortlist</button>
+        <button class="btn btn-danger btn-sm" onclick="setDec(${id},'rejected')">✗ Reject</button>
+        <a href="candidate-profile.html?id=${id}" class="btn btn-outline btn-sm">Full Profile →</a>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('detail-modal')">Close</button>
+    </div>`;
+  openModal('detail-modal');
+}
+function setDec(id,d){DB.updateCandidate(id,{decision:d});closeModal('detail-modal');renderAll();updateStats();showToast(d==='shortlisted'?'★ Candidate shortlisted':'✗ Candidate rejected');}
+function setStage(id,s){DB.updateCandidate(id,{stage:s});renderAll();if(s)showToast(`Stage set: ${s}`);}
+
+function issueCode(){
+  const name=document.getElementById('nc-name').value.trim();
+  const email=document.getElementById('nc-email').value.trim();
+  const role=document.getElementById('nc-role').value;
+  if(!name||!email){showToast('Please fill in all fields','warn');return;}
+  const {candidate,code}=DB.issueCode({name,email,role});
+  closeModal('new-code-modal');
+  document.getElementById('nc-name').value='';document.getElementById('nc-email').value='';
+  document.getElementById('gen-code-val').textContent=code;
+  document.getElementById('gen-code-name').textContent=name;
+  document.getElementById('gen-code-role').textContent=role;
+  openModal('code-gen-modal');
+  renderAll();updateStats();
+}
+function copyCode(){navigator.clipboard.writeText(document.getElementById('gen-code-val').textContent).then(()=>showToast('Code copied to clipboard'));}
+
+function exportCSV(){
+  const cands=DB.getCandidates();
+  const h=['Name','Email','Role','Weighted Score','Judgement','Numerical','Verbal','Situational','Status','Decision','Time'];
+  const r=cands.map(c=>[c.name,c.email,c.role,DB.wScore(c.scores)??'',c.scores?.judgement??'',c.scores?.numerical??'',c.scores?.verbal??'',c.scores?.situational??'',c.status,c.decision,c.time??'']);
+  const csv=[h,...r].map(row=>row.map(v=>`"${v}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='novaCS-candidates.csv';a.click();
+  showToast('CSV exported');
+}
+
+function openModal(id){document.getElementById(id)?.classList.add('open');}
+function closeModal(id){document.getElementById(id)?.classList.remove('open');}
+function closeBg(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+let toastTimer;
+function showToast(msg,type='ok'){const t=document.getElementById('toast');if(!t)return;const cols={ok:'#1c2333',err:'#991b1b',warn:'#854d0e'};t.style.background=cols[type]||cols.ok;t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2800);}
+
+// INIT
+populateRoleFilter();
+updateStats();
+renderAll();
+
+// Deep-link: open quick detail if ?id= in URL
+const urlId=new URLSearchParams(window.location.search).get('id');
+if(urlId){const c=DB.getCandidateById(urlId);if(c&&c.scores)openDetail(c.id);}
+</script>
+</body>
+</html>

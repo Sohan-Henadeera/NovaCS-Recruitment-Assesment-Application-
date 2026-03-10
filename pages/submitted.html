@@ -3,227 +3,484 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NovaCS — Assessment Submitted</title>
-<link rel="stylesheet" href="../css/base.css">
+<title>Assessment Submitted — NovaCS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-body {
-  background: linear-gradient(160deg, var(--navy-900) 0%, var(--navy-800) 100%);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 20px;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy-900:#0d1b2a;--navy-800:#1a2e45;--navy-700:#1e3a5f;--navy-600:#2452a0;
+  --navy-500:#2d64c8;--navy-400:#4a7fd4;
+  --slate-900:#1c2333;--slate-700:#334155;--slate-600:#475569;--slate-500:#64748b;
+  --slate-400:#94a3b8;--slate-200:#e2e8f0;--slate-100:#f1f5f9;--slate-50:#f8fafc;
+  --white:#ffffff;
+  --success:#0f6b3a;--success-bg:#e6f4ed;--success-border:#a3d4b8;
+  --warning:#854d0e;--danger:#991b1b;
+  --green-900:#064e2b;--green-800:#0a5a30;--green-700:#0f6b3a;--green-600:#158a4a;
+  --green-500:#1fa05a;--green-400:#2d9e6b;--green-100:#a3d4b8;--green-50:#e6f4ed;
+  --r-sm:8px;--r:12px;--r-lg:16px;--r-xl:22px;
 }
 
-.submitted-card {
-  background: var(--white);
-  border-radius: var(--r-xl);
-  padding: 52px 48px 44px;
-  max-width: 520px;
-  width: 100%;
-  text-align: center;
-  box-shadow: var(--shadow-xl);
+body{
+  font-family:'Figtree',sans-serif;
+  background:linear-gradient(135deg,#1a2e45 0%,#2d3a6b 50%,#1e3a5f 100%);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px 16px;
 }
 
-.success-ring {
-  width: 80px; height: 80px;
-  border-radius: 50%;
-  background: var(--success-bg);
-  border: 3px solid var(--success-border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 32px;
-  margin: 0 auto 26px;
-  animation: popIn .5s cubic-bezier(.175,.885,.32,1.275) both;
-}
-@keyframes popIn {
-  from { transform: scale(0); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
+.card{
+  background:var(--white);
+  border-radius:var(--r-xl);
+  width:100%;
+  max-width:540px;
+  box-shadow:0 32px 80px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.2);
+  overflow:hidden;
+  animation:slideUp .5s cubic-bezier(.22,1,.36,1) both;
 }
 
-.submitted-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 30px;
-  font-weight: 700;
-  color: var(--navy-900);
-  margin-bottom: 10px;
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(32px) scale(.97);}
+  to{opacity:1;transform:none;}
 }
 
-.submitted-sub {
-  font-size: 15px;
-  color: var(--slate-500);
-  line-height: 1.7;
-  margin-bottom: 32px;
+.card-accent{
+  height:5px;
+  background:linear-gradient(90deg,var(--green-900),var(--green-700),var(--green-400));
 }
 
-/* Summary strip */
-.summary-strip {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1px;
-  background: var(--slate-200);
-  border: 1px solid var(--slate-200);
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  margin-bottom: 28px;
-}
-.summary-cell {
-  background: var(--white);
-  padding: 18px 14px;
-  text-align: center;
-}
-.summary-val {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--navy-700);
-  line-height: 1;
-  margin-bottom: 4px;
-}
-.summary-lbl {
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: .6px;
-  text-transform: uppercase;
-  color: var(--slate-400);
+.card-header{
+  padding:22px 36px 0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid var(--slate-100);
+  padding-bottom:18px;
 }
 
-/* What happens next */
-.next-steps {
-  background: var(--navy-50);
-  border: 1px solid var(--navy-100);
-  border-radius: var(--r-lg);
-  padding: 20px 22px;
-  text-align: left;
-  margin-bottom: 28px;
-}
-.next-steps-title {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--navy-500);
-  margin-bottom: 14px;
-}
-.next-step {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-.next-step:last-child { margin-bottom: 0; }
-.next-step-num {
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  background: var(--navy-700);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.next-step-text { font-size: 13px; color: var(--slate-700); line-height: 1.5; }
-
-.flag-notice {
-  background: var(--warning-bg);
-  border: 1px solid var(--warning-border);
-  border-radius: var(--r);
-  padding: 12px 16px;
-  font-size: 12.5px;
-  color: var(--warning);
-  font-weight: 600;
-  text-align: left;
-  margin-bottom: 20px;
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
+.logo{
+  font-family:'Playfair Display',serif;
+  font-size:21px;
+  font-weight:700;
+  color:var(--slate-900);
+  letter-spacing:-.2px;
+  text-decoration:none;
 }
 
-.wordmark-footer {
-  margin-top: 28px;
-  font-size: 12px;
-  color: var(--slate-300);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+.logo .cs{
+  font-family:'Figtree',sans-serif;
+  font-size:11px;
+  font-weight:700;
+  color:var(--green-600);
+  vertical-align:super;
+  margin-left:2px;
 }
-.wordmark-footer a { color: var(--slate-400); text-decoration: none; font-weight: 700; }
+
+.org-tag{
+  font-size:11.5px;
+  color:var(--slate-400);
+  font-weight:500;
+}
+
+/* ── Hero ── */
+.hero{
+  text-align:center;
+  padding:40px 36px 28px;
+}
+
+.tick-wrap{
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  background:var(--green-50);
+  border:2.5px solid var(--green-100);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 20px;
+  animation:popIn .5s .25s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+@keyframes popIn{
+  from{opacity:0;transform:scale(.4);}
+  to{opacity:1;transform:scale(1);}
+}
+
+.tick-icon{
+  font-size:32px;
+  line-height:1;
+}
+
+.hero-title{
+  font-family:'Playfair Display',serif;
+  font-size:27px;
+  font-weight:700;
+  color:var(--slate-900);
+  letter-spacing:-.3px;
+  margin-bottom:8px;
+}
+
+.hero-sub{
+  font-size:14px;
+  color:var(--slate-500);
+  line-height:1.55;
+  max-width:380px;
+  margin:0 auto;
+}
+
+/* ── Stats strip ── */
+.stats-strip{
+  display:flex;
+  gap:1px;
+  background:var(--slate-200);
+  border-top:1px solid var(--slate-200);
+  border-bottom:1px solid var(--slate-200);
+  margin-bottom:28px;
+}
+
+.stat-cell{
+  flex:1;
+  background:var(--white);
+  padding:18px 12px;
+  text-align:center;
+}
+
+.stat-val{
+  font-family:'Playfair Display',serif;
+  font-size:26px;
+  font-weight:700;
+  color:var(--slate-900);
+  line-height:1;
+  margin-bottom:5px;
+}
+
+.stat-val .stat-unit{
+  font-size:14px;
+  color:var(--slate-400);
+  font-family:'Figtree',sans-serif;
+  font-weight:400;
+}
+
+.stat-lbl{
+  font-size:10.5px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.7px;
+  color:var(--slate-400);
+}
+
+/* ── Category breakdown ── */
+.breakdown{
+  padding:0 36px 24px;
+}
+
+.breakdown-title{
+  font-family:'Playfair Display',serif;
+  font-size:14px;
+  font-weight:700;
+  color:var(--slate-900);
+  margin-bottom:14px;
+}
+
+.breakdown-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:11px;
+}
+
+.br-icon{
+  font-size:16px;
+  width:24px;
+  text-align:center;
+  flex-shrink:0;
+}
+
+.br-name{
+  font-size:12.5px;
+  color:var(--slate-500);
+  width:180px;
+  flex-shrink:0;
+}
+
+.br-bar{
+  flex:1;
+  height:7px;
+  background:var(--slate-100);
+  border-radius:4px;
+  overflow:hidden;
+}
+
+.br-fill{
+  height:100%;
+  border-radius:4px;
+  transition:width .8s cubic-bezier(.22,1,.36,1);
+}
+
+.br-score{
+  font-size:12.5px;
+  font-weight:700;
+  width:38px;
+  text-align:right;
+  flex-shrink:0;
+}
+
+/* ── Confirm note ── */
+.confirm-note{
+  margin:4px 36px 20px;
+  background:var(--slate-50);
+  border:1.5px solid var(--slate-200);
+  border-radius:var(--r-sm);
+  padding:14px 18px;
+  font-size:13px;
+  color:var(--slate-600);
+  line-height:1.55;
+}
+
+/* ── Close box ── */
+.close-box{
+  margin:0 36px 32px;
+  background:var(--green-50);
+  border:1.5px solid var(--green-100);
+  border-radius:var(--r-sm);
+  padding:16px 20px;
+  text-align:center;
+  font-size:13.5px;
+  color:var(--green-700);
+  font-weight:500;
+  line-height:1.5;
+}
+
+.close-box strong{
+  color:var(--green-900);
+}
+
+/* ── Footer ── */
+.card-footer{
+  padding:14px 36px 20px;
+  border-top:1px solid var(--slate-100);
+  text-align:center;
+  font-size:11.5px;
+  color:var(--slate-400);
+}
+
+.card-footer a{
+  color:var(--green-600);
+  font-weight:500;
+  text-decoration:none;
+}
+
+.card-footer a:hover{color:var(--green-800);}
+
+/* ── Flagged notice ── */
+.flag-notice{
+  margin:0 36px 18px;
+  background:#fff7ed;
+  border:1.5px solid #fed7aa;
+  border-radius:var(--r-sm);
+  padding:12px 16px;
+  font-size:12.5px;
+  color:var(--warning);
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  line-height:1.5;
+}
+
+.flag-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+
+@media(max-width:480px){
+  .card-header,.hero,.breakdown,.confirm-note,.close-box,.card-footer{padding-left:20px;padding-right:20px;}
+  .hero{padding-top:28px;}
+  .hero-title{font-size:22px;}
+  .stat-val{font-size:21px;}
+  .br-name{width:120px;font-size:11.5px;}
+}
 </style>
 </head>
 <body>
 
-<div class="submitted-card">
+<div class="card">
+  <div class="card-accent"></div>
 
-  <div class="success-ring">✅</div>
-
-  <div class="submitted-title">Assessment submitted</div>
-  <div class="submitted-sub">
-    Well done <strong id="cand-name">there</strong> — your assessment has been received and your responses are now being reviewed.
+  <div class="card-header">
+    <span class="logo">Nova<sup class="cs">CS</sup></span>
+    <span class="org-tag" id="org-tag">Assessment Portal</span>
   </div>
 
-  <!-- SUMMARY STRIP -->
-  <div class="summary-strip">
-    <div class="summary-cell">
-      <div class="summary-val" id="sum-questions">25</div>
-      <div class="summary-lbl">Questions answered</div>
+  <!-- Hero -->
+  <div class="hero">
+    <div class="tick-wrap">
+      <span class="tick-icon">✅</span>
     </div>
-    <div class="summary-cell">
-      <div class="summary-val" id="sum-time">—</div>
-      <div class="summary-lbl">Time taken</div>
-    </div>
-    <div class="summary-cell">
-      <div class="summary-val" id="sum-sections">4</div>
-      <div class="summary-lbl">Sections completed</div>
-    </div>
+    <div class="hero-title">Assessment submitted!</div>
+    <p class="hero-sub" id="hero-sub">Your responses have been recorded and sent to your recruiter.</p>
   </div>
 
-  <!-- FLAG NOTICE (shown if tab switch flagged) -->
-  <div class="flag-notice" id="flag-notice" style="display:none;">
-    ⚠ <span>A tab switch was detected during your session. This has been noted and passed to your recruiter.</span>
-  </div>
-
-  <!-- WHAT HAPPENS NEXT -->
-  <div class="next-steps">
-    <div class="next-steps-title">What happens next</div>
-    <div class="next-step">
-      <div class="next-step-num">1</div>
-      <div class="next-step-text">Your recruiter has been notified and will review your results alongside other candidates.</div>
+  <!-- Stats strip -->
+  <div class="stats-strip">
+    <div class="stat-cell">
+      <div class="stat-val" id="stat-answered">—<span class="stat-unit">/25</span></div>
+      <div class="stat-lbl">Answered</div>
     </div>
-    <div class="next-step">
-      <div class="next-step-num">2</div>
-      <div class="next-step-text">If you're progressing in the process, <span id="org-name">the organisation</span> will be in touch directly via the email address you registered with.</div>
+    <div class="stat-cell">
+      <div class="stat-val" id="stat-time">—<span class="stat-unit"> min</span></div>
+      <div class="stat-lbl">Time Taken</div>
     </div>
-    <div class="next-step">
-      <div class="next-step-num">3</div>
-      <div class="next-step-text">Your access code has now expired — this assessment cannot be re-entered or retried.</div>
+    <div class="stat-cell">
+      <div class="stat-val" id="stat-sections">4<span class="stat-unit"></span></div>
+      <div class="stat-lbl">Sections</div>
     </div>
   </div>
 
-  <div class="wordmark-footer">
-    Assessed fairly by <a href="../index.html">Nova<sup style="font-size:.6em;font-weight:700;color:#4a7fd4;vertical-align:super;">CS</sup></a>
+  <!-- Flagged notice (hidden unless flagged) -->
+  <div class="flag-notice" id="flag-notice" style="display:none">
+    <span class="flag-icon">⚠️</span>
+    <div>Our system detected browser activity during your assessment. Your recruiter will review your results in context of this flag.</div>
   </div>
 
+  <!-- Category breakdown -->
+  <div class="breakdown">
+    <div class="breakdown-title">Category breakdown</div>
+    <div id="breakdown-list">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- Confirm note -->
+  <div class="confirm-note" id="confirm-note">
+    📧 A confirmation has been sent to <strong id="confirm-email">your email address</strong>.<br>
+    Your recruiter will be in touch if your application progresses.
+  </div>
+
+  <!-- Close box -->
+  <div class="close-box">
+    You may now <strong>close this browser tab</strong>.<br>
+    <span style="font-size:12px;color:var(--green-600)">Thank you for completing the NovaCS assessment.</span>
+  </div>
+
+  <div class="card-footer">
+    Powered by <strong>NovaCS</strong> &mdash; <a href="../pages/contact.html">Contact support</a>
+  </div>
 </div>
 
-<script src="../js/utils.js"></script>
 <script>
-// Pull submission data passed via sessionStorage from the assessment
-const data = (() => {
-  try { return JSON.parse(sessionStorage.getItem('novaCS_submission')) || {}; }
-  catch { return {}; }
-})();
+// ══════════════════════════════════════════════════
+// submitted.html
+//
+// Reads result data from sessionStorage key 'novaCS_submission'
+// Set this before redirecting here:
+//
+//   sessionStorage.setItem('novaCS_submission', JSON.stringify({
+//     name:      'Alex Chen',
+//     email:     'alex@email.com',
+//     org:       'Acme Corp',
+//     answered:  25,
+//     time:      18.7,        // minutes (number)
+//     sections:  4,
+//     flagged:   false,
+//     scores: {
+//       judgement:   88,
+//       numerical:   72,
+//       verbal:      80,
+//       situational: 76,
+//     }
+//   }));
+//   window.location.href = 'submitted.html';
+//
+// assess.html already does this automatically on submission.
+// ══════════════════════════════════════════════════
 
-if (data.name)      document.getElementById('cand-name').textContent = data.name;
-if (data.answered)  document.getElementById('sum-questions').textContent = data.answered;
-if (data.time)      document.getElementById('sum-time').textContent = data.time;
-if (data.sections)  document.getElementById('sum-sections').textContent = data.sections;
-if (data.org)       document.getElementById('org-name').textContent = data.org;
-if (data.flagged)   document.getElementById('flag-notice').style.display = 'flex';
+const CATS = [
+  { id:'judgement',  name:'Judgement & Decision',  icon:'⚖️', color:'#1e3a5f' },
+  { id:'numerical',  name:'Numerical Reasoning',   icon:'🔢', color:'#0f6b3a' },
+  { id:'verbal',     name:'Verbal & Communication',icon:'💬', color:'#6d28d9' },
+  { id:'situational',name:'Situational Scenarios', icon:'🎭', color:'#0e4e6e' },
+];
 
-// Fallback demo values
-if (!data.time) document.getElementById('sum-time').textContent = '18:42';
+function sColor(s){
+  if(s===null||s===undefined)return'#94a3b8';
+  if(s>=80)return'#0f6b3a';
+  if(s>=65)return'#2452a0';
+  if(s>=50)return'#854d0e';
+  return'#991b1b';
+}
+
+function set(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+function html(id,val){const el=document.getElementById(id);if(el)el.innerHTML=val;}
+
+// Load data from sessionStorage
+let data = null;
+try {
+  const raw = sessionStorage.getItem('novaCS_submission');
+  if (raw) data = JSON.parse(raw);
+} catch(e) {}
+
+// Demo fallback so page renders meaningfully if opened directly
+if (!data) {
+  data = {
+    name:     'Candidate',
+    email:    'candidate@email.com',
+    org:      'Your Organisation',
+    answered:  25,
+    time:      18.7,
+    sections:  4,
+    flagged:   false,
+    scores: { judgement:82, numerical:74, verbal:88, situational:78 },
+  };
+}
+
+// Populate hero
+document.getElementById('org-tag').textContent = data.org || 'Assessment Portal';
+document.getElementById('hero-sub').textContent =
+  `Your responses have been recorded${data.name ? ', ' + data.name.split(' ')[0] : ''}. Your recruiter will be in touch if your application progresses.`;
+
+// Stats
+set('stat-answered', data.answered ?? '—');
+document.getElementById('stat-answered').innerHTML =
+  `${data.answered ?? '—'}<span class="stat-unit">/${data.totalQuestions || 25}</span>`;
+document.getElementById('stat-time').innerHTML =
+  `${typeof data.time === 'number' ? data.time.toFixed(1) : (data.time ?? '—')}<span class="stat-unit"> min</span>`;
+document.getElementById('stat-sections').innerHTML =
+  `${data.sections ?? 4}<span class="stat-unit"></span>`;
+
+// Flagged notice
+if (data.flagged) {
+  document.getElementById('flag-notice').style.display = 'flex';
+}
+
+// Confirm note
+document.getElementById('confirm-note').innerHTML =
+  `📧 A confirmation has been sent to <strong>${data.email || 'your email address'}</strong>.<br>Your recruiter will be in touch if your application progresses.`;
+
+// Category breakdown
+if (data.scores) {
+  document.getElementById('breakdown-list').innerHTML = CATS.map(cat => {
+    const sc = data.scores[cat.id] ?? 0;
+    const col = sColor(sc);
+    return `<div class="breakdown-row">
+      <span class="br-icon">${cat.icon}</span>
+      <span class="br-name">${cat.name}</span>
+      <div class="br-bar"><div class="br-fill" style="width:0%;background:${col}" data-w="${sc}"></div></div>
+      <span class="br-score" style="color:${col}">${sc}%</span>
+    </div>`;
+  }).join('');
+
+  // Animate bars after a short delay
+  setTimeout(() => {
+    document.querySelectorAll('.br-fill[data-w]').forEach(el => {
+      el.style.width = el.dataset.w + '%';
+    });
+  }, 200);
+} else {
+  document.getElementById('breakdown-list').innerHTML =
+    '<p style="font-size:13px;color:var(--slate-400)">Category breakdown not available.</p>';
+}
+
+// Clean up sessionStorage after reading
+try { sessionStorage.removeItem('novaCS_submission'); } catch(e) {}
 </script>
 </body>
 </html>

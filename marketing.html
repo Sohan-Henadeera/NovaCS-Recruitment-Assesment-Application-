@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCS — Stop Guessing. Start Assessing.</title>
+<meta name="description" content="NovaCS is the candidate assessment platform for serious recruitment teams. Science-backed. Bias-reducing. Built for scale.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0e1117;--ink-2:#1c2535;--ink-3:#334165;
+  --navy:#0f1f38;--navy-2:#162d52;--accent:#1e4799;--accent-2:#3361c2;
+  --gold:#9a7b2f;--gold-2:#c9a84c;--gold-3:#f0d080;
+  --cream:#f5f1ea;--cream-2:#ede8df;--cream-3:#e3dcd0;
+  --white:#fff;--muted:#6b7a96;--muted-2:#9aaabb;
+  --line:rgba(14,17,23,.1);--success:#1a6644;--success-bg:#e8f4ee;
+  --f-disp:'Cormorant Garamond',Georgia,serif;
+  --f-ui:'DM Sans',system-ui,sans-serif;
+  --ease:cubic-bezier(.25,.46,.45,.94);
+  --max:1200px;--max-sm:900px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--f-ui);background:var(--cream);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit;}
+button{font-family:var(--f-ui);cursor:pointer;}
+body::before{content:'';position:fixed;inset:0;z-index:1000;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");opacity:.028;pointer-events:none;}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:500;height:72px;display:flex;align-items:center;padding:0 48px;transition:all .4s var(--ease);}
+.nav::after{content:'';position:absolute;inset:0;background:rgba(245,241,234,.9);backdrop-filter:blur(20px) saturate(160%);border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s;z-index:-1;}
+.nav.scrolled::after{border-color:var(--cream-3);box-shadow:0 2px 32px rgba(14,17,23,.07);}
+.nav-inner{width:100%;max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+.brand{display:flex;flex-direction:column;gap:1px;}
+.brand-mark{font-family:var(--f-disp);font-size:26px;font-weight:600;color:var(--navy);letter-spacing:-.02em;line-height:1;}
+.brand-mark sup{font-family:var(--f-ui);font-size:10px;font-weight:700;color:var(--accent-2);vertical-align:super;margin-left:1px;}
+.brand-sub{font-size:9px;font-weight:500;letter-spacing:2.4px;text-transform:uppercase;color:var(--muted);line-height:1;}
+.nav-links{display:flex;align-items:center;gap:2px;}
+.nav-link{font-size:13.5px;font-weight:400;color:var(--muted);padding:6px 14px;border-radius:6px;transition:all .15s;}
+.nav-link:hover{color:var(--ink);background:var(--cream-2);}
+.nav-actions{display:flex;align-items:center;gap:10px;}
+.btn-nav-ghost{font-size:13.5px;font-weight:500;color:var(--ink-2);background:none;border:none;padding:7px 14px;border-radius:6px;transition:all .15s;}
+.btn-nav-ghost:hover{background:var(--cream-2);}
+.btn-nav-solid{font-size:13.5px;font-weight:600;color:var(--white);background:var(--navy);border:none;padding:9px 22px;border-radius:8px;transition:all .2s var(--ease);box-shadow:0 2px 12px rgba(15,31,56,.28);}
+.btn-nav-solid:hover{background:var(--navy-2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(15,31,56,.35);}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:6px;}
+.nav-hamburger span{display:block;width:22px;height:1.5px;background:var(--ink);border-radius:2px;transition:all .2s;}
+
+/* HERO */
+.hero{min-height:100vh;padding:72px 48px 0;display:flex;align-items:stretch;position:relative;overflow:hidden;background:var(--cream);}
+.hero-bg-char{position:absolute;top:50%;right:-2%;transform:translateY(-50%);font-family:var(--f-disp);font-size:clamp(400px,40vw,600px);font-weight:300;font-style:italic;color:var(--cream-2);line-height:1;user-select:none;pointer-events:none;opacity:.7;}
+.hero-rule{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--navy) 0%,var(--accent) 50%,transparent 100%);}
+.hero-inner{max-width:var(--max);margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;padding:100px 0 80px;position:relative;z-index:1;}
+.hero-kicker{display:flex;align-items:center;gap:12px;margin-bottom:32px;animation:slideIn .7s var(--ease) both;}
+.hero-kicker-line{width:40px;height:1px;background:var(--gold-2);}
+.hero-kicker-text{font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--gold);}
+.hero-h1{font-family:var(--f-disp);font-size:clamp(52px,6vw,82px);font-weight:600;line-height:1.04;letter-spacing:-.025em;color:var(--navy);margin-bottom:28px;animation:slideIn .7s var(--ease) .08s both;}
+.hero-h1 em{font-style:italic;color:var(--accent-2);}
+.hero-h1-ruled{position:relative;display:inline-block;}
+.hero-h1-ruled::after{content:'';position:absolute;left:0;bottom:4px;right:0;height:2px;background:linear-gradient(90deg,var(--gold-2),transparent);}
+.hero-body{font-family:var(--f-disp);font-size:21px;font-weight:300;font-style:italic;line-height:1.65;color:var(--muted);max-width:460px;margin-bottom:44px;animation:slideIn .7s var(--ease) .15s both;}
+.hero-ctas{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:56px;animation:slideIn .7s var(--ease) .22s both;}
+.btn-hp{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:var(--white);font-size:15px;font-weight:600;padding:15px 32px;border-radius:10px;border:none;transition:all .22s var(--ease);box-shadow:0 4px 20px rgba(15,31,56,.3);}
+.btn-hp:hover{background:var(--navy-2);transform:translateY(-2px);box-shadow:0 10px 36px rgba(15,31,56,.38);}
+.btn-hp .arr{transition:transform .2s var(--ease);}
+.btn-hp:hover .arr{transform:translateX(4px);}
+.btn-ht{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--muted);background:none;border:none;transition:color .15s;}
+.btn-ht:hover{color:var(--ink);}
+.hero-proof{display:flex;gap:36px;flex-wrap:wrap;animation:slideIn .7s var(--ease) .30s both;}
+.hp-num{font-family:var(--f-disp);font-size:36px;font-weight:600;line-height:1;color:var(--navy);letter-spacing:-.03em;}
+.hp-num span{color:var(--gold-2);}
+.hp-lbl{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4;max-width:100px;}
+.hp-div{width:1px;background:var(--line);align-self:stretch;margin:4px 0;}
+
+/* HERO MOCK */
+.hero-right{position:relative;animation:slideInRight .8s var(--ease) .05s both;}
+@keyframes slideInRight{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:none;}}
+.dash-mock{background:var(--white);border-radius:20px;border:1px solid var(--cream-3);box-shadow:0 40px 80px rgba(14,17,23,.15),0 12px 32px rgba(14,17,23,.08);}
+.dm-topbar{background:var(--navy);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-radius:20px 20px 0 0;}
+.dm-logo{font-family:var(--f-disp);font-size:17px;font-weight:600;color:rgba(255,255,255,.9);}
+.dm-logo sup{font-family:var(--f-ui);font-size:9px;color:rgba(160,190,240,.85);vertical-align:super;}
+.dm-live{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;color:rgba(255,255,255,.5);}
+.dm-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 3px rgba(74,222,128,.2);animation:dp 2s ease infinite;}
+@keyframes dp{0%,100%{opacity:1;}50%{opacity:.35;}}
+.dm-body{padding:20px;}
+.dm-cand-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--cream-2);}
+.dm-av{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--navy-2),var(--accent-2));color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dm-cname{font-weight:600;font-size:14.5px;color:var(--ink);}
+.dm-crole{font-size:12px;color:var(--muted);margin-top:2px;}
+.dm-pass{margin-left:auto;background:var(--success-bg);color:var(--success);font-size:12px;font-weight:700;padding:5px 12px;border-radius:100px;border:1px solid rgba(26,102,68,.2);white-space:nowrap;}
+.dm-scores{display:flex;flex-direction:column;gap:10px;}
+.dm-srow{display:flex;align-items:center;gap:10px;}
+.dm-slbl{font-size:12px;color:var(--muted);width:90px;flex-shrink:0;}
+.dm-track{flex:1;height:8px;background:var(--cream-2);border-radius:10px;overflow:hidden;}
+.dm-fill{height:100%;border-radius:10px;}
+.dm-sval{font-size:12.5px;font-weight:700;color:var(--ink-2);width:28px;text-align:right;flex-shrink:0;}
+.dm-total{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding:14px 16px;background:var(--cream);border-radius:12px;}
+.dm-tlbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:3px;}
+.dm-tscore{font-family:var(--f-disp);font-size:30px;font-weight:700;color:var(--navy);line-height:1;}
+.dm-rank{font-size:12px;color:var(--muted);margin-top:4px;}
+.hero-float{position:absolute;background:var(--white);border-radius:14px;border:1px solid var(--cream-3);box-shadow:0 16px 40px rgba(14,17,23,.14);padding:14px 18px;}
+.hf-a{bottom:-24px;left:-28px;display:flex;align-items:center;gap:12px;animation:fla 5s ease-in-out infinite;}
+@keyframes fla{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.hf-b{top:-22px;right:-22px;background:var(--navy);border-color:var(--navy-2);animation:flb 5s ease-in-out 1.2s infinite;}
+@keyframes flb{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+
+/* MARQUEE */
+.trusted-bar{background:var(--navy);padding:20px 0;overflow:hidden;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);}
+.trusted-track{display:flex;gap:60px;animation:mq 24s linear infinite;width:max-content;}
+@keyframes mq{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.trusted-item{font-family:var(--f-disp);font-size:17px;font-weight:400;font-style:italic;color:rgba(255,255,255,.3);white-space:nowrap;display:flex;align-items:center;gap:60px;}
+.trusted-item::after{content:'·';color:var(--gold-2);font-style:normal;}
+
+/* STATS BANNER */
+.stats-banner{background:var(--cream);padding:80px 48px;border-bottom:1px solid var(--cream-3);}
+.sb-inner{max-width:var(--max);margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--cream-3);border:1px solid var(--cream-3);border-radius:16px;overflow:hidden;}
+.sb-cell{background:var(--cream);padding:36px 32px;text-align:center;transition:background .2s;}
+.sb-cell:hover{background:var(--white);}
+.sb-num{font-family:var(--f-disp);font-size:58px;font-weight:600;line-height:1;letter-spacing:-.04em;color:var(--navy);margin-bottom:8px;}
+.sb-num em{font-style:normal;color:var(--gold-2);}
+.sb-lbl{font-size:13px;color:var(--muted);line-height:1.5;}
+
+/* SECTION COMMON */
+.eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.eyebrow-line{width:32px;height:1px;background:var(--gold-2);}
+.eyebrow-text{font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--gold);}
+.section-h{font-family:var(--f-disp);font-size:clamp(36px,4vw,56px);font-weight:500;line-height:1.1;letter-spacing:-.03em;color:var(--navy);margin-bottom:18px;}
+.section-h em{font-style:italic;}
+.section-lead{font-family:var(--f-disp);font-size:20px;font-weight:300;font-style:italic;line-height:1.65;color:var(--muted);max-width:560px;}
+
+/* HOW */
+.how{background:var(--white);padding:120px 48px;}
+.how-inner{max-width:var(--max);margin:0 auto;}
+.section-head{margin-bottom:72px;}
+.section-head.centered{text-align:center;}
+.section-head.centered .section-lead{margin:0 auto;}
+.section-head.centered .eyebrow{justify-content:center;}
+.steps-row{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:20px;overflow:hidden;}
+.step{padding:48px 40px;border-right:1px solid var(--line);position:relative;transition:background .2s;}
+.step:last-child{border-right:none;}
+.step:hover{background:var(--cream);}
+.step-num{font-family:var(--f-disp);font-size:100px;font-weight:300;line-height:1;letter-spacing:-.05em;color:var(--cream-3);position:absolute;top:24px;right:24px;line-height:.9;user-select:none;transition:color .2s;}
+.step:hover .step-num{color:var(--cream-2);}
+.step-icon{width:56px;height:56px;border-radius:16px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:28px;box-shadow:0 6px 20px rgba(15,31,56,.22);}
+.step-h{font-family:var(--f-disp);font-size:26px;font-weight:600;color:var(--navy);line-height:1.2;margin-bottom:14px;letter-spacing:-.02em;}
+.step-p{font-size:14.5px;line-height:1.8;color:var(--muted);}
+
+/* FEATURES */
+.features{background:var(--cream);padding:120px 48px;}
+.features-inner{max-width:var(--max);margin:0 auto;}
+.features-head{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end;margin-bottom:72px;}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.feat{background:var(--white);border:1px solid var(--cream-3);border-radius:18px;padding:36px 30px;transition:all .22s var(--ease);position:relative;overflow:hidden;}
+.feat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--navy),var(--accent-2));transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease);}
+.feat:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(14,17,23,.1);}
+.feat:hover::before{transform:scaleX(1);}
+.feat-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:22px;}
+.fi-1{background:rgba(15,31,56,.07);}
+.fi-2{background:rgba(30,71,153,.08);}
+.fi-3{background:rgba(26,102,68,.08);}
+.fi-4{background:rgba(154,123,47,.1);}
+.feat-h{font-family:var(--f-disp);font-size:22px;font-weight:600;color:var(--navy);margin-bottom:12px;letter-spacing:-.02em;}
+.feat-p{font-size:14px;line-height:1.8;color:var(--muted);}
+.feat-status{display:inline-flex;margin-top:18px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;}
+.fs-live{background:var(--success-bg);color:var(--success);border:1px solid rgba(26,102,68,.2);}
+.fs-soon{background:#fef8e8;color:var(--gold);border:1px solid rgba(154,123,47,.2);}
+
+/* TESTIMONIALS */
+.testimonials{background:var(--navy);padding:120px 48px;position:relative;overflow:hidden;}
+.testimonials::before{content:'\201C';position:absolute;top:-40px;left:40px;font-family:var(--f-disp);font-size:400px;font-weight:700;color:rgba(255,255,255,.025);line-height:1;pointer-events:none;user-select:none;}
+.test-inner{max-width:var(--max);margin:0 auto;position:relative;z-index:1;}
+.test-head{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end;margin-bottom:72px;}
+.test-head .eyebrow-line{background:rgba(201,168,76,.5);}
+.test-head .eyebrow-text{color:var(--gold-2);}
+.test-head .section-h{color:var(--white);}
+.test-head .section-lead{color:rgba(255,255,255,.4);}
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.test-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:20px;padding:36px 30px;display:flex;flex-direction:column;gap:24px;transition:all .22s var(--ease);}
+.test-card:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.15);transform:translateY(-3px);}
+.test-stars{display:flex;gap:3px;}
+.test-star{color:var(--gold-3);font-size:15px;}
+.test-quote{font-family:var(--f-disp);font-size:18px;font-weight:400;font-style:italic;line-height:1.7;color:rgba(255,255,255,.75);flex:1;}
+.test-person{display:flex;align-items:center;gap:14px;}
+.test-av{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--white);flex-shrink:0;}
+.test-name{font-weight:600;font-size:14px;color:rgba(255,255,255,.9);}
+.test-role{font-size:12px;color:rgba(255,255,255,.4);margin-top:2px;}
+
+/* PRICING */
+.pricing{background:var(--cream);padding:120px 48px;}
+.pricing-inner{max-width:var(--max);margin:0 auto;}
+.pricing-head{text-align:center;margin-bottom:56px;}
+.pricing-head .eyebrow{justify-content:center;}
+.pricing-head .section-lead{margin:0 auto;}
+.btw-wrap{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:64px;}
+.btw-lbl{font-size:14px;font-weight:500;color:var(--muted);transition:color .2s;cursor:pointer;}
+.btw-lbl.active{color:var(--ink);}
+.btw-switch{width:48px;height:26px;border-radius:13px;background:var(--cream-3);border:1.5px solid var(--cream-3);cursor:pointer;position:relative;transition:background .2s;}
+.btw-switch.on{background:var(--navy);border-color:var(--navy);}
+.btw-switch::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--white);box-shadow:0 1px 4px rgba(0,0,0,.2);transition:left .2s var(--ease);}
+.btw-switch.on::after{left:23px;}
+.annual-pill{font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:100px;background:rgba(154,123,47,.1);color:var(--gold);border:1px solid rgba(154,123,47,.2);}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:start;}
+.plan{border-radius:20px;padding:40px 34px;position:relative;transition:transform .22s var(--ease);}
+.plan:hover{transform:translateY(-4px);}
+.plan-std{background:var(--white);border:1px solid var(--cream-3);box-shadow:0 4px 16px rgba(14,17,23,.05);}
+.plan-featured{background:var(--navy);border:1px solid var(--navy-2);box-shadow:0 24px 56px rgba(15,31,56,.32);}
+.plan-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--white);font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:5px 18px;border-radius:100px;box-shadow:0 4px 14px rgba(154,123,47,.4);white-space:nowrap;}
+.plan-name{font-family:var(--f-disp);font-size:26px;font-weight:600;letter-spacing:-.02em;margin-bottom:8px;}
+.plan-std .plan-name{color:var(--navy);}
+.plan-featured .plan-name{color:var(--white);}
+.plan-tagline{font-size:13.5px;line-height:1.55;margin-bottom:32px;}
+.plan-std .plan-tagline{color:var(--muted);}
+.plan-featured .plan-tagline{color:rgba(255,255,255,.45);}
+.plan-amount{font-family:var(--f-disp);font-size:52px;font-weight:600;letter-spacing:-.04em;line-height:1;}
+.plan-std .plan-amount{color:var(--navy);}
+.plan-featured .plan-amount{color:var(--white);}
+.plan-period{font-size:14px;font-weight:400;margin-left:2px;}
+.plan-std .plan-period{color:var(--muted);}
+.plan-featured .plan-period{color:rgba(255,255,255,.4);}
+.plan-rule{height:1px;margin:28px 0;}
+.plan-std .plan-rule{background:var(--cream-3);}
+.plan-featured .plan-rule{background:rgba(255,255,255,.1);}
+.plan-list{list-style:none;display:flex;flex-direction:column;gap:13px;margin-bottom:36px;}
+.plan-list li{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.5;}
+.plan-std .plan-list li{color:var(--ink-3);}
+.plan-featured .plan-list li{color:rgba(255,255,255,.7);}
+.pl-check{flex-shrink:0;font-size:15px;margin-top:.5px;}
+.plan-std .pl-check{color:var(--accent-2);}
+.plan-featured .pl-check{color:var(--gold-2);}
+.plan-btn{display:flex;align-items:center;justify-content:center;width:100%;padding:14px 20px;border-radius:10px;font-size:14.5px;font-weight:600;border:none;cursor:pointer;transition:all .2s var(--ease);}
+.pb-std{background:var(--cream);color:var(--navy);border:1.5px solid var(--cream-3);}
+.pb-std:hover{background:var(--cream-2);border-color:var(--muted-2);}
+.pb-featured{background:var(--white);color:var(--navy);box-shadow:0 4px 16px rgba(0,0,0,.2);}
+.pb-featured:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.28);}
+
+/* ABOUT */
+.about{background:var(--white);padding:120px 48px;}
+.about-inner{max-width:var(--max);margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+.about-manifesto{font-family:var(--f-disp);font-size:26px;font-weight:400;font-style:italic;line-height:1.55;color:var(--ink-2);padding:32px 0 32px 32px;border-left:2px solid var(--gold-2);margin:32px 0;}
+.about-body{font-size:15px;line-height:1.8;color:var(--muted);}
+.about-stats{display:flex;gap:40px;margin-top:44px;flex-wrap:wrap;}
+.about-stat-val{font-family:var(--f-disp);font-size:40px;font-weight:600;color:var(--navy);line-height:1;letter-spacing:-.03em;}
+.about-stat-lbl{font-size:12.5px;color:var(--muted);margin-top:4px;}
+.about-right{display:flex;flex-direction:column;gap:16px;}
+.about-card{background:var(--cream);border:1px solid var(--cream-3);border-radius:16px;padding:28px 24px;transition:all .2s var(--ease);}
+.about-card:hover{background:var(--white);box-shadow:0 8px 28px rgba(14,17,23,.07);transform:translateX(4px);}
+.ac-icon{font-size:26px;margin-bottom:12px;}
+.ac-h{font-family:var(--f-disp);font-size:20px;font-weight:600;color:var(--navy);margin-bottom:8px;letter-spacing:-.02em;}
+.ac-p{font-size:13.5px;line-height:1.75;color:var(--muted);}
+
+/* FAQ */
+.faq{background:var(--cream);padding:120px 48px;}
+.faq-inner{max-width:var(--max-sm);margin:0 auto;}
+.faq-head{text-align:center;margin-bottom:64px;}
+.faq-head .eyebrow{justify-content:center;}
+.faq-list{display:flex;flex-direction:column;gap:2px;}
+.faq-item{border-radius:14px;overflow:hidden;border:1px solid var(--cream-3);background:var(--white);transition:border-color .2s;}
+.faq-item.open{border-color:var(--accent-2);box-shadow:0 4px 16px rgba(30,71,153,.08);}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:22px 28px;cursor:pointer;font-family:var(--f-disp);font-size:20px;font-weight:500;color:var(--navy);line-height:1.35;gap:16px;user-select:none;}
+.faq-q:hover,.faq-item.open .faq-q{background:var(--cream);}
+.faq-ico{width:30px;height:30px;border-radius:8px;background:var(--cream-2);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--muted);flex-shrink:0;font-weight:300;transition:all .2s var(--ease);}
+.faq-item.open .faq-ico{background:var(--navy);color:var(--white);transform:rotate(45deg);}
+.faq-a{display:none;padding:0 28px 24px;font-family:var(--f-disp);font-size:18px;font-weight:300;font-style:italic;line-height:1.75;color:var(--muted);}
+.faq-item.open .faq-a{display:block;}
+
+/* CTA FINAL */
+.cta-final{background:var(--navy);padding:140px 48px;text-align:center;position:relative;overflow:hidden;}
+.cta-final::before{content:'';position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:1px;background:rgba(255,255,255,.06);}
+.cta-final::after{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,255,255,.04);}
+.cta-inner{max-width:680px;margin:0 auto;position:relative;z-index:1;}
+.cta-eyebrow{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px;}
+.cta-eyebrow-line{width:32px;height:1px;background:rgba(201,168,76,.5);}
+.cta-eyebrow-text{font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--gold-2);}
+.cta-h{font-family:var(--f-disp);font-size:clamp(44px,5vw,68px);font-weight:500;line-height:1.08;letter-spacing:-.03em;color:var(--white);margin-bottom:22px;}
+.cta-h em{font-style:italic;color:var(--gold-2);}
+.cta-sub{font-family:var(--f-disp);font-size:20px;font-weight:300;font-style:italic;color:rgba(255,255,255,.45);line-height:1.65;margin-bottom:52px;}
+.cta-btns{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:28px;}
+.btn-cta-w{display:inline-flex;align-items:center;gap:10px;background:var(--white);color:var(--navy);font-size:15px;font-weight:700;padding:16px 36px;border-radius:10px;border:none;cursor:pointer;transition:all .22s var(--ease);box-shadow:0 6px 24px rgba(0,0,0,.3);}
+.btn-cta-w:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(0,0,0,.4);}
+.btn-cta-g{display:inline-flex;align-items:center;gap:10px;background:transparent;color:rgba(255,255,255,.65);font-size:14.5px;font-weight:500;padding:15px 28px;border-radius:10px;border:1px solid rgba(255,255,255,.16);cursor:pointer;transition:all .2s;}
+.btn-cta-g:hover{border-color:rgba(255,255,255,.35);color:var(--white);}
+.cta-note{font-size:13px;color:rgba(255,255,255,.25);}
+
+/* FOOTER */
+.footer{background:#070d17;padding:72px 48px 44px;}
+.footer-inner{max-width:var(--max);margin:0 auto;}
+.footer-top{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;gap:60px;padding-bottom:56px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:36px;}
+.footer-bname{font-family:var(--f-disp);font-size:22px;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:4px;}
+.footer-bname sup{font-family:var(--f-ui);font-size:10px;color:rgba(160,190,240,.7);vertical-align:super;}
+.footer-bsub{font-size:10px;font-weight:600;letter-spacing:2.2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:18px;}
+.footer-bdesc{font-family:var(--f-disp);font-size:15px;font-style:italic;font-weight:300;color:rgba(255,255,255,.3);line-height:1.7;max-width:280px;}
+.footer-col-h{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:18px;}
+.footer-lnk{display:block;font-size:14px;color:rgba(255,255,255,.3);margin-bottom:12px;transition:color .15s;}
+.footer-lnk:hover{color:rgba(255,255,255,.7);}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:rgba(255,255,255,.22);flex-wrap:wrap;gap:12px;}
+.footer-legal{display:flex;gap:24px;}
+.footer-legal a{color:rgba(255,255,255,.22);transition:color .15s;}
+.footer-legal a:hover{color:rgba(255,255,255,.5);}
+
+/* ANIMATIONS & REVEAL */
+@keyframes slideIn{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:none;}}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
+.reveal.visible{opacity:1;transform:none;}
+.reveal-r{opacity:0;transform:translateX(30px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
+.reveal-r.visible{opacity:1;transform:none;}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .hero-inner,.about-inner{grid-template-columns:1fr;}
+  .hero-bg-char{display:none;}
+  .hero-right{max-width:520px;}
+  .features-head,.test-head{grid-template-columns:1fr;gap:24px;}
+  .test-grid{grid-template-columns:1fr 1fr;}
+  .plans{grid-template-columns:1fr;max-width:440px;margin:0 auto;}
+  .footer-top{grid-template-columns:1fr 1fr;}
+  .sb-inner{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:768px){
+  .nav{padding:0 24px;}
+  .nav-links,.nav-actions .btn-nav-ghost{display:none;}
+  .nav-hamburger{display:flex;}
+  .hero{padding:72px 24px 0;}
+  .hero-inner{padding:60px 0;}
+  .steps-row{grid-template-columns:1fr;}
+  .step{border-right:none;border-bottom:1px solid var(--line);}
+  .step:last-child{border-bottom:none;}
+  .feat-grid,.test-grid{grid-template-columns:1fr;}
+  .how,.features,.about,.faq,.pricing,.testimonials,.cta-final{padding-left:24px;padding-right:24px;}
+  .stats-banner{padding-left:24px;padding-right:24px;}
+  .footer{padding-left:24px;padding-right:24px;}
+  .footer-top{grid-template-columns:1fr;}
+  .about-stats{gap:24px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="main-nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">Nova<sup>CS</sup></div>
+      <div class="brand-sub">Client Systems &amp; Digital Solutions</div>
+    </a>
+    <div class="nav-links" id="nav-links">
+      <a href="#how" class="nav-link">How it works</a>
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="pages/contact.html" class="nav-link">Contact</a>
+    </div>
+    <div class="nav-actions">
+      <a href="pages/login.html"><button class="btn-nav-ghost">Sign in</button></a>
+      <a href="pages/login.html"><button class="btn-nav-solid">Get started →</button></a>
+    </div>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-char">N</div>
+  <div class="hero-rule"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-kicker">
+        <div class="hero-kicker-line"></div>
+        <span class="hero-kicker-text">Candidate Assessment Platform</span>
+      </div>
+      <h1 class="hero-h1">Stop guessing.<br><em>Start <span class="hero-h1-ruled">assessing.</span></em></h1>
+      <p class="hero-body">A structured, science-backed way to evaluate candidates — fairly, consistently, and at any scale. No more gut feel. Just clear data.</p>
+      <div class="hero-ctas">
+        <a href="pages/login.html"><button class="btn-hp">Start for free <span class="arr">→</span></button></a>
+        <a href="#how"><button class="btn-ht">See how it works →</button></a>
+      </div>
+      <div class="hero-proof">
+        <div>
+          <div class="hp-num">3<span>×</span></div>
+          <div class="hp-lbl">faster to shortlist</div>
+        </div>
+        <div class="hp-div"></div>
+        <div>
+          <div class="hp-num">62<span>%</span></div>
+          <div class="hp-lbl">avg platform pass rate</div>
+        </div>
+        <div class="hp-div"></div>
+        <div>
+          <div class="hp-num">98<span>%</span></div>
+          <div class="hp-lbl">recruiter confidence score</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="dash-mock">
+        <div class="dm-topbar">
+          <div class="dm-logo">Nova<sup>CS</sup></div>
+          <div class="dm-live"><div class="dm-dot"></div>Assessment live</div>
+        </div>
+        <div class="dm-body">
+          <div class="dm-cand-row">
+            <div class="dm-av">AC</div>
+            <div>
+              <div class="dm-cname">Alex Chen</div>
+              <div class="dm-crole">Operations Analyst · Acme Corp</div>
+            </div>
+            <span class="dm-pass">✓ Pass</span>
+          </div>
+          <div class="dm-scores">
+            <div class="dm-srow"><div class="dm-slbl">Judgement</div><div class="dm-track"><div class="dm-fill" style="width:82%;background:#1e4799"></div></div><div class="dm-sval">82</div></div>
+            <div class="dm-srow"><div class="dm-slbl">Numerical</div><div class="dm-track"><div class="dm-fill" style="width:74%;background:#3361c2"></div></div><div class="dm-sval">74</div></div>
+            <div class="dm-srow"><div class="dm-slbl">Verbal</div><div class="dm-track"><div class="dm-fill" style="width:79%;background:#1a7a55"></div></div><div class="dm-sval">79</div></div>
+            <div class="dm-srow"><div class="dm-slbl">Situational</div><div class="dm-track"><div class="dm-fill" style="width:68%;background:#7a6bb5"></div></div><div class="dm-sval">68</div></div>
+          </div>
+          <div class="dm-total">
+            <div>
+              <div class="dm-tlbl">Weighted Score</div>
+              <div class="dm-tscore">76.4</div>
+              <div class="dm-rank">Top 14% of all candidates</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Completed in</div>
+              <div style="font-family:var(--f-disp);font-size:24px;font-weight:600;color:var(--navy)">18m 42s</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-float hf-a">
+        <span style="font-size:24px">🏆</span>
+        <div>
+          <div style="font-family:var(--f-disp);font-size:20px;font-weight:700;color:var(--navy);line-height:1">Top 14%</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">of all candidates assessed</div>
+        </div>
+      </div>
+      <div class="hero-float hf-b">
+        <div style="font-family:var(--f-disp);font-size:28px;font-weight:600;color:var(--white);line-height:1">3×</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:3px">faster shortlisting</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="trusted-bar" aria-hidden="true">
+  <div class="trusted-track">
+    <span class="trusted-item">Acme Corp</span>
+    <span class="trusted-item">NexGen Talent</span>
+    <span class="trusted-item">Vertex Consulting</span>
+    <span class="trusted-item">ClearPath Group</span>
+    <span class="trusted-item">Meridian Partners</span>
+    <span class="trusted-item">Halcyon Recruit</span>
+    <span class="trusted-item">Acme Corp</span>
+    <span class="trusted-item">NexGen Talent</span>
+    <span class="trusted-item">Vertex Consulting</span>
+    <span class="trusted-item">ClearPath Group</span>
+    <span class="trusted-item">Meridian Partners</span>
+    <span class="trusted-item">Halcyon Recruit</span>
+  </div>
+</div>
+
+<!-- STATS BANNER -->
+<div class="stats-banner">
+  <div class="sb-inner">
+    <div class="sb-cell reveal"><div class="sb-num">3<em>×</em></div><div class="sb-lbl">faster shortlisting than manual CV review</div></div>
+    <div class="sb-cell reveal" style="transition-delay:.08s"><div class="sb-num">62<em>%</em></div><div class="sb-lbl">average pass rate across the platform</div></div>
+    <div class="sb-cell reveal" style="transition-delay:.16s"><div class="sb-num">40<em>+</em></div><div class="sb-lbl">assessments completed this month</div></div>
+    <div class="sb-cell reveal" style="transition-delay:.24s"><div class="sb-num">98<em>%</em></div><div class="sb-lbl">of recruiters rate results as consistent</div></div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="section-head centered reveal">
+      <div class="eyebrow" style="justify-content:center"><div class="eyebrow-line"></div><span class="eyebrow-text">How it works</span><div class="eyebrow-line"></div></div>
+      <h2 class="section-h">From invite to insight<br>in <em>three steps</em></h2>
+      <p class="section-lead">NovaCS strips the friction from structured assessment. Issue a code, let candidates complete on their own time, get weighted results instantly.</p>
+    </div>
+    <div class="steps-row reveal">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-icon">🔑</div>
+        <h3 class="step-h">Issue an access code</h3>
+        <p class="step-p">Generate a unique, time-limited code from your recruiter dashboard. Send it to the candidate however you choose — no account creation required on their end.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-icon">📋</div>
+        <h3 class="step-h">Candidate completes the assessment</h3>
+        <p class="step-p">The candidate enters their code, verifies their identity, and completes a timed multi-category assessment from any device. Tab-switch detection keeps results clean.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-icon">📊</div>
+        <h3 class="step-h">Review weighted results instantly</h3>
+        <p class="step-p">The moment they finish, a full weighted breakdown appears in your dashboard — scores across all four categories, a Pass/Fail result, and a candidate ranking.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="features-inner">
+    <div class="features-head reveal">
+      <div>
+        <div class="eyebrow"><div class="eyebrow-line"></div><span class="eyebrow-text">Features</span></div>
+        <h2 class="section-h">Everything your hiring<br>team <em>actually needs</em></h2>
+      </div>
+      <p class="section-lead" style="align-self:end">Purpose-built for recruitment teams who need rigour without complexity. Every feature is designed around how real hiring decisions get made.</p>
+    </div>
+    <div class="feat-grid reveal">
+      <div class="feat"><div class="feat-icon fi-1">⚖️</div><h3 class="feat-h">Weighted scoring</h3><p class="feat-p">Set different importance for each category by role. Weight numerical reasoning at 40% for a finance role; prioritise situational judgement for customer-facing positions. One calibrated score per role.</p><span class="feat-status fs-live">Live now</span></div>
+      <div class="feat"><div class="feat-icon fi-2">🛡</div><h3 class="feat-h">Integrity detection</h3><p class="feat-p">Tab-switch detection flags every time a candidate navigates away. The total count appears alongside their score, giving you context for borderline calls without overriding your judgement.</p><span class="feat-status fs-live">Live now</span></div>
+      <div class="feat"><div class="feat-icon fi-3">👥</div><h3 class="feat-h">Team roles &amp; access</h3><p class="feat-p">Admins configure settings. Recruiters issue codes and review results. Viewers see everything but change nothing. Everyone on your team gets exactly what they need, nothing more.</p><span class="feat-status fs-live">Live now</span></div>
+      <div class="feat"><div class="feat-icon fi-4">📩</div><h3 class="feat-h">Bulk candidate invites</h3><p class="feat-p">Upload a CSV and issue codes to an entire intake in a single action. Track who has started, completed, and who hasn't opened their invite yet — all from one view.</p><span class="feat-status fs-live">Live now</span></div>
+      <div class="feat"><div class="feat-icon fi-1">📤</div><h3 class="feat-h">Export &amp; ATS integration</h3><p class="feat-p">Export any result set as a clean CSV. Full push integrations for Workable, Greenhouse and Lever are arriving in Q3 2026, letting results flow directly into your existing hiring workflow.</p><span class="feat-status fs-soon">ATS push — Q3 2026</span></div>
+      <div class="feat"><div class="feat-icon fi-2">🤖</div><h3 class="feat-h">AI question generation</h3><p class="feat-p">Paste a job description and let NovaCS build a bespoke, role-specific question set automatically. Every generated set is validated before candidates see it.</p><span class="feat-status fs-soon">Coming 2026</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="testimonials">
+  <div class="test-inner">
+    <div class="test-head reveal">
+      <div>
+        <div class="eyebrow"><div class="eyebrow-line" style="background:rgba(201,168,76,.5)"></div><span class="eyebrow-text" style="color:var(--gold-2)">What recruiters say</span></div>
+        <h2 class="section-h" style="color:var(--white)">Real teams.<br><em>Real results.</em></h2>
+      </div>
+      <p class="section-lead" style="color:rgba(255,255,255,.4)">Used by recruitment teams ranging from two-person agencies to enterprise talent functions running hundreds of active roles simultaneously.</p>
+    </div>
+    <div class="test-grid reveal">
+      <div class="test-card">
+        <div class="test-stars"><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span></div>
+        <p class="test-quote">We used to spend two hours per candidate on CVs and phone screens. With NovaCS we shortlist in under 20 minutes. The weighted scoring means assessments actually reflect what matters for each role.</p>
+        <div class="test-person"><div class="test-av" style="background:linear-gradient(135deg,#162d52,#1e4799)">SM</div><div><div class="test-name">Sarah Mitchell</div><div class="test-role">Head of Talent · Acme Corp</div></div></div>
+      </div>
+      <div class="test-card">
+        <div class="test-stars"><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span></div>
+        <p class="test-quote">The tab-switch detection has already saved us from two bad hires. More importantly it signals to candidates this is a real assessment — the quality of applicants we attract has improved markedly.</p>
+        <div class="test-person"><div class="test-av" style="background:linear-gradient(135deg,#0f3a22,#1a6644)">TK</div><div><div class="test-name">Tobias Kraft</div><div class="test-role">Recruitment Lead · NexGen Talent</div></div></div>
+      </div>
+      <div class="test-card">
+        <div class="test-stars"><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span></div>
+        <p class="test-quote">We run assessments for multiple client firms simultaneously. Configuring separate scoring weights per organisation is a game-changer. Our clients trust results because the criteria come from them.</p>
+        <div class="test-person"><div class="test-av" style="background:linear-gradient(135deg,#2a1a5e,#5040a0)">CW</div><div><div class="test-name">Chris Walton</div><div class="test-role">Senior Consultant · Vertex Consulting</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="pricing-inner">
+    <div class="pricing-head reveal">
+      <div class="eyebrow" style="justify-content:center"><div class="eyebrow-line"></div><span class="eyebrow-text">Pricing</span><div class="eyebrow-line"></div></div>
+      <h2 class="section-h">Simple,<br>transparent pricing</h2>
+      <p class="section-lead">No per-assessment fees. No surprise charges. Choose the plan that fits your team and scale when you need to.</p>
+    </div>
+    <div class="btw-wrap reveal">
+      <span class="btw-lbl active" id="lbl-mo">Monthly</span>
+      <button class="btw-switch" id="btw" onclick="toggleBilling()"></button>
+      <span class="btw-lbl" id="lbl-yr">Annual</span>
+      <span class="annual-pill">Save 20%</span>
+    </div>
+    <div class="plans reveal">
+      <div class="plan plan-std">
+        <div class="plan-name">Starter</div>
+        <p class="plan-tagline">For small teams and agencies getting started with structured assessment.</p>
+        <div><span class="plan-amount" id="p-start">$79</span><span class="plan-period">/month</span></div>
+        <div class="plan-rule"></div>
+        <ul class="plan-list">
+          <li><span class="pl-check">✓</span>Up to 3 recruiter seats</li>
+          <li><span class="pl-check">✓</span>20 assessments per month</li>
+          <li><span class="pl-check">✓</span>All 4 assessment categories</li>
+          <li><span class="pl-check">✓</span>Weighted scoring configuration</li>
+          <li><span class="pl-check">✓</span>CSV export</li>
+          <li><span class="pl-check">✓</span>Email support</li>
+        </ul>
+        <button class="plan-btn pb-std" onclick="location.href='pages/contact.html'">Get started →</button>
+      </div>
+      <div class="plan plan-featured">
+        <div class="plan-badge">Most popular</div>
+        <div class="plan-name">Professional</div>
+        <p class="plan-tagline">For growing recruitment teams running consistent assessment pipelines.</p>
+        <div><span class="plan-amount" id="p-pro">$299</span><span class="plan-period">/month</span></div>
+        <div class="plan-rule"></div>
+        <ul class="plan-list">
+          <li><span class="pl-check">✓</span>Up to 5 recruiter seats</li>
+          <li><span class="pl-check">✓</span>50 assessments per month</li>
+          <li><span class="pl-check">✓</span>Bulk CSV candidate invites</li>
+          <li><span class="pl-check">✓</span>Invite batch management</li>
+          <li><span class="pl-check">✓</span>Priority email &amp; chat support</li>
+          <li><span class="pl-check">✓</span>Custom organisation branding</li>
+          <li><span class="pl-check">✓</span>Analytics dashboard</li>
+        </ul>
+        <button class="plan-btn pb-featured" onclick="location.href='pages/contact.html'">Get started →</button>
+      </div>
+      <div class="plan plan-std">
+        <div class="plan-name">Enterprise</div>
+        <p class="plan-tagline">For enterprise talent functions and multi-client consulting firms.</p>
+        <div><span class="plan-amount" id="p-ent">$599</span><span class="plan-period">/month</span></div>
+        <div class="plan-rule"></div>
+        <ul class="plan-list">
+          <li><span class="pl-check">✓</span>Up to 15 recruiter seats</li>
+          <li><span class="pl-check">✓</span>Unlimited assessments</li>
+          <li><span class="pl-check">✓</span>Multi-department support</li>
+          <li><span class="pl-check">✓</span>Dedicated account manager</li>
+          <li><span class="pl-check">✓</span>Custom SLA &amp; uptime guarantee</li>
+          <li><span class="pl-check">✓</span>SSO &amp; advanced security</li>
+          <li><span class="pl-check">✓</span>ATS integration (Q3 2026)</li>
+        </ul>
+        <button class="plan-btn pb-std" onclick="location.href='pages/contact.html'">Contact us →</button>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:28px;font-size:13px;color:var(--muted)" class="reveal">14-day free trial on all plans &nbsp;·&nbsp; No credit card required &nbsp;·&nbsp; Cancel anytime</p>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-inner">
+    <div class="reveal">
+      <div class="eyebrow"><div class="eyebrow-line"></div><span class="eyebrow-text">About NovaCS</span></div>
+      <h2 class="section-h">Built for recruiters,<br>not data scientists</h2>
+      <p class="section-lead" style="max-width:none;font-size:18px">NovaCS exists because structured candidate assessment was too hard to run without an enterprise budget and a dedicated I/O psychology team. We changed that.</p>
+      <blockquote class="about-manifesto">"A strong CV tells you what someone has done. A NovaCS assessment tells you how they think."</blockquote>
+      <p class="about-body">We believe every candidate deserves to be assessed on ability, not presentation. And every recruiter deserves a tool that gives them confidence in their decisions without adding hours to their process.</p>
+      <div class="about-stats">
+        <div><div class="about-stat-val">4</div><div class="about-stat-lbl">Assessment categories</div></div>
+        <div><div class="about-stat-val">100+</div><div class="about-stat-lbl">Questions in the bank</div></div>
+        <div><div class="about-stat-val">25m</div><div class="about-stat-lbl">Average completion time</div></div>
+      </div>
+    </div>
+    <div class="about-right reveal-r">
+      <div class="about-card"><div class="ac-icon">⚖️</div><h4 class="ac-h">Designed to reduce bias</h4><p class="ac-p">Every assessment is structured, standardised and scored algorithmically — not by whoever happens to review it first on a Monday morning.</p></div>
+      <div class="about-card"><div class="ac-icon">🔬</div><h4 class="ac-h">Evidence-backed categories</h4><p class="ac-p">Judgement, numerical, verbal and situational reasoning are the four competencies most predictive of workplace performance across role types and industries.</p></div>
+      <div class="about-card"><div class="ac-icon">🛡</div><h4 class="ac-h">Your data stays yours</h4><p class="ac-p">All candidate and assessment data is stored in your organisation's own isolated partition. NovaCS staff cannot access your records. Export or delete at any time.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="faq-inner">
+    <div class="faq-head reveal">
+      <div class="eyebrow" style="justify-content:center"><div class="eyebrow-line"></div><span class="eyebrow-text">FAQ</span><div class="eyebrow-line"></div></div>
+      <h2 class="section-h">Common questions</h2>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">How does the candidate access the assessment?<span class="faq-ico">+</span></div><div class="faq-a">The recruiter generates a unique access code from their dashboard and sends it to the candidate. The candidate visits the NovaCS portal, enters the code and their phone number to verify identity, and the assessment begins. No account creation required.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Can I customise the scoring weights for each role?<span class="faq-ico">+</span></div><div class="faq-a">Yes. From Settings you can assign a percentage weight to each of the four categories. Weights must total 100%. The platform shows a live preview of how any change would affect your current candidate pass/fail outcomes before you save.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">What happens if a candidate switches tabs?<span class="faq-ico">+</span></div><div class="faq-a">Every navigation away from the assessment window is recorded as a tab-switch flag. The total count appears alongside their result. The flag does not automatically reduce their score — that call is yours — but it is always visible for borderline decisions.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Is there a limit on how many candidates I can assess?<span class="faq-ico">+</span></div><div class="faq-a">Starter plans include 20 assessments per month. Professional includes 50. Enterprise is unlimited. If you need a temporary limit increase for a large intake, contact us and we will accommodate you at no extra charge.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Can multiple people on my team use the platform?<span class="faq-ico">+</span></div><div class="faq-a">Yes. Admins have full access including settings and billing. Recruiters can issue codes and review results. Viewers can see results but cannot take any action. All seats are managed from the Settings page within your dashboard.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">How do I get started?<span class="faq-ico">+</span></div><div class="faq-a">Click Get started in the navigation, create your organisation account, and you will be inside your dashboard within two minutes. The first 14 days are free on any plan — no credit card required. Contact us to arrange a guided demo if you prefer.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final">
+  <div class="cta-inner">
+    <div class="cta-eyebrow reveal"><div class="cta-eyebrow-line"></div><span class="cta-eyebrow-text">Ready when you are</span><div class="cta-eyebrow-line"></div></div>
+    <h2 class="cta-h reveal">Your next great hire<br><em>is already applying.</em></h2>
+    <p class="cta-sub reveal">Give them a fair shot. Give your team the data to make a confident decision. NovaCS is free for 14 days — no credit card, no setup fees, no friction.</p>
+    <div class="cta-btns reveal">
+      <a href="pages/login.html"><button class="btn-cta-w">Start for free →</button></a>
+      <a href="pages/contact.html"><button class="btn-cta-g">Book a demo</button></a>
+    </div>
+    <p class="cta-note reveal">14-day free trial · No credit card required · Cancel anytime</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-bname">Nova<sup>CS</sup></div>
+        <div class="footer-bsub">Client Systems &amp; Digital Solutions</div>
+        <p class="footer-bdesc">Structured, science-backed candidate assessment for teams who need more than a gut feeling.</p>
+      </div>
+      <div>
+        <div class="footer-col-h">Platform</div>
+        <a href="#how" class="footer-lnk">How it works</a>
+        <a href="#features" class="footer-lnk">Features</a>
+        <a href="#pricing" class="footer-lnk">Pricing</a>
+        <a href="#faq" class="footer-lnk">FAQ</a>
+      </div>
+      <div>
+        <div class="footer-col-h">Product</div>
+        <a href="pages/login.html" class="footer-lnk">Recruiter login</a>
+        <a href="pages/assess.html" class="footer-lnk">Candidate portal</a>
+        <a href="index.html" class="footer-lnk">Platform overview</a>
+        <a href="pages/contact.html" class="footer-lnk">Request a demo</a>
+      </div>
+      <div>
+        <div class="footer-col-h">Company</div>
+        <a href="#about" class="footer-lnk">About NovaCS</a>
+        <a href="pages/contact.html" class="footer-lnk">Contact us</a>
+        <a href="pages/contact.html" class="footer-lnk">Support</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 NovaCS · Client Systems &amp; Digital Solutions</span>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Data Processing</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const nav = document.getElementById('main-nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20),{passive:true});
+
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});
+},{threshold:.1,rootMargin:'0px 0px -50px 0px'});
+document.querySelectorAll('.reveal,.reveal-r').forEach(el=>io.observe(el));
+
+const prices={monthly:{start:'$79',pro:'$299',ent:'$599'},annual:{start:'$63',pro:'$239',ent:'$479'}};
+let isAnnual=false;
+function toggleBilling(){
+  isAnnual=!isAnnual;
+  document.getElementById('btw').classList.toggle('on',isAnnual);
+  document.getElementById('lbl-mo').classList.toggle('active',!isAnnual);
+  document.getElementById('lbl-yr').classList.toggle('active',isAnnual);
+  const p=isAnnual?prices.annual:prices.monthly;
+  document.getElementById('p-start').textContent=p.start;
+  document.getElementById('p-pro').textContent=p.pro;
+  document.getElementById('p-ent').textContent=p.ent;
+}
+
+function toggleFaq(el){
+  const item=el.closest('.faq-item');
+  const wasOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i=>i.classList.remove('open'));
+  if(!wasOpen)item.classList.add('open');
+}
+
+let navOpen=false;
+const navLinks=document.getElementById('nav-links');
+function toggleNav(){
+  navOpen=!navOpen;
+  navLinks.style.cssText=navOpen?'display:flex;flex-direction:column;position:fixed;top:72px;left:0;right:0;background:var(--cream);padding:20px 28px 28px;border-bottom:1px solid var(--cream-3);box-shadow:0 8px 32px rgba(14,17,23,.1);z-index:499;gap:2px;':'';
+}
+navLinks.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{if(navOpen)toggleNav();}));
+</script>
+</body>
+</html>

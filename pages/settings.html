@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCS — Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy-900:#0d1b2a;--navy-800:#1a2e45;--navy-700:#1e3a5f;--navy-600:#2452a0;--navy-500:#2d64c8;--navy-400:#4a7fd4;--navy-100:#dce8f7;--navy-50:#eef4fc;--slate-900:#1c2333;--slate-700:#334155;--slate-600:#475569;--slate-500:#64748b;--slate-400:#94a3b8;--slate-200:#e2e8f0;--slate-100:#f1f5f9;--slate-50:#f8fafc;--white:#fff;--bg:#edf0f7;--success:#0f6b3a;--success-bg:#e6f4ed;--success-border:#a3d4b8;--danger:#991b1b;--danger-bg:#fef2f2;--danger-border:#fca5a5;--shadow-xs:0 1px 2px rgba(13,27,42,.06);--shadow-sm:0 2px 6px rgba(13,27,42,.08);--shadow-md:0 6px 22px rgba(13,27,42,.09),0 2px 6px rgba(13,27,42,.05);--shadow-xl:0 22px 56px rgba(13,27,42,.15);--r-sm:8px;--r:12px;--r-lg:16px;--r-xl:22px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--slate-900);min-height:100vh;font-size:14px;}
+.topbar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--white);border-bottom:1px solid var(--slate-200);box-shadow:var(--shadow-sm);position:sticky;top:0;z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.back-btn{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--slate-500);text-decoration:none;padding:6px 12px;border-radius:var(--r-sm);border:1.5px solid var(--slate-200);background:var(--white);transition:all .15s;}
+.back-btn:hover{border-color:var(--navy-400);color:var(--navy-600);background:var(--navy-50);}
+.topbar-brand{font-family:'Playfair Display',serif;font-weight:700;font-size:18px;color:var(--slate-900);}
+.topbar-brand sup{font-family:'Figtree',sans-serif;font-size:11px;font-weight:700;color:var(--navy-500);vertical-align:super;margin-left:2px;}
+.crumb{font-size:13px;color:var(--slate-400);}
+.crumb span{color:var(--slate-700);font-weight:600;}
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:'Figtree',sans-serif;font-weight:600;font-size:13px;padding:8px 17px;border-radius:var(--r-sm);border:none;cursor:pointer;transition:all .17s;white-space:nowrap;}
+.btn-navy{background:var(--navy-700);color:#fff;box-shadow:0 2px 8px rgba(30,58,95,.28);}
+.btn-navy:hover{background:var(--navy-800);transform:translateY(-1px);}
+.btn-outline{background:var(--white);color:var(--slate-700);border:1.5px solid var(--slate-200);}
+.btn-outline:hover{border-color:var(--navy-400);color:var(--navy-600);background:var(--navy-50);}
+.btn-ghost{background:transparent;color:var(--slate-600);border:1.5px solid transparent;}
+.btn-ghost:hover{background:var(--slate-100);}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border:1.5px solid var(--danger-border);}
+.btn-danger:hover{background:#fde4e4;}
+.btn-sm{padding:5px 11px;font-size:12px;}
+.btn-success-outline{background:var(--success-bg);color:var(--success);border:1.5px solid var(--success-border);}
+.main{max-width:1100px;margin:0 auto;padding:28px;}
+.pg-head{margin-bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.pg-h1{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:3px;}
+.pg-sub{font-size:13px;color:var(--slate-500);}
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r);padding:5px;margin-bottom:24px;box-shadow:var(--shadow-xs);width:fit-content;}
+.tab-btn{padding:7px 18px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;background:transparent;border:none;color:var(--slate-500);font-family:'Figtree',sans-serif;}
+.tab-btn.active{background:var(--navy-700);color:#fff;box-shadow:0 2px 8px rgba(30,58,95,.22);}
+.tab-btn:not(.active):hover{background:var(--slate-100);color:var(--slate-900);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.grid-1{margin-bottom:18px;}
+/* CARD */
+.card{background:var(--white);border:1px solid var(--slate-200);border-radius:var(--r-lg);box-shadow:var(--shadow-md);overflow:hidden;}
+.card-head{padding:15px 20px;border-bottom:1px solid var(--slate-100);display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.card-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
+.card-body{padding:18px 20px;}
+.field{margin-bottom:14px;}
+.field:last-child{margin-bottom:0;}
+.field-label{display:block;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--slate-500);margin-bottom:6px;}
+.field-hint{font-size:11.5px;color:var(--slate-400);margin-top:4px;}
+.field-input{width:100%;background:var(--white);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:9px 13px;font-family:'Figtree',sans-serif;font-size:14px;color:var(--slate-900);outline:none;transition:all .18s;box-shadow:var(--shadow-xs);}
+.field-input:focus{border-color:var(--navy-500);box-shadow:0 0 0 3px rgba(45,100,200,.1);}
+.field-input::placeholder{color:var(--slate-400);}
+.notes-field{width:100%;background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:9px 12px;font-family:'Figtree',sans-serif;font-size:13px;color:var(--slate-900);outline:none;resize:vertical;transition:border-color .18s;}
+.notes-field:focus{border-color:var(--navy-400);}
+/* TOGGLE ROWS */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--slate-100);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-label{font-size:13px;font-weight:500;color:var(--slate-800);}
+.toggle-desc{font-size:11.5px;color:var(--slate-400);margin-top:2px;}
+.toggle{width:36px;height:20px;border-radius:10px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--navy-600);}
+.toggle.off{background:var(--slate-300);}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle.on::after{left:18px;}
+.toggle.off::after{left:3px;}
+/* WEIGHT GRID */
+.weight-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.weight-item label{font-size:11px;color:var(--slate-500);font-weight:600;display:block;margin-bottom:4px;}
+.weight-total{margin-top:8px;font-size:12px;font-weight:700;}
+/* DANGER ZONE */
+.danger-card{background:var(--white);border:1.5px solid var(--danger-border);border-radius:var(--r-lg);box-shadow:var(--shadow-md);overflow:hidden;}
+.danger-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--danger-bg);border-radius:var(--r-sm);gap:12px;}
+.danger-row-title{font-weight:600;font-size:13px;color:var(--slate-900);}
+.danger-row-desc{font-size:12px;color:var(--slate-500);margin-top:2px;}
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--slate-900);color:#fff;border-radius:var(--r);padding:11px 16px;font-size:13px;font-weight:500;z-index:999;display:flex;align-items:center;gap:8px;transform:translateY(70px);opacity:0;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-xl);max-width:300px;}
+.toast.show{transform:none;opacity:1;}
+@media(max-width:800px){.grid-2{grid-template-columns:1fr;}.main{padding:16px;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a class="back-btn" href="../dashboard.html">← Dashboard</a>
+    <div class="topbar-brand">Nova<sup>CS</sup></div>
+    <div class="crumb">/ <span>Settings</span></div>
+  </div>
+  <div>
+    <button class="btn btn-navy" onclick="saveAll()">Save All Changes</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="pg-head">
+    <div>
+      <h1 class="pg-h1">Settings</h1>
+      <p class="pg-sub">Organisation configuration, branding, scoring defaults and platform preferences</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('organisation',this)">Organisation</button>
+    <button class="tab-btn" onclick="switchTab('scoring',this)">Scoring & Assessment</button>
+    <button class="tab-btn" onclick="switchTab('preferences',this)">Preferences</button>
+    <button class="tab-btn" onclick="switchTab('danger',this)">Danger Zone</button>
+  </div>
+
+  <!-- ── ORGANISATION TAB ── -->
+  <div class="tab-panel active" id="tab-organisation">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Organisation Details</div></div>
+        <div class="card-body">
+          <div class="field"><label class="field-label">Organisation Name</label><input class="field-input" value="Acme Corp"/></div>
+          <div class="field">
+            <label class="field-label">Industry</label>
+            <select class="field-input"><option>Technology</option><option selected>Professional Services</option><option>Finance</option><option>Healthcare</option><option>Retail</option><option>Government</option></select>
+          </div>
+          <div class="field"><label class="field-label">Contact Email</label><input class="field-input" type="email" value="hr@acmecorp.com"/></div>
+          <div class="field"><label class="field-label">Website</label><input class="field-input" value="https://acmecorp.com"/></div>
+          <div class="field">
+            <label class="field-label">Time Zone</label>
+            <select class="field-input"><option selected>AEST (UTC+10)</option><option>AEDT (UTC+11)</option><option>UTC</option><option>GMT+1</option><option>EST (UTC-5)</option></select>
+          </div>
+          <div class="field"><label class="field-label">Country</label><select class="field-input"><option selected>Australia</option><option>United Kingdom</option><option>United States</option><option>New Zealand</option><option>Canada</option></select></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Branding</div><button class="btn btn-ghost btn-sm" onclick="showToast('Preview updated')">Preview</button></div>
+        <div class="card-body">
+          <div class="field">
+            <label class="field-label">Organisation Logo</label>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
+              <div style="width:52px;height:52px;border-radius:var(--r-sm);background:var(--navy-700);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0">AC</div>
+              <button class="btn btn-outline btn-sm" onclick="showToast('Logo upload — coming soon')">Upload Logo</button>
+            </div>
+            <div class="field-hint">PNG or SVG recommended. Max 2MB.</div>
+          </div>
+          <div class="field">
+            <label class="field-label">Primary Brand Colour</label>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+              <input type="color" value="#1e3a5f" style="width:40px;height:36px;border:1.5px solid var(--slate-200);border-radius:var(--r-sm);cursor:pointer;padding:2px 3px;background:var(--white)" oninput="document.getElementById('brand-hex').value=this.value"/>
+              <input class="field-input" id="brand-hex" value="#1e3a5f" style="flex:1;font-family:'Courier New',monospace;font-size:13px"/>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Email Footer Text</label>
+            <textarea class="notes-field" rows="3">Acme Corp — HR & Talent Acquisition
+sydney@acmecorp.com · acmecorp.com</textarea>
+          </div>
+          <div class="field">
+            <label class="field-label">Applicant Welcome Message</label>
+            <textarea class="notes-field" rows="3">Welcome! Please complete this assessment honestly and without assistance. You have 25 minutes.</textarea>
+            <div class="field-hint">Shown to candidates on the assessment instructions screen.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCORING TAB ── -->
+  <div class="tab-panel" id="tab-scoring">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Pass / Fail Threshold</div></div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--slate-500);margin-bottom:16px;line-height:1.65">The minimum weighted score a candidate must achieve to be marked as <strong>Pass</strong>. Candidates below this score are marked Fail.</p>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
+            <input type="range" id="thresh-slider" min="40" max="90" value="65" style="flex:1;accent-color:var(--navy-600)" oninput="updateThreshold(this.value)"/>
+            <span id="thresh-disp" style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy-700);min-width:56px;text-align:right">65%</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--slate-400);margin-bottom:18px"><span>40% (Lenient)</span><span>90% (Strict)</span></div>
+          <div style="background:var(--navy-50);border:1.5px solid var(--navy-100);border-radius:var(--r-sm);padding:12px 14px;font-size:12.5px;color:var(--navy-700)">
+            <strong>Current config:</strong> Candidates scoring <span id="thresh-lbl">65%</span> or above will pass. Based on current data, <span id="thresh-pass-count">—</span> of <span id="thresh-total">—</span> assessed candidates pass.
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Category Weights</div></div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--slate-500);margin-bottom:16px;line-height:1.65">Set how much each category contributes to the weighted score. Weights must add up to exactly 100%.</p>
+          <div class="weight-grid">
+            <div class="weight-item"><label>⚖️ Judgement & Decision</label><input class="field-input" type="number" id="w-judgement" value="35" min="0" max="100" oninput="checkWeights()"/></div>
+            <div class="weight-item"><label>🔢 Numerical Reasoning</label><input class="field-input" type="number" id="w-numerical" value="25" min="0" max="100" oninput="checkWeights()"/></div>
+            <div class="weight-item"><label>💬 Verbal & Communication</label><input class="field-input" type="number" id="w-verbal" value="20" min="0" max="100" oninput="checkWeights()"/></div>
+            <div class="weight-item"><label>🧠 Situational Scenarios</label><input class="field-input" type="number" id="w-situational" value="20" min="0" max="100" oninput="checkWeights()"/></div>
+          </div>
+          <div class="weight-total" id="weight-msg" style="color:var(--success)">✓ Total: 100% — weights are valid</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Assessment Defaults</div></div>
+        <div class="card-body">
+          <div class="field"><label class="field-label">Default Time Limit</label><select class="field-input"><option>20 minutes</option><option selected>25 minutes</option><option>30 minutes</option><option>40 minutes</option></select></div>
+          <div class="field"><label class="field-label">Default Question Count</label><select class="field-input"><option>20</option><option selected>25</option><option>30</option></select><div class="field-hint">Questions are drawn evenly from each category.</div></div>
+          <div class="field"><label class="field-label">Code Expiry (hours)</label><input class="field-input" type="number" value="72" min="1" max="720"/><div class="field-hint">Access codes expire this many hours after issue if unused.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Questions per Category</div></div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--slate-500);margin-bottom:14px">With 25 questions total, the default split across categories.</p>
+          <div class="weight-grid">
+            <div class="weight-item"><label>⚖️ Judgement</label><input class="field-input" type="number" value="7" min="1" max="20"/></div>
+            <div class="weight-item"><label>🔢 Numerical</label><input class="field-input" type="number" value="6" min="1" max="20"/></div>
+            <div class="weight-item"><label>💬 Verbal</label><input class="field-input" type="number" value="6" min="1" max="20"/></div>
+            <div class="weight-item"><label>🧠 Situational</label><input class="field-input" type="number" value="6" min="1" max="20"/></div>
+          </div>
+          <div class="weight-total" style="color:var(--success);margin-top:8px">✓ Total: 25 questions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PREFERENCES TAB ── -->
+  <div class="tab-panel" id="tab-preferences">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Assessment Behaviour</div></div>
+        <div class="card-body" style="padding:6px 20px">
+          <div class="toggle-row">
+            <div><div class="toggle-label">Auto-rank candidates</div><div class="toggle-desc">Automatically assign rank position once assessment is submitted</div></div>
+            <button class="toggle on" onclick="flipToggle(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">One attempt only</div><div class="toggle-desc">Expire access code immediately on submission — no retakes</div></div>
+            <button class="toggle on" onclick="flipToggle(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Randomise question order</div><div class="toggle-desc">Each candidate receives a unique question sequence</div></div>
+            <button class="toggle on" onclick="flipToggle(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Show scores to candidates</div><div class="toggle-desc">Display weighted score on the submission confirmation screen</div></div>
+            <button class="toggle off" onclick="flipToggle(this)"></button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Integrity & Notifications</div></div>
+        <div class="card-body" style="padding:6px 20px">
+          <div class="toggle-row">
+            <div><div class="toggle-label">Tab-switch detection</div><div class="toggle-desc">Flag candidates who navigate away from the assessment window</div></div>
+            <button class="toggle on" onclick="flipToggle(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Email admin on submission</div><div class="toggle-desc">Notify org admins by email when a candidate completes</div></div>
+            <button class="toggle on" onclick="flipToggle(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Email candidate on invite</div><div class="toggle-desc">Send an automated email to the candidate with their access code</div></div>
+            <button class="toggle on" onclick="flipToggle(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Weekly summary report</div><div class="toggle-desc">Email admins a summary of assessment activity every Monday</div></div>
+            <button class="toggle off" onclick="flipToggle(this)"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DANGER ZONE TAB ── -->
+  <div class="tab-panel" id="tab-danger">
+    <div class="danger-card">
+      <div class="card-head"><div class="card-title" style="color:var(--danger)">⚠ Danger Zone</div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+        <div class="danger-row">
+          <div>
+            <div class="danger-row-title">Export All Organisation Data</div>
+            <div class="danger-row-desc">Download a full CSV export of all candidates, scores, codes and audit logs for this organisation.</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="showToast('Export started — check your email')">Export All Data</button>
+        </div>
+        <div class="danger-row">
+          <div>
+            <div class="danger-row-title">Clear All Candidate Data</div>
+            <div class="danger-row-desc">Permanently removes all candidate records and assessment results for this organisation. This cannot be undone.</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="confirmDanger('Clear all candidate data? This cannot be undone.')">Clear Data</button>
+        </div>
+        <div class="danger-row">
+          <div>
+            <div class="danger-row-title">Delete Organisation</div>
+            <div class="danger-row-desc">Permanently deletes this organisation, all recruiters, all candidates and all associated data from NovaCS.</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="confirmDanger('Delete this organisation? This is permanent and cannot be undone.')">Delete Organisation</button>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top:14px;font-size:12px;color:var(--slate-400);text-align:center">For irreversible actions, contact <a href="contact.html" style="color:var(--navy-500);font-weight:500;text-decoration:none">NovaCS support</a> directly.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../js/db.js"></script>
+<script src="../js/utils.js"></script>
+<script>
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function flipToggle(btn){
+  btn.classList.toggle('on');
+  btn.classList.toggle('off');
+}
+
+function updateThreshold(v){
+  document.getElementById('thresh-disp').textContent=v+'%';
+  document.getElementById('thresh-lbl').textContent=v+'%';
+  // Live pass count using DB
+  const threshold=parseInt(v)||65;
+  const cands=DB.getCandidates();
+  const completed=cands.filter(c=>c.scores);
+  const passed=completed.filter(c=>DB.wScore(c.scores)>=threshold).length;
+  if(document.getElementById('thresh-pass-count'))document.getElementById('thresh-pass-count').textContent=passed;
+  if(document.getElementById('thresh-total'))document.getElementById('thresh-total').textContent=completed.length;
+}
+
+function checkWeights(){
+  const ids=['w-judgement','w-numerical','w-verbal','w-situational'];
+  const total=ids.reduce((s,id)=>s+(parseInt(document.getElementById(id).value)||0),0);
+  const msg=document.getElementById('weight-msg');
+  if(total===100){msg.style.color='var(--success)';msg.textContent='✓ Total: 100% — weights are valid';}
+  else{msg.style.color='var(--danger)';msg.textContent=`✗ Total: ${total}% — must equal 100%`;}
+}
+
+function saveAll(){
+  const ids=['w-judgement','w-numerical','w-verbal','w-situational'];
+  const keys=['judgement','numerical','verbal','situational'];
+  const total=ids.reduce((s,id)=>s+(parseInt(document.getElementById(id).value)||0),0);
+  if(total!==100){showToast('Fix category weights before saving','warn');return;}
+  // Persist to DB
+  const weights={};
+  ids.forEach((id,i)=>{ weights[keys[i]]=(parseInt(document.getElementById(id).value)||0)/100; });
+  const thresh=parseInt(document.getElementById('thresh-slider')?.value||document.getElementById('thresh-inp')?.value)||65;
+  DB.updateConfig({weights, passThreshold:thresh});
+  showToast('✓ All settings saved');
+}
+
+function confirmDanger(msg){
+  if(window.confirm(msg+'\n\nContact NovaCS support to perform this action.')){
+    showToast('Contact support@novacs.io to complete this action');
+  }
+}
+
+// Init — populate fields from DB.config
+function initSettings(){
+  const cfg=DB.config;
+  const w=cfg.weights;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  set('w-judgement',  Math.round(w.judgement  *100));
+  set('w-numerical',  Math.round(w.numerical  *100));
+  set('w-verbal',     Math.round(w.verbal      *100));
+  set('w-situational',Math.round(w.situational *100));
+  ['thresh-slider','thresh-inp','thresh-inp-2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=cfg.passThreshold;});
+  updateThreshold(cfg.passThreshold);
+  checkWeights();
+  // Populate org name
+  const orgEl=document.getElementById('org-name-field');
+  if(orgEl)orgEl.value=DB.session.org.name;
+}
+
+document.addEventListener('DOMContentLoaded', initSettings);
+
+let toastTimer;
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  const cols={ok:'#1c2333',err:'#991b1b',warn:'#854d0e'};
+  t.style.background=cols[type]||cols.ok;
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCS — Candidate Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-900:#0d1b2a;--navy-800:#1a2e45;--navy-700:#1e3a5f;--navy-600:#2452a0;
+  --navy-500:#2d64c8;--navy-400:#4a7fd4;--navy-200:#9bbce8;--navy-100:#dce8f7;--navy-50:#eef4fc;
+  --slate-900:#1c2333;--slate-700:#334155;--slate-600:#475569;--slate-500:#64748b;
+  --slate-400:#94a3b8;--slate-200:#e2e8f0;--slate-100:#f1f5f9;--slate-50:#f8fafc;
+  --white:#ffffff;
+  --success:#0f6b3a;--success-bg:#e6f4ed;--success-border:#a3d4b8;
+  --warning:#854d0e;--warning-bg:#fef9ec;--warning-border:#fcd34d;
+  --danger:#991b1b;--danger-bg:#fef2f2;--danger-border:#fca5a5;
+  --r-sm:8px;--r:12px;--r-lg:16px;--r-xl:22px;
+  --green-900:#064e2b;--green-800:#0a5a30;--green-700:#0f6b3a;--green-600:#158a4a;--green-500:#1fa05a;--green-400:#2d9e6b;--green-100:#a3d4b8;--green-50:#e6f4ed;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;}
+
+body{
+  font-family:'Figtree',sans-serif;
+  min-height:100vh;
+  background:#2d3a6b;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;
+  position:relative;
+}
+
+/* Floating brand — identical to login */
+.float-brand{
+  position:fixed;top:28px;left:28px;
+  display:flex;flex-direction:column;gap:5px;
+  animation:fadeSlideIn .6s ease both;
+  z-index:5;
+}
+.float-wordmark{
+  font-family:'Playfair Display',serif;font-size:24px;font-weight:700;
+  color:rgba(255,255,255,.92);letter-spacing:-.3px;line-height:1;
+}
+.float-wordmark sup{
+  font-family:'Figtree',sans-serif;font-size:12px;font-weight:700;
+  color:rgba(160,185,230,.95);vertical-align:super;margin-left:2px;font-style:normal;
+}
+.float-sub{
+  font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.5);
+}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+/* Main card — matches login card exactly */
+.main-card{
+  background:var(--white);
+  border-radius:var(--r-xl);
+  width:100%;max-width:500px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08),0 32px 80px rgba(0,0,0,.5),0 8px 24px rgba(0,0,0,.3);
+  position:relative;z-index:10;overflow:hidden;
+  animation:cardIn .5s cubic-bezier(.4,0,.2,1) both;
+  animation-delay:.05s;
+  transition:max-width .35s ease;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(24px) scale(.98);}to{opacity:1;transform:none;}}
+
+.card-accent{height:4px;background:linear-gradient(90deg,var(--green-900),var(--green-700),var(--green-400));}
+
+/* Card header */
+.card-header{
+  padding:28px 36px 22px;
+  border-bottom:1px solid var(--slate-100);
+}
+.card-logo{display:flex;align-items:baseline;gap:0;margin-bottom:20px;}
+.card-logo-nova{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--slate-900);letter-spacing:-.2px;}
+.card-logo-cs{font-family:'Figtree',sans-serif;font-size:11px;font-weight:700;color:var(--green-600);vertical-align:super;margin-left:2px;}
+.card-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--slate-900);letter-spacing:-.3px;margin-bottom:4px;}
+.card-subtitle{font-size:13.5px;color:var(--slate-400);}
+.step-pills{display:flex;gap:6px;margin-top:16px;}
+.step-pill{height:3px;border-radius:2px;background:var(--slate-200);transition:all .3s;}
+.step-pill.sm{width:24px;}.step-pill.lg{flex:1;}
+.step-pill.active{background:var(--green-700);}
+.step-pill.done{background:var(--green-500);}
+
+/* Card body */
+.card-body{padding:24px 36px 28px;}
+
+/* Card footer */
+.card-footer{padding:14px 36px 20px;border-top:1px solid var(--slate-100);text-align:center;font-size:12px;color:var(--slate-400);}
+.card-footer a{color:var(--green-600);font-weight:500;text-decoration:none;}
+.card-footer a:hover{color:var(--green-800);}
+
+/* Fields */
+.field{margin-bottom:16px;}
+.field-label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--slate-500);margin-bottom:7px;}
+.field-input{width:100%;background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:11px 14px;font-family:'Figtree',sans-serif;font-size:14px;color:var(--slate-900);outline:none;transition:all .18s;}
+.field-input:focus{background:var(--white);border-color:var(--green-600);box-shadow:0 0 0 3px rgba(15,107,58,.12);}
+.field-input.err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(153,27,27,.08);}
+.field-input::placeholder{color:var(--slate-400);}
+.code-input{font-family:'Courier New',monospace;font-size:20px;font-weight:700;letter-spacing:4px;text-align:center;text-transform:uppercase;}
+.code-input::placeholder{font-size:14px;letter-spacing:1px;font-family:'Figtree',sans-serif;font-weight:400;}
+
+/* Buttons */
+.btn-submit{width:100%;padding:13px;border:none;border-radius:var(--r-sm);background:var(--green-700);color:#fff;font-family:'Figtree',sans-serif;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(15,107,58,.3);display:flex;align-items:center;justify-content:center;gap:9px;}
+.btn-submit:hover:not(:disabled){background:var(--green-800);transform:translateY(-1px);box-shadow:0 6px 22px rgba(15,107,58,.38);}
+.btn-submit:disabled{opacity:.55;cursor:not-allowed;transform:none;}
+.btn-outline-full{width:100%;padding:11px;border:1.5px solid var(--slate-200);border-radius:var(--r-sm);background:var(--white);color:var(--slate-700);font-family:'Figtree',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .18s;}
+.btn-outline-full:hover{border-color:var(--green-500);color:var(--green-700);}
+.btn-back{display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-family:'Figtree',sans-serif;font-size:12.5px;font-weight:600;color:var(--slate-400);padding:0;margin-bottom:20px;transition:color .15s;}
+.btn-back:hover{color:var(--slate-700);}
+
+/* Banners */
+.banner{border-radius:var(--r-sm);padding:10px 13px;font-size:12.5px;font-weight:500;margin-bottom:14px;display:none;align-items:center;gap:8px;}
+.banner.show{display:flex;}
+.banner-err{background:var(--danger-bg);border:1.5px solid var(--danger-border);color:var(--danger);}
+.banner-warn{background:var(--warning-bg);border:1.5px solid var(--warning-border);color:var(--warning);}
+.banner-ok{background:var(--success-bg);border:1.5px solid var(--success-border);color:var(--success);}
+
+/* Demo hint */
+.demo-hint{margin-top:14px;background:var(--green-50);border:1px solid var(--green-100);border-radius:var(--r-sm);padding:10px 13px;font-size:12px;color:var(--slate-500);display:flex;align-items:flex-start;gap:8px;line-height:1.6;}
+.demo-hint-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+
+/* Spinner */
+.spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Screen transitions */
+.screen{animation:screenIn .25s ease both;}
+@keyframes screenIn{from{opacity:0;transform:translateX(8px);}to{opacity:1;transform:none;}}
+.hidden{display:none!important;}
+
+/* ── INSTRUCTIONS ── */
+.rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0;}
+.rule-card{background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r);padding:15px;}
+.rule-icon{font-size:20px;margin-bottom:8px;}
+.rule-title{font-weight:700;font-size:13px;color:var(--slate-800);margin-bottom:3px;}
+.rule-desc{font-size:12px;color:var(--slate-500);line-height:1.6;}
+.cat-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-sm);margin-bottom:8px;}
+.cat-row-icon{font-size:16px;width:28px;text-align:center;flex-shrink:0;}
+.cat-row-name{font-weight:600;font-size:13px;flex:1;color:var(--slate-800);}
+.cat-row-qs{font-size:12px;color:var(--slate-400);}
+.cat-row-wt{font-weight:700;font-size:13px;color:var(--green-700);min-width:34px;text-align:right;}
+.info-strip{background:var(--green-50);border:1px solid var(--green-100);border-radius:var(--r-sm);padding:11px 14px;font-size:13px;color:var(--slate-600);margin:16px 0;line-height:1.7;}
+.btn-row{display:flex;gap:9px;margin-top:4px;}
+.btn-row .btn-outline-full{flex:1;}
+.btn-row .btn-submit{flex:2;}
+
+/* ── ASSESSMENT ── */
+.assess-topbar{display:flex;align-items:center;gap:14px;padding:13px 28px;border-bottom:1px solid var(--slate-100);background:var(--white);position:sticky;top:0;z-index:20;}
+.prog-wrap{flex:1;}
+.prog-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--slate-400);font-weight:600;margin-bottom:5px;}
+.prog-track{height:5px;background:var(--slate-100);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--green-700),var(--green-500));border-radius:3px;transition:width .4s ease;}
+.timer-pill{display:flex;align-items:center;gap:7px;background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:7px 13px;flex-shrink:0;transition:all .3s;}
+.timer-pill.warn{border-color:var(--warning-border);background:var(--warning-bg);}
+.timer-pill.danger{border-color:var(--danger-border);background:var(--danger-bg);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.7;}}
+.timer-val{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--slate-800);min-width:46px;}
+.timer-pill.warn .timer-val{color:var(--warning);}
+.timer-pill.danger .timer-val{color:var(--danger);}
+
+.cat-header{padding:20px 28px 14px;border-bottom:1px solid var(--slate-100);}
+.cat-badge{display:inline-flex;align-items:center;gap:7px;background:var(--green-50);border:1px solid var(--green-100);border-radius:100px;padding:4px 13px;font-size:11.5px;font-weight:700;color:var(--green-700);margin-bottom:10px;}
+.cat-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:3px;color:var(--slate-900);}
+.cat-meta{font-size:12.5px;color:var(--slate-400);}
+.cat-dots{display:flex;gap:6px;margin-top:10px;}
+.cat-dot{width:7px;height:7px;border-radius:50%;background:var(--slate-200);transition:all .2s;}
+.cat-dot.done{background:var(--green-500);}
+.cat-dot.active{background:var(--green-700);box-shadow:0 0 0 3px rgba(15,107,58,.2);}
+
+.qs-area{padding:20px 28px;}
+.q-block{margin-bottom:26px;}
+.q-num{font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--slate-400);margin-bottom:7px;}
+.q-context{font-size:13px;color:var(--slate-600);line-height:1.7;background:var(--slate-50);border-left:3px solid var(--green-500);padding:11px 15px;border-radius:0 var(--r-sm) var(--r-sm) 0;margin-bottom:12px;}
+.q-text{font-size:14.5px;font-weight:600;color:var(--slate-900);line-height:1.6;margin-bottom:12px;}
+.options{display:flex;flex-direction:column;gap:7px;}
+.opt{display:flex;align-items:flex-start;gap:11px;padding:12px 15px;background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r);cursor:pointer;transition:all .18s;}
+.opt:hover{border-color:var(--green-500);background:var(--green-50);}
+.opt.sel{border-color:var(--green-700);background:var(--green-50);box-shadow:0 0 0 3px rgba(15,107,58,.1);}
+.opt-letter{width:24px;height:24px;border-radius:6px;background:var(--slate-200);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--slate-600);flex-shrink:0;transition:all .18s;margin-top:1px;}
+.opt.sel .opt-letter{background:var(--green-700);color:#fff;}
+.opt-text{font-size:13.5px;color:var(--slate-700);line-height:1.6;font-weight:500;}
+.opt.sel .opt-text{color:var(--slate-900);font-weight:600;}
+
+.cat-footer{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-top:1px solid var(--slate-100);background:var(--slate-50);}
+.answered-lbl{font-size:12.5px;color:var(--slate-400);font-weight:500;}
+.answered-lbl b{color:var(--slate-700);}
+.cat-footer-btns{display:flex;gap:8px;}
+.btn-cat{padding:9px 18px;border-radius:var(--r-sm);font-family:'Figtree',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;border:none;}
+.btn-cat-outline{background:var(--white);color:var(--slate-700);border:1.5px solid var(--slate-200);}
+.btn-cat-outline:hover{border-color:var(--green-500);color:var(--green-700);}
+.btn-cat-navy{background:var(--green-700);color:#fff;box-shadow:0 3px 10px rgba(15,107,58,.25);}
+.btn-cat-navy:hover{background:var(--green-800);}
+
+/* ── REVIEW ── */
+.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0;}
+.review-cat{background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r);padding:15px;}
+.review-cat.incomplete{border-color:var(--warning-border);background:var(--warning-bg);}
+.review-cat-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.review-cat-name{font-weight:700;font-size:13px;color:var(--slate-800);}
+.review-cat-count{font-size:12px;font-weight:700;}
+.review-bar{height:5px;background:var(--slate-200);border-radius:3px;overflow:hidden;margin-bottom:6px;}
+.review-bar-fill{height:100%;border-radius:3px;transition:width .5s ease;}
+.review-cat-status{font-size:11.5px;font-weight:600;}
+
+/* ── SUBMITTED ── */
+.submitted-wrap{text-align:center;padding:40px 36px;}
+.tick{font-size:52px;margin-bottom:18px;display:block;animation:popIn .4s cubic-bezier(.4,0,.2,1) both;}
+@keyframes popIn{from{transform:scale(.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+.score-box{display:inline-flex;flex-direction:column;align-items:center;background:var(--green-50);border:2px solid var(--green-100);border-radius:var(--r-lg);padding:22px 44px;margin:18px 0;}
+.score-num{font-family:'Playfair Display',serif;font-size:52px;font-weight:700;line-height:1;}
+.score-lbl{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--slate-400);margin-top:4px;}
+.score-verdict{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:100px;font-size:12.5px;font-weight:700;margin-top:10px;}
+.breakdown-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--slate-100);}
+.breakdown-row:last-child{border-bottom:none;}
+.br-icon{font-size:15px;width:22px;text-align:center;flex-shrink:0;}
+.br-name{flex:1;font-size:13px;font-weight:600;color:var(--slate-700);}
+.br-bar{width:70px;height:5px;background:var(--slate-200);border-radius:3px;overflow:hidden;flex-shrink:0;}
+.br-fill{height:100%;border-radius:3px;}
+.br-score{font-weight:700;font-size:13.5px;min-width:38px;text-align:right;}
+.confirm-note{background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-sm);padding:13px 15px;font-size:13px;color:var(--slate-600);line-height:1.8;margin:18px 0;text-align:left;}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--slate-900);color:#fff;border-radius:var(--r);padding:11px 20px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:all .25s;box-shadow:0 8px 28px rgba(0,0,0,.4);white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+@media(max-width:640px){
+  .float-brand{top:16px;left:16px;}
+  .rules-grid,.review-grid{grid-template-columns:1fr;}
+  .card-header,.card-body,.card-footer,.submitted-wrap{padding-left:22px;padding-right:22px;}
+  .assess-topbar,.cat-header,.qs-area,.cat-footer{padding-left:16px;padding-right:16px;}
+  .main-card{max-width:100%!important;}
+}
+</style>
+</head>
+<body>
+
+<!-- Floating brand — same as login -->
+<div class="float-brand">
+  <div class="float-wordmark">Nova<sup>CS</sup></div>
+  <div class="float-sub">Client Systems &amp; Digital Solutions</div>
+</div>
+
+<div class="main-card" id="main-card">
+  <div class="card-accent"></div>
+
+  <!-- ══ SCREEN 1: ENTRY ══ -->
+  <div id="scr-entry">
+    <div class="card-header">
+      <div class="card-logo"><span class="card-logo-nova">Nova</span><sup class="card-logo-cs">CS</sup></div>
+      <div class="card-title">Enter your access code</div>
+      <div class="card-subtitle">You should have received a unique 6-character code from your recruiter</div>
+      <div class="step-pills">
+        <div class="step-pill sm active" id="sp-1"></div>
+        <div class="step-pill lg" id="sp-2"></div>
+        <div class="step-pill lg" id="sp-3"></div>
+        <div class="step-pill lg" id="sp-4"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="banner banner-err" id="entry-err"><span>⚠</span><span id="entry-err-msg">Invalid code. Please check and try again.</span></div>
+      <div class="field">
+        <label class="field-label">Access Code</label>
+        <input class="field-input code-input" id="code-in" placeholder="e.g. AX7K2M" maxlength="6"
+          oninput="this.value=this.value.toUpperCase();clearEntryErr()"
+          onkeydown="if(event.key==='Enter')document.getElementById('phone-in').focus()"/>
+      </div>
+      <div class="field">
+        <label class="field-label">Last 4 digits of your phone number</label>
+        <input class="field-input" id="phone-in" placeholder="e.g. 3317" maxlength="4" type="tel"
+          oninput="clearEntryErr()"
+          onkeydown="if(event.key==='Enter')verifyCode()"/>
+      </div>
+      <button class="btn-submit" id="entry-btn" onclick="verifyCode()">
+        <span id="entry-lbl">Verify &amp; Continue →</span>
+      </button>
+      <div class="demo-hint">
+        <span class="demo-hint-icon">💡</span>
+        <span><b>Demo:</b> use code <b>AX7K2M</b> and phone last 4 <b>3317</b>, or code <b>DEMO01</b> and phone <b>1234</b>.</span>
+      </div>
+    </div>
+    <div class="card-footer">Applicant portal &nbsp;·&nbsp; <a href="../index.html">Back to portal</a></div>
+  </div>
+
+  <!-- ══ SCREEN 2: INSTRUCTIONS ══ -->
+  <div id="scr-instructions" class="hidden">
+    <div class="card-header">
+      <div class="card-logo"><span class="card-logo-nova">Nova</span><sup class="card-logo-cs">CS</sup></div>
+      <div class="card-title">Before you begin</div>
+      <div class="card-subtitle" id="instr-subtitle">Read the instructions carefully — the timer starts when you click Start</div>
+      <div class="step-pills">
+        <div class="step-pill sm done"></div>
+        <div class="step-pill lg active"></div>
+        <div class="step-pill lg"></div>
+        <div class="step-pill lg"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="banner banner-ok show" id="verified-banner"><span>✓</span><span id="verified-name">Identity verified</span></div>
+      <div class="rules-grid">
+        <div class="rule-card"><div class="rule-icon">⏱</div><div class="rule-title">25 minute limit</div><div class="rule-desc">The timer runs continuously and cannot be paused once started.</div></div>
+        <div class="rule-card"><div class="rule-icon">🔒</div><div class="rule-title">One attempt only</div><div class="rule-desc">Your code expires on submission. You cannot retake the assessment.</div></div>
+        <div class="rule-card"><div class="rule-icon">👁</div><div class="rule-title">Stay on this page</div><div class="rule-desc">Switching tabs or windows will be detected and flagged to your recruiter.</div></div>
+        <div class="rule-card"><div class="rule-icon">🤝</div><div class="rule-title">Answer honestly</div><div class="rule-desc">Complete the assessment independently without assistance from others.</div></div>
+      </div>
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:10px">Assessment structure</div>
+      <div id="cat-preview"></div>
+      <div class="info-strip">📋 <b>25 questions</b> across 4 categories &nbsp;·&nbsp; <b>25 minute</b> time limit &nbsp;·&nbsp; Results sent to your recruiter automatically</div>
+      <div class="btn-row">
+        <button class="btn-outline-full" onclick="goScreen('entry')">← Back</button>
+        <button class="btn-submit" style="flex:2" onclick="startAssessment()">Start Assessment →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 3: ASSESSMENT ══ -->
+  <div id="scr-assess" class="hidden">
+    <div class="assess-topbar">
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--slate-800);white-space:nowrap;flex-shrink:0">Assessment</div>
+      <div class="prog-wrap">
+        <div class="prog-labels"><span id="prog-lbl">Q1 of 25</span><span id="prog-pct">0%</span></div>
+        <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      </div>
+      <div class="timer-pill" id="timer-pill">
+        <span style="font-size:14px">⏱</span>
+        <span class="timer-val" id="timer-val">25:00</span>
+      </div>
+    </div>
+    <div class="cat-header">
+      <div class="cat-badge" id="cat-badge">⚖️ Category 1 of 4</div>
+      <div class="cat-name" id="cat-name">Judgement &amp; Decision Making</div>
+      <div class="cat-meta" id="cat-meta">Questions 1–7 · 35% of your total score</div>
+      <div class="cat-dots" id="cat-dots"></div>
+    </div>
+    <div class="qs-area" id="qs-area"></div>
+    <div class="cat-footer">
+      <div class="answered-lbl" id="answered-lbl"><b>0</b> of 7 answered</div>
+      <div class="cat-footer-btns">
+        <button class="btn-cat btn-cat-outline" id="btn-prev" onclick="prevCat()">← Back</button>
+        <button class="btn-cat btn-cat-navy" id="btn-next" onclick="nextCat()">Next Category →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 4: REVIEW ══ -->
+  <div id="scr-review" class="hidden">
+    <div class="card-header">
+      <div class="card-logo"><span class="card-logo-nova">Nova</span><sup class="card-logo-cs">CS</sup></div>
+      <div class="card-title">Review your answers</div>
+      <div class="card-subtitle">Check everything before submitting — you cannot go back after this</div>
+      <div class="step-pills">
+        <div class="step-pill sm done"></div>
+        <div class="step-pill lg done"></div>
+        <div class="step-pill lg done"></div>
+        <div class="step-pill lg active"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="review-grid" id="review-grid"></div>
+      <div class="banner banner-warn" id="review-warn"><span>⚠</span><span id="review-warn-msg"></span></div>
+      <div class="btn-row">
+        <button class="btn-outline-full" onclick="goScreen('assess')">← Edit Answers</button>
+        <button class="btn-submit" style="flex:2" onclick="submitAssessment()">Submit Assessment →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 5: SUBMITTED ══ -->
+  <div id="scr-submitted" class="hidden">
+    <div class="card-accent" style="background:linear-gradient(90deg,var(--success),#2d9e6b)"></div>
+    <div class="submitted-wrap">
+      <span class="tick">✅</span>
+      <div class="card-title" style="margin-bottom:6px">Assessment submitted!</div>
+      <div class="card-subtitle" style="margin-bottom:0">Your responses have been recorded and sent to your recruiter.</div>
+      <div class="score-box" id="score-box"></div>
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:10px;text-align:left">Category breakdown</div>
+      <div id="breakdown-list"></div>
+      <div class="confirm-note" id="confirm-note"></div>
+      <div style="background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:13px 16px;text-align:center;font-size:13.5px;color:var(--slate-500);font-weight:500;margin-top:4px">You may now <b style="color:var(--slate-700)">close this browser tab</b>.<br><span style="font-size:12px">Thank you for completing the NovaCS assessment.</span></div>
+    </div>
+  </div>
+
+</div><!-- /main-card -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+const CODES={
+  'AX7K2M':{name:'Alex Chen',email:'alex@email.com',phone:'3317',role:'Customer Success Manager'},
+  'MP9X2A':{name:'Maya Patel',email:'maya.p@email.com',phone:'4821',role:'Customer Success Manager'},
+  'LT5X9G':{name:'Liam Torres',email:'l.torres@email.com',phone:'6641',role:'Project Manager'},
+  'ST3N1C':{name:'Sophie Tan',email:'sophie.t@email.com',phone:'2209',role:'Project Manager'},
+  'DEMO01':{name:'Demo Candidate',email:'demo@novacs.com',phone:'1234',role:'General'},
+};
+const CATS=[
+  {id:'judgement', name:'Judgement & Decision Making',icon:'⚖️',weight:35,count:7,from:0,to:6},
+  {id:'numerical',  name:'Numerical Reasoning',       icon:'🔢',weight:25,count:6,from:7,to:12},
+  {id:'verbal',     name:'Verbal & Communication',    icon:'💬',weight:20,count:6,from:13,to:18},
+  {id:'situational',name:'Situational Scenarios',     icon:'🎭',weight:20,count:6,from:19,to:24},
+];
+const QS=[
+  // JUDGEMENT
+  {c:'judgement',t:'You are managing a project and discover a critical error two days before the deadline. The fix requires significant rework. What is the most appropriate course of action?',o:['Fix the error overnight without informing the team to avoid concern','Inform stakeholders immediately, present the options, and recommend the most viable path forward','Delay the deadline without telling the client and fix it quietly','Submit the project as-is and address the error in a follow-up'],a:1},
+  {c:'judgement',t:'A colleague shares confidential client information with you to vent. Later you discover this information is relevant to a key decision your manager is making. What do you do?',o:['Share it with your manager since it affects an important decision','Keep it confidential as it was shared in confidence','Ask your colleague\'s permission before sharing','Report the colleague for sharing confidential information'],a:2},
+  {c:'judgement',t:'You have two urgent tasks due at the same time. Task A affects a client externally. Task B affects an internal process. Resources only allow completing one on time. Which do you prioritise?',o:['Task B — internal processes keep the business running','Task A — external commitments protect the client relationship','Do half of each and submit both partially complete','Flip a coin — both are equally important'],a:1},
+  {c:'judgement',ctx:'Your team has been asked to cut costs by 15% this quarter. You have identified three options: reduce headcount by one, defer a software upgrade, or cut the training budget entirely.',t:'Which approach reflects the most balanced decision-making?',o:['Reduce headcount — immediate and significant savings','Defer the software upgrade — least immediate impact on people','Present all three options to leadership with a full analysis of short and long-term impact','Cut the training budget — least visible impact'],a:2},
+  {c:'judgement',t:'A junior team member makes a significant error on a client deliverable. The client has not yet noticed. What is the right course of action?',o:['Say nothing and quietly fix it before the client notices','Tell the client immediately and let them decide the response','Fix the error, inform your manager, and proactively notify the client with a correction','Blame the junior team member in communications to the client'],a:2},
+  {c:'judgement',t:'During a meeting your manager makes a factually incorrect statement that could mislead the client. What do you do?',o:['Stay quiet — it\'s not your place to correct your manager','Politely clarify the correct information at an appropriate moment','Send a correction email to the client after the meeting without telling your manager','Interrupt immediately and correct your manager in front of everyone'],a:1},
+  {c:'judgement',t:'You receive feedback that one of your decisions last month led to a poor outcome for the team. How do you respond?',o:['Defend your decision — you had all the information available at the time','Acknowledge the outcome, analyse what went wrong, and share learnings with the team','Apologise to everyone and avoid making decisions in the future','Attribute the outcome to external factors beyond your control'],a:1},
+  // NUMERICAL
+  {c:'numerical',t:'A project budget is $120,000. After the first phase, 35% has been spent. How much remains?',o:['$42,000','$78,000','$85,000','$68,000'],a:1},
+  {c:'numerical',t:'Sales increased from $240,000 to $312,000 year-over-year. What is the percentage increase?',o:['25%','30%','72%','18%'],a:1},
+  {c:'numerical',ctx:'A team of 8 completed 192 units of work in 3 weeks.',t:'What is the average output per person per week?',o:['6 units','8 units','24 units','12 units'],a:1},
+  {c:'numerical',t:'Customer churn increased by 4 percentage points, from 12% to 16%. For a customer base of 5,000, how many additional customers were lost?',o:['200','400','800','600'],a:0},
+  {c:'numerical',t:'An employee earns $85,000 per year and receives a 6% pay rise. What is their new annual salary?',o:['$89,800','$91,000','$90,100','$95,200'],a:2},
+  {c:'numerical',t:'A proposal costs $45,000 upfront and saves $1,500 per month. How many months until break-even?',o:['25 months','30 months','35 months','20 months'],a:1},
+  // VERBAL
+  {c:'verbal',t:'Which sentence is grammatically correct and professionally appropriate?',o:['"The team have been informed of the changes, effective immediately."','"The team has been informed about the changes, effective immediately."','"The team were all informed on the changes, effective immediately."','"The team was informed on the changes that are effective immediately."'],a:1},
+  {c:'verbal',ctx:'"Despite the project\'s delayed start, the team demonstrated remarkable adaptability, ultimately delivering results that exceeded initial benchmarks by a considerable margin."',t:'What is the most accurate summary of the above statement?',o:['The project failed to meet its original targets','The team succeeded in exceeding expectations despite a late start','The project started on time but finished late','The team struggled throughout the project'],a:1},
+  {c:'verbal',t:'Which word is closest in meaning to "mitigate"?',o:['Aggravate','Eliminate','Reduce','Ignore'],a:2},
+  {c:'verbal',t:'A client emails: "We\'re a little concerned about the timeline." What does this most likely mean?',o:['They are happy with the timeline','They want to escalate to your manager','They have reservations and may need reassurance or a revised plan','They are cancelling the project'],a:2},
+  {c:'verbal',t:'Which of the following is the clearest and most professional message?',o:['"Just wanted to touch base re: the thing we discussed."','"Following our recent conversation, I wanted to follow up on the action items we agreed upon."','"Hey, any update on that stuff?"','"I\'m circling back to synergise on our previous touchpoint."'],a:1},
+  {c:'verbal',t:'What does "ambiguous" mean in a professional context?',o:['Clearly defined and well documented','Open to more than one interpretation','Overly detailed and complex','Incorrect or misleading'],a:1},
+  // SITUATIONAL
+  {c:'situational',t:'You are in a client meeting and your colleague gives incorrect information confidently. The client seems to accept it. What do you do?',o:['Stay silent to avoid embarrassing your colleague','Interrupt immediately and loudly correct the error','Wait for a natural pause then politely offer the correct information','Send a follow-up email after the meeting correcting the error'],a:3},
+  {c:'situational',ctx:'You have been asked to lead a new cross-functional project. Two team members have a known history of conflict.',t:'How do you approach this?',o:['Avoid assigning them to the same tasks entirely','Meet with each individually to set expectations, then establish norms in a team kickoff','Report the conflict to HR before the project begins','Let them sort it out themselves'],a:1},
+  {c:'situational',t:'A client asks for something outside your agreed scope of work. Your manager is unavailable. What do you do?',o:['Agree to help and figure out the billing later','Refuse until your manager is back','Explain the request is outside current scope and confirm with your manager before proceeding','Do the work and say nothing about scope'],a:2},
+  {c:'situational',t:'You are overwhelmed and cannot complete everything by the deadline. What is the best course of action?',o:['Work through the night to complete everything','Say nothing and submit whatever is done','Communicate proactively with your manager, prioritise with their input, and reset expectations early','Ask a colleague to do your work without telling your manager'],a:2},
+  {c:'situational',ctx:'During a team retrospective, a colleague criticises your approach in front of the group. You believe the criticism is partially unfair.',t:'How do you respond in the moment?',o:['Defend yourself forcefully and point out their mistakes in return','Dismiss the feedback publicly','Acknowledge the feedback calmly and suggest following up privately if needed','Stay completely silent to avoid conflict'],a:2},
+  {c:'situational',t:'You discover a process inefficiency that could save your team significant time but requires upfront effort and cross-department buy-in. What do you do?',o:['Do nothing — it\'s too complex','Implement it yourself without telling anyone','Document the idea, estimate the impact, and present it to your manager with a proposal','Complain to colleagues without taking action'],a:2},
+];
+
+// ── STATE ──
+let candidate=null;
+let answers={};
+let currentCat=0;
+let timerSecs=25*60;
+let timerInterval=null;
+let assessRunning=false;
+
+// ── SCREEN MANAGER ──
+const SCREENS=['entry','instructions','assess','review','submitted'];
+function goScreen(name){
+  SCREENS.forEach(s=>{
+    const el=document.getElementById('scr-'+s);
+    if(el) el.classList.toggle('hidden',s!==name);
+  });
+  const card=document.getElementById('main-card');
+  const widths={entry:'500px',instructions:'560px',assess:'720px',review:'560px',submitted:'540px'};
+  card.style.maxWidth=widths[name]||'500px';
+}
+
+// ── ENTRY ──
+function clearEntryErr(){
+  document.getElementById('entry-err').classList.remove('show');
+  ['code-in','phone-in'].forEach(id=>document.getElementById(id).classList.remove('err'));
+}
+function verifyCode(){
+  const code=document.getElementById('code-in').value.trim().toUpperCase();
+  const phone=document.getElementById('phone-in').value.trim();
+  if(!code||code.length<4){document.getElementById('code-in').classList.add('err');return;}
+  if(!phone||phone.length<4){document.getElementById('phone-in').classList.add('err');return;}
+  const btn=document.getElementById('entry-btn');
+  btn.disabled=true;
+  document.getElementById('entry-lbl').innerHTML='<div class="spinner"></div>';
+  setTimeout(()=>{
+    const rec=CODES[code];
+    if(rec&&rec.phone===phone){
+      candidate={...rec,code};
+      buildCatPreview();
+      document.getElementById('verified-name').textContent=`Welcome, ${candidate.name} — identity verified`;
+      goScreen('instructions');
+    } else if(rec){
+      btn.disabled=false;document.getElementById('entry-lbl').innerHTML='Verify &amp; Continue →';
+      document.getElementById('entry-err-msg').textContent='Phone number does not match. Please check and try again.';
+      document.getElementById('entry-err').classList.add('show');
+      document.getElementById('phone-in').classList.add('err');
+    } else {
+      btn.disabled=false;document.getElementById('entry-lbl').innerHTML='Verify &amp; Continue →';
+      document.getElementById('entry-err-msg').textContent='Invalid access code. Please check with your recruiter.';
+      document.getElementById('entry-err').classList.add('show');
+      document.getElementById('code-in').classList.add('err');
+    }
+  },900);
+}
+
+// ── INSTRUCTIONS ──
+function buildCatPreview(){
+  document.getElementById('cat-preview').innerHTML=CATS.map(c=>`
+    <div class="cat-row">
+      <div class="cat-row-icon">${c.icon}</div>
+      <div class="cat-row-name">${c.name}</div>
+      <div class="cat-row-qs">${c.count} questions</div>
+      <div class="cat-row-wt">${c.weight}%</div>
+    </div>`).join('');
+}
+
+// ── ASSESSMENT ──
+function startAssessment(){
+  assessRunning=true;
+  currentCat=0;
+  answers={};
+  goScreen('assess');
+  startTimer();
+  setupTabDetect();
+  renderCat();
+}
+
+function startTimer(){
+  updateTimerDisplay();
+  timerInterval=setInterval(()=>{
+    timerSecs--;
+    updateTimerDisplay();
+    if(timerSecs<=0){clearInterval(timerInterval);forceSubmit();}
+  },1000);
+}
+function updateTimerDisplay(){
+  const m=Math.floor(timerSecs/60),s=timerSecs%60;
+  const el=document.getElementById('timer-val');
+  const pill=document.getElementById('timer-pill');
+  if(el) el.textContent=`${m}:${String(s).padStart(2,'0')}`;
+  if(pill){
+    pill.classList.toggle('warn',timerSecs<=300&&timerSecs>60);
+    pill.classList.toggle('danger',timerSecs<=60);
+  }
+}
+function setupTabDetect(){
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden&&assessRunning) showToast('⚠ Tab switch detected and flagged');
+  });
+}
+
+function renderCat(){
+  const cat=CATS[currentCat];
+  const qs=QS.filter(q=>q.c===cat.id);
+
+  document.getElementById('cat-badge').textContent=`${cat.icon} Category ${currentCat+1} of ${CATS.length}`;
+  document.getElementById('cat-name').textContent=cat.name;
+  document.getElementById('cat-meta').textContent=`Questions ${cat.from+1}–${cat.to+1} · ${cat.weight}% of your total score`;
+
+  document.getElementById('cat-dots').innerHTML=CATS.map((c,i)=>`
+    <div class="cat-dot ${i<currentCat?'done':i===currentCat?'active':''}" title="${c.name}"></div>`).join('');
+
+  document.getElementById('qs-area').innerHTML=qs.map((q,qi)=>{
+    const gi=cat.from+qi;
+    const sel=answers[gi]??-1;
+    return`<div class="q-block">
+      <div class="q-num">Question ${gi+1} of ${QS.length}</div>
+      ${q.ctx?`<div class="q-context">${q.ctx}</div>`:''}
+      <div class="q-text">${q.t}</div>
+      <div class="options">
+        ${q.o.map((opt,oi)=>`
+          <div class="opt ${sel===oi?'sel':''}" onclick="selectAns(${gi},${oi},this)">
+            <div class="opt-letter">${String.fromCharCode(65+oi)}</div>
+            <div class="opt-text">${opt}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  const isLast=currentCat===CATS.length-1;
+  document.getElementById('btn-next').textContent=isLast?'Review Answers →':'Next Category →';
+  document.getElementById('btn-prev').style.visibility=currentCat===0?'hidden':'visible';
+  updateFooter();
+  updateProgress();
+  document.getElementById('main-card').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function selectAns(gi,oi,el){
+  answers[gi]=oi;
+  el.closest('.options').querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  el.querySelector('.opt-letter').style.background='var(--green-700)';
+  el.querySelector('.opt-letter').style.color='#fff';
+  el.closest('.options').querySelectorAll('.opt:not(.sel) .opt-letter').forEach(l=>{l.style.background='';l.style.color='';});
+  updateFooter();updateProgress();
+}
+function updateFooter(){
+  const cat=CATS[currentCat];
+  const done=Object.keys(answers).filter(k=>+k>=cat.from&&+k<=cat.to).length;
+  document.getElementById('answered-lbl').innerHTML=`<b>${done}</b> of ${cat.count} answered`;
+}
+function updateProgress(){
+  const done=Object.keys(answers).length,total=QS.length;
+  const pct=Math.round(done/total*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-lbl').textContent=`Q${Math.min(done+1,total)} of ${total}`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+}
+function nextCat(){
+  if(currentCat<CATS.length-1){currentCat++;renderCat();}
+  else goReview();
+}
+function prevCat(){if(currentCat>0){currentCat--;renderCat();}}
+
+// ── REVIEW ──
+function goReview(){
+  goScreen('review');
+  document.getElementById('review-grid').innerHTML=CATS.map(cat=>{
+    const done=Object.keys(answers).filter(k=>+k>=cat.from&&+k<=cat.to).length;
+    const pct=Math.round(done/cat.count*100);
+    const ok=done===cat.count;
+    return`<div class="review-cat ${ok?'':'incomplete'}">
+      <div class="review-cat-head">
+        <div class="review-cat-name">${cat.icon} ${cat.name}</div>
+        <div class="review-cat-count" style="color:${ok?'var(--success)':'var(--warning)'}">${done}/${cat.count}</div>
+      </div>
+      <div class="review-bar"><div class="review-bar-fill" style="width:${pct}%;background:${ok?'var(--success)':'var(--warning)'}"></div></div>
+      <div class="review-cat-status" style="color:${ok?'var(--success)':'var(--warning)'}">${ok?'Complete ✓':(cat.count-done)+' unanswered'}</div>
+    </div>`;
+  }).join('');
+  const unanswered=QS.length-Object.keys(answers).length;
+  const warn=document.getElementById('review-warn');
+  if(unanswered>0){
+    document.getElementById('review-warn-msg').textContent=`${unanswered} unanswered question${unanswered>1?'s':''} — these will score zero.`;
+    warn.classList.add('show');
+  } else warn.classList.remove('show');
+}
+
+// ── SUBMIT ──
+function submitAssessment(){
+  clearInterval(timerInterval);assessRunning=false;
+  calcResults();goScreen('submitted');
+}
+function forceSubmit(){
+  assessRunning=false;
+  showToast('⏱ Time\'s up — submitting automatically');
+  setTimeout(()=>{calcResults();goScreen('submitted');},1500);
+}
+function calcResults(){
+  const scores={};
+  CATS.forEach(cat=>{
+    const qs=QS.slice(cat.from,cat.to+1);
+    const correct=qs.filter((q,i)=>answers[cat.from+i]===q.a).length;
+    scores[cat.id]=Math.round(correct/cat.count*100);
+  });
+  const weighted=Math.round(scores.judgement*.35+scores.numerical*.25+scores.verbal*.20+scores.situational*.20);
+  const timeTaken=Math.round((25*60-timerSecs)/60*10)/10;
+
+  // Save to sessionStorage for submitted.html
+  const submission={
+    name:      candidate?.name||'Candidate',
+    email:     candidate?.email||'',
+    org:       'Acme Corp',
+    answered:  Object.keys(answers).length,
+    time:      timeTaken,
+    totalQuestions: 25,
+    sections:  4,
+    flagged:   false, // tab-switch detection handled in assess.html
+    scores,
+  };
+  try{sessionStorage.setItem('novaCS_submission',JSON.stringify(submission));}catch(e){}
+
+  // Redirect to dedicated submitted page
+  window.location.href='submitted.html';
+}
+
+// ── TOAST ──
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// Init
+goScreen('entry');
+</script>
+</body>
+</html>

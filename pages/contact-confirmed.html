@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCS — Message Received</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-900:#0d1b2a;--navy-800:#1a2e45;--navy-700:#1e3a5f;--navy-600:#2452a0;
+  --navy-500:#2d64c8;--navy-400:#4a7fd4;--navy-200:#9bbce8;--navy-100:#dce8f7;--navy-50:#eef4fc;
+  --slate-900:#1c2333;--slate-700:#334155;--slate-600:#475569;--slate-500:#64748b;
+  --slate-400:#94a3b8;--slate-200:#e2e8f0;--slate-100:#f1f5f9;--slate-50:#f8fafc;
+  --white:#ffffff;
+  --success:#0f6b3a;--success-bg:#e6f4ed;--success-border:#a3d4b8;
+  --r-sm:8px;--r:12px;--r-lg:16px;--r-xl:22px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;}
+body{
+  font-family:'Figtree',sans-serif;min-height:100vh;background:#2d3a6b;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;
+}
+.float-brand{position:fixed;top:28px;left:28px;display:flex;flex-direction:column;gap:5px;animation:fadeUp .6s ease both;z-index:5;}
+.float-wordmark{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:rgba(255,255,255,.92);letter-spacing:-.3px;line-height:1;}
+.float-wordmark sup{font-family:'Figtree',sans-serif;font-size:12px;font-weight:700;color:rgba(160,185,230,.95);vertical-align:super;margin-left:2px;}
+.float-sub{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+.card{
+  background:var(--white);border-radius:var(--r-xl);width:100%;max-width:500px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08),0 32px 80px rgba(0,0,0,.5),0 8px 24px rgba(0,0,0,.3);
+  overflow:hidden;animation:cardIn .5s cubic-bezier(.4,0,.2,1) .05s both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(24px) scale(.98);}to{opacity:1;transform:none;}}
+.card-accent{height:4px;background:linear-gradient(90deg,var(--success),#2d9e6b);}
+
+.card-body{padding:40px 36px 32px;text-align:center;}
+
+/* Animated tick */
+.tick-wrap{width:72px;height:72px;border-radius:50%;background:var(--success-bg);border:2px solid var(--success-border);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;animation:popIn .45s cubic-bezier(.4,0,.2,1) .2s both;}
+@keyframes popIn{from{transform:scale(.4);opacity:0;}to{transform:scale(1);opacity:1;}}
+.tick-wrap svg{width:30px;height:30px;stroke:var(--success);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none;}
+.tick-path{stroke-dasharray:40;stroke-dashoffset:40;animation:drawTick .35s ease .6s both;}
+@keyframes drawTick{to{stroke-dashoffset:0;}}
+
+.card-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--slate-900);letter-spacing:-.3px;margin-bottom:8px;}
+.card-sub{font-size:13.5px;color:var(--slate-400);line-height:1.75;margin-bottom:28px;}
+
+/* Ref box */
+.ref-box{background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.ref-label{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--slate-400);}
+.ref-num{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--slate-800);letter-spacing:.5px;}
+
+/* What happens next */
+.next-list{text-align:left;margin-bottom:24px;}
+.next-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--slate-900);margin-bottom:12px;text-align:left;}
+.next-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--slate-100);}
+.next-item:last-child{border-bottom:none;}
+.next-num{width:22px;height:22px;border-radius:6px;background:var(--navy-700);color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.next-text{font-size:13px;color:var(--slate-600);line-height:1.65;}
+.next-text b{color:var(--slate-800);}
+
+/* Actions */
+.action-row{display:flex;flex-direction:column;gap:9px;}
+.btn-solid{width:100%;padding:12px;border:none;border-radius:var(--r-sm);background:var(--navy-700);color:#fff;font-family:'Figtree',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;box-shadow:0 4px 14px rgba(30,58,95,.28);}
+.btn-solid:hover{background:var(--navy-800);transform:translateY(-1px);}
+.btn-ghost{width:100%;padding:11px;border:1.5px solid var(--slate-200);border-radius:var(--r-sm);background:var(--white);color:var(--slate-600);font-family:'Figtree',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;}
+.btn-ghost:hover{border-color:var(--navy-400);color:var(--navy-600);}
+
+.card-footer{padding:14px 36px 18px;border-top:1px solid var(--slate-100);text-align:center;font-size:12px;color:var(--slate-400);}
+.card-footer a{color:var(--navy-500);font-weight:500;text-decoration:none;}
+.card-footer a:hover{color:var(--navy-700);}
+
+@media(max-width:600px){
+  .float-brand{top:16px;left:16px;}
+  .card-body{padding:32px 22px 28px;}
+  .card-footer{padding-left:22px;padding-right:22px;}
+}
+</style>
+</head>
+<body>
+
+<div class="float-brand">
+  <div class="float-wordmark">Nova<sup>CS</sup></div>
+  <div class="float-sub">Client Systems &amp; Digital Solutions</div>
+</div>
+
+<div class="card">
+  <div class="card-accent"></div>
+  <div class="card-body">
+
+    <div class="tick-wrap">
+      <svg viewBox="0 0 24 24"><polyline class="tick-path" points="4,12 9,17 20,6"/></svg>
+    </div>
+
+    <div class="card-title" id="page-title">Message received</div>
+    <div class="card-sub" id="page-sub">Thanks for getting in touch. A member of the NovaCS team will review your message and get back to you shortly.</div>
+
+    <div class="ref-box">
+      <div>
+        <div class="ref-label">Reference number</div>
+        <div class="ref-num" id="ref-num">NCS-000000</div>
+      </div>
+      <div style="font-size:11.5px;color:var(--slate-400);text-align:right;line-height:1.6">Keep this for<br>your records</div>
+    </div>
+
+    <div class="next-list">
+      <div class="next-title" id="next-title">What happens next</div>
+      <div id="next-steps"></div>
+    </div>
+
+    <div class="action-row" id="action-row"></div>
+
+  </div>
+  <div class="card-footer">
+    <a href="../index.html">← Back to portal</a>
+    &nbsp;·&nbsp;
+    <a href="../marketing.html">About NovaCS</a>
+    &nbsp;·&nbsp;
+    <a href="contact.html">Send another message</a>
+  </div>
+</div>
+
+<script>
+const params=new URLSearchParams(window.location.search);
+const type=params.get('type')||'enquiry';
+const name=params.get('name')||'there';
+
+// Generate reference number
+const ref='NCS-'+String(Date.now()).slice(-6);
+document.getElementById('ref-num').textContent=ref;
+
+// Content based on submission type
+const content={
+  enquiry:{
+    title:`Thanks, ${name}!`,
+    sub:'Your enquiry has been received. A member of the NovaCS team will review it and respond to your email address within 1–2 business days.',
+    steps:[
+      {n:1,t:'<b>Check your inbox.</b> You should receive an automated confirmation email shortly. If you don\'t see it, check your spam folder.'},
+      {n:2,t:'<b>Our team will review your enquiry</b> and respond within 1–2 business days, Mon–Fri.'},
+      {n:3,t:'<b>For urgent matters</b>, email us directly at <b>hello@novacs.io</b>.'},
+    ],
+    actions:[
+      {href:'../index.html',cls:'btn-solid',lbl:'Return to portal →'},
+      {href:'../marketing.html',cls:'btn-ghost',lbl:'Learn more about NovaCS'},
+    ]
+  },
+  access:{
+    title:`Issue reported, ${name}`,
+    sub:'Your access issue has been logged and sent to the NovaCS support team. We\'ll investigate and follow up with you by email.',
+    steps:[
+      {n:1,t:'<b>Your report has been logged</b> with the reference number above. Keep it in case you need to follow up.'},
+      {n:2,t:'<b>Our support team will investigate</b> and respond within 1 business day. If the issue is urgent, email <b>support@novacs.io</b> with your reference number.'},
+      {n:3,t:'<b>If your assessment was affected</b>, your recruiter will also be notified so they can take appropriate action.'},
+    ],
+    actions:[
+      {href:'assess.html',cls:'btn-solid',lbl:'Return to assessment portal →'},
+      {href:'contact.html',cls:'btn-ghost',lbl:'Submit another report'},
+    ]
+  }
+};
+
+const c=content[type]||content.enquiry;
+document.getElementById('page-title').textContent=c.title;
+document.getElementById('page-sub').textContent=c.sub;
+document.getElementById('next-steps').innerHTML=c.steps.map(s=>`
+  <div class="next-item">
+    <div class="next-num">${s.n}</div>
+    <div class="next-text">${s.t}</div>
+  </div>`).join('');
+document.getElementById('action-row').innerHTML=c.actions.map(a=>`
+  <a href="${a.href}" class="${a.cls}">${a.lbl}</a>`).join('');
+</script>
+</body>
+</html>
