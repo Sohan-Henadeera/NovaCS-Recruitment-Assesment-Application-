@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NovaCS — Recruiter Dashboard</title>
+<title>NovaCS \u2014 Recruiter Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -62,11 +62,26 @@ body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--slate-900
 .tb-icon:hover{border-color:var(--navy-400);color:var(--navy-600);background:var(--navy-50);}
 .tb-icon svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .notif-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--danger);border:1.5px solid var(--white);}
-.user-pill{display:flex;align-items:center;gap:9px;background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:4px 12px 4px 5px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow-xs);}
-.user-pill:hover{border-color:var(--navy-300);background:var(--white);}
-.user-av{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--navy-700),var(--navy-500));color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.user-pill-wrap{position:relative;}
+.user-pill{display:flex;align-items:center;gap:9px;background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:var(--r-sm);padding:4px 10px 4px 5px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow-xs);user-select:none;}
+.user-pill:hover,.user-pill.open{border-color:var(--navy-400);background:var(--white);}
+.user-av{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--navy-700),var(--navy-500));color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .user-name{font-size:13px;font-weight:600;color:var(--slate-700);}
 .user-org{font-size:11px;color:var(--slate-400);}
+.pill-chevron{color:var(--slate-400);font-size:10px;transition:transform .18s;flex-shrink:0;}
+.user-pill.open .pill-chevron{transform:rotate(180deg);}
+.user-dropdown{position:absolute;top:calc(100% + 7px);right:0;width:210px;background:var(--white);border:1.5px solid var(--slate-200);border-radius:var(--r-lg);box-shadow:var(--shadow-xl);z-index:200;overflow:hidden;animation:dropIn .15s ease;}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
+.ud-header{padding:13px 15px 11px;border-bottom:1px solid var(--slate-100);}
+.ud-name{font-weight:700;font-size:13.5px;color:var(--slate-900);}
+.ud-email{font-size:11.5px;color:var(--slate-400);margin-top:1px;}
+.ud-item{display:flex;align-items:center;gap:10px;padding:9px 15px;font-size:13px;font-weight:500;color:var(--slate-700);cursor:pointer;transition:background .12s;}
+.ud-item:hover{background:var(--slate-50);color:var(--slate-900);}
+.ud-item svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;color:var(--slate-400);flex-shrink:0;}
+.ud-divider{height:1px;background:var(--slate-100);margin:3px 0;}
+.ud-item.logout{color:var(--danger);}
+.ud-item.logout:hover{background:var(--danger-bg);}
+.ud-item.logout svg{color:var(--danger);}
 
 /* BODY */
 .body{display:flex;flex:1;overflow:hidden;}
@@ -276,7 +291,7 @@ tr:hover td{background:#fafbfc;}
     <div class="topbar-brand">
       <div class="topbar-name">Nova<sup class="cs-sup">CS</sup></div>
     </div>
-    <div class="topbar-crumb">Dashboard · <span id="topbar-org">Acme Corp</span></div>
+    <div class="topbar-crumb">Dashboard \u00b7 <span id="topbar-org">Acme Corp</span></div>
   </div>
   <div class="topbar-right">
     <div class="tb-icon" onclick="showToast('No new notifications')">
@@ -286,9 +301,31 @@ tr:hover td{background:#fafbfc;}
     <div class="tb-icon" onclick="switchSection('support',document.querySelector('.sb-item:last-child'))">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     </div>
-    <div class="user-pill">
-      <div class="user-av">SM</div>
-      <div><div class="user-name">Sarah Mitchell</div><div class="user-org">Acme Corp · Admin</div></div>
+    <div class="user-pill-wrap">
+      <div class="user-pill" id="user-pill" onclick="toggleUserDropdown(event)">
+        <div class="user-av" id="user-av">SM</div>
+        <div><div class="user-name" id="user-pill-name">Sarah Mitchell</div><div class="user-org" id="user-pill-org">Acme Corp · Admin</div></div>
+        <span class="pill-chevron">▼</span>
+      </div>
+      <div class="user-dropdown hidden" id="user-dropdown">
+        <div class="ud-header">
+          <div class="ud-name" id="ud-name">Sarah Mitchell</div>
+          <div class="ud-email" id="ud-email">sarah.mitchell@acmecorp.com</div>
+        </div>
+        <div class="ud-item" onclick="switchSection('profiles',null);closeUserDropdown()">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          My Profile
+        </div>
+        <div class="ud-item" onclick="window.location.href='pages/settings.html'">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </div>
+        <div class="ud-divider"></div>
+        <div class="ud-item logout" onclick="logout()">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -343,21 +380,21 @@ tr:hover td{background:#fafbfc;}
       <span class="sb-text">Help & Support</span>
     </div>
   </div>
-  <div class="sidebar-foot"><div class="sf-dot"></div><span>NovaCS v3.0 · Live</span></div>
+  <div class="sidebar-foot"><div class="sf-dot"></div><span>NovaCS v3.0 \u00b7 Live</span></div>
 </aside>
 
 <!-- MAIN -->
 <main class="main" id="main-area">
 
-  <!-- ══ OVERVIEW ══ -->
+  <!-- \u2550\u2550 OVERVIEW \u2550\u2550 -->
   <div id="sec-overview">
     <div class="pg-head">
       <div>
         <h1 class="pg-h1">Dashboard</h1>
-        <p class="pg-sub">Batch 4 · General Applications · <span id="dash-date"></span></p>
+        <p class="pg-sub">Batch 4 \u00b7 General Applications \u00b7 <span id="dash-date"></span></p>
       </div>
       <div class="pg-actions">
-        <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn btn-outline btn-sm" onclick="exportCSV()">\u2b07 Export CSV</button>
         <button class="btn btn-navy" onclick="openModal('new-code-modal')">+ Issue Access Code</button>
       </div>
     </div>
@@ -366,31 +403,31 @@ tr:hover td{background:#fafbfc;}
     <div class="stats-grid">
       <div class="stat-card navy">
         <div class="stat-icon-w navy"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-        <div class="stat-lbl">Total Invited</div><div class="stat-val navy" id="st-total">—</div><div class="stat-sub-txt">Active this batch</div>
+        <div class="stat-lbl">Total Invited</div><div class="stat-val navy" id="st-total">\u2014</div><div class="stat-sub-txt">Active this batch</div>
       </div>
       <div class="stat-card success">
         <div class="stat-icon-w success"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="stat-lbl">Completed</div><div class="stat-val success" id="st-done">—</div><div class="stat-sub-txt" id="st-rate">—</div>
+        <div class="stat-lbl">Completed</div><div class="stat-val success" id="st-done">\u2014</div><div class="stat-sub-txt" id="st-rate">\u2014</div>
       </div>
       <div class="stat-card warning">
         <div class="stat-icon-w warning"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-        <div class="stat-lbl">Pending</div><div class="stat-val warning" id="st-pend">—</div><div class="stat-sub-txt">Not yet started</div>
+        <div class="stat-lbl">Pending</div><div class="stat-val warning" id="st-pend">\u2014</div><div class="stat-sub-txt">Not yet started</div>
       </div>
       <div class="stat-card gold">
         <div class="stat-icon-w gold"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-        <div class="stat-lbl">Shortlisted</div><div class="stat-val gold" id="st-short">—</div><div class="stat-sub-txt">Marked for review</div>
+        <div class="stat-lbl">Shortlisted</div><div class="stat-val gold" id="st-short">\u2014</div><div class="stat-sub-txt">Marked for review</div>
       </div>
       <div class="stat-card danger">
         <div class="stat-icon-w danger"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-        <div class="stat-lbl">Flagged</div><div class="stat-val danger" id="st-flag">—</div><div class="stat-sub-txt">Tab switch detected</div>
+        <div class="stat-lbl">Flagged</div><div class="stat-val danger" id="st-flag">\u2014</div><div class="stat-sub-txt">Tab switch detected</div>
       </div>
       <div class="stat-card slate">
         <div class="stat-icon-w slate"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
-        <div class="stat-lbl">Pass Rate</div><div class="stat-val slate" id="st-pass">—</div><div class="stat-sub-txt" id="st-thresh-sub">Threshold: 65%</div>
+        <div class="stat-lbl">Pass Rate</div><div class="stat-val slate" id="st-pass">\u2014</div><div class="stat-sub-txt" id="st-thresh-sub">Threshold: 65%</div>
       </div>
       <div class="stat-card navy" style="grid-column:span 2">
         <div class="stat-icon-w navy"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-        <div class="stat-lbl">Average Weighted Score</div><div class="stat-val navy" id="st-avg">—</div><div class="stat-sub-txt">Across all completed assessments</div>
+        <div class="stat-lbl">Average Weighted Score</div><div class="stat-val navy" id="st-avg">\u2014</div><div class="stat-sub-txt">Across all completed assessments</div>
       </div>
     </div>
 
@@ -404,7 +441,7 @@ tr:hover td{background:#fafbfc;}
       <input type="range" class="thresh-slider" id="thresh-slider" min="0" max="100" value="65" oninput="updateThreshold(this.value)"/>
       <input class="thresh-inp" type="number" id="thresh-inp" value="65" min="0" max="100" oninput="updateThreshold(this.value)"/>
       <div class="vdiv"></div>
-      <div class="thresh-weights"><strong>Judgement 35%</strong> · Numerical 25% · Verbal 20% · Situational 20%</div>
+      <div class="thresh-weights"><strong>Judgement 35%</strong> \u00b7 Numerical 25% \u00b7 Verbal 20% \u00b7 Situational 20%</div>
     </div>
 
     <!-- Recent + Leaderboard -->
@@ -415,7 +452,7 @@ tr:hover td{background:#fafbfc;}
             <div class="card-title">Recent Candidates</div>
             <div class="card-badge" id="card-badge">10</div>
           </div>
-          <button class="btn btn-ghost btn-sm" onclick="switchSection('candidates',document.querySelectorAll('.sb-item')[1])">View all →</button>
+          <button class="btn btn-ghost btn-sm" onclick="switchSection('candidates',document.querySelectorAll('.sb-item')[1])">View all \u2192</button>
         </div>
         <div class="tbl-wrap"><table>
           <thead><tr><th>Rank</th><th>Candidate</th><th>Score</th><th>Status</th><th></th></tr></thead>
@@ -440,12 +477,12 @@ tr:hover td{background:#fafbfc;}
     </div>
   </div>
 
-  <!-- ══ CANDIDATES ══ -->
+  <!-- \u2550\u2550 CANDIDATES \u2550\u2550 -->
   <div id="sec-candidates" class="hidden">
     <div class="pg-head">
-      <div><h1 class="pg-h1">All Candidates</h1><p class="pg-sub">Full list · filter, search and action</p></div>
+      <div><h1 class="pg-h1">All Candidates</h1><p class="pg-sub">Full list \u00b7 filter, search and action</p></div>
       <div class="pg-actions">
-        <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn btn-outline btn-sm" onclick="exportCSV()">\u2b07 Export CSV</button>
         <button class="btn btn-navy" onclick="openModal('new-code-modal')">+ Issue Code</button>
       </div>
     </div>
@@ -455,7 +492,7 @@ tr:hover td{background:#fafbfc;}
         <div class="card-hr filter-row">
           <div class="search-wrap">
             <div class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-            <input class="search-input" type="text" id="srch" placeholder="Search name or email…" oninput="renderAll()"/>
+            <input class="search-input" type="text" id="srch" placeholder="Search name or email\u2026" oninput="renderAll()"/>
           </div>
           <select class="filt-sel" id="filt-status" onchange="renderAll()">
             <option value="">All Status</option><option value="completed">Completed</option>
@@ -466,8 +503,8 @@ tr:hover td{background:#fafbfc;}
             <option value="rejected">Rejected</option><option value="none">Undecided</option>
           </select>
           <select class="filt-sel" id="filt-sort" onchange="renderAll()">
-            <option value="rank">Rank</option><option value="score_desc">Score ↓</option>
-            <option value="score_asc">Score ↑</option><option value="name">Name A–Z</option>
+            <option value="rank">Rank</option><option value="score_desc">Score \u2193</option>
+            <option value="score_asc">Score \u2191</option><option value="name">Name A\u2013Z</option>
           </select>
         </div>
       </div>
@@ -480,7 +517,7 @@ tr:hover td{background:#fafbfc;}
 
 
 
-  <!-- ══ PROFILES ══ -->
+  <!-- \u2550\u2550 PROFILES \u2550\u2550 -->
   <div id="sec-profiles" class="hidden">
     <div class="pg-head">
       <div><h1 class="pg-h1">Profiles</h1><p class="pg-sub">Your account and your organisation's recruiter team</p></div>
@@ -498,10 +535,10 @@ tr:hover td{background:#fafbfc;}
           <div style="padding:28px 20px;text-align:center">
             <div style="width:76px;height:76px;border-radius:18px;background:linear-gradient(135deg,var(--navy-700),var(--navy-500));color:#fff;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:var(--shadow-md)">SM</div>
             <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:3px">Sarah Mitchell</div>
-            <div style="font-size:12.5px;color:var(--slate-500);margin-bottom:14px">Administrator · Acme Corp</div>
-            <span class="pill pill-done" style="margin-bottom:16px;display:inline-flex">● Active</span>
+            <div style="font-size:12.5px;color:var(--slate-500);margin-bottom:14px">Administrator \u00b7 Acme Corp</div>
+            <span class="pill pill-done" style="margin-bottom:16px;display:inline-flex">\u25cf Active</span>
             <div style="font-size:12px;color:var(--slate-400);margin-bottom:16px">Member since Jan 2024</div>
-            <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center" onclick="showToast('Avatar upload — coming soon')">Change Photo</button>
+            <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center" onclick="showToast('Avatar upload \u2014 coming soon')">Change Photo</button>
           </div>
           <div style="padding:14px 20px;border-top:1px solid var(--slate-100)">
             <div style="display:flex;flex-direction:column;gap:10px">
@@ -530,8 +567,8 @@ tr:hover td{background:#fafbfc;}
             <div class="card">
               <div class="card-head"><div class="card-title">Security</div></div>
               <div style="padding:16px 20px;display:flex;flex-direction:column;gap:12px">
-                <div><label class="field-label">Current Password</label><input class="field-input" type="password" placeholder="••••••••"/></div>
-                <div><label class="field-label">New Password</label><input class="field-input" type="password" placeholder="••••••••"/></div>
+                <div><label class="field-label">Current Password</label><input class="field-input" type="password" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"/></div>
+                <div><label class="field-label">New Password</label><input class="field-input" type="password" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"/></div>
                 <button class="btn btn-navy btn-sm" onclick="showToast('Password updated')">Update Password</button>
               </div>
             </div>
@@ -581,7 +618,7 @@ tr:hover td{background:#fafbfc;}
           <div class="card-head"><div class="card-title">Role Permissions</div></div>
           <div style="padding:6px 0">
             <div style="padding:11px 18px;border-bottom:1px solid var(--slate-100);display:flex;align-items:center;justify-content:space-between">
-              <div><div style="font-size:13px;font-weight:600">Administrator</div><div style="font-size:11.5px;color:var(--slate-400)">Full access — settings, billing, team</div></div>
+              <div><div style="font-size:13px;font-weight:600">Administrator</div><div style="font-size:11.5px;color:var(--slate-400)">Full access \u2014 settings, billing, team</div></div>
               <span class="pill" style="background:var(--navy-50);color:var(--navy-700);border:1px solid var(--navy-100)">2 members</span>
             </div>
             <div style="padding:11px 18px;border-bottom:1px solid var(--slate-100);display:flex;align-items:center;justify-content:space-between">
@@ -589,7 +626,7 @@ tr:hover td{background:#fafbfc;}
               <span class="pill" style="background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)">1 member</span>
             </div>
             <div style="padding:11px 18px;display:flex;align-items:center;justify-content:space-between">
-              <div><div style="font-size:13px;font-weight:600">Viewer</div><div style="font-size:11.5px;color:var(--slate-400)">Read-only — scores and reports</div></div>
+              <div><div style="font-size:13px;font-weight:600">Viewer</div><div style="font-size:11.5px;color:var(--slate-400)">Read-only \u2014 scores and reports</div></div>
               <span class="pill" style="background:var(--slate-100);color:var(--slate-600)">1 member</span>
             </div>
           </div>
@@ -598,7 +635,7 @@ tr:hover td{background:#fafbfc;}
           <div class="card-head"><div class="card-title">Pending Invites</div></div>
           <div style="padding:18px 20px">
             <div style="background:var(--warning-bg);border:1px solid var(--warning-border);border-radius:var(--r-sm);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-              <div><div style="font-size:13px;font-weight:600">james.h@acmecorp.com</div><div style="font-size:11.5px;color:var(--slate-500)">Invited Mar 6 · Recruiter role</div></div>
+              <div><div style="font-size:13px;font-weight:600">james.h@acmecorp.com</div><div style="font-size:11.5px;color:var(--slate-500)">Invited Mar 6 \u00b7 Recruiter role</div></div>
               <button class="btn btn-ghost btn-sm" onclick="showToast('Invite resent')">Resend</button>
             </div>
             <div style="text-align:center;padding:14px 0;font-size:13px;color:var(--slate-400)">1 invite pending</div>
@@ -608,7 +645,7 @@ tr:hover td{background:#fafbfc;}
     </div>
   </div>
 
-  <!-- ══ ASSESSMENTS ══ -->
+  <!-- \u2550\u2550 ASSESSMENTS \u2550\u2550 -->
   <div id="sec-assessments" class="hidden">
     <div class="pg-head">
       <div><h1 class="pg-h1">Assessments</h1><p class="pg-sub">Manage batches, customise questions and configure scoring</p></div>
@@ -617,7 +654,7 @@ tr:hover td{background:#fafbfc;}
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px" id="batch-grid"></div>
     <div class="two-col" style="margin-bottom:18px">
       <div class="card">
-        <div class="card-head"><div class="card-title">Question Categories</div><button class="btn btn-ghost btn-sm" onclick="showToast('Question editor — coming soon')">Edit Questions</button></div>
+        <div class="card-head"><div class="card-title">Question Categories</div><button class="btn btn-ghost btn-sm" onclick="showToast('Question editor \u2014 coming soon')">Edit Questions</button></div>
         <div style="padding:6px 0" id="cat-config-list"></div>
       </div>
       <div class="card">
@@ -655,11 +692,11 @@ tr:hover td{background:#fafbfc;}
     </div>
   </div>
 
-  <!-- ══ OPEN POSITIONS ══ -->
+  <!-- \u2550\u2550 OPEN POSITIONS \u2550\u2550 -->
   <div id="sec-positions" class="hidden">
     <div class="pg-head">
       <div><h1 class="pg-h1">Open Positions</h1><p class="pg-sub">Roles currently accepting assessment candidates</p></div>
-      <div class="pg-actions"><button class="btn btn-navy" onclick="showToast('Position editor — coming soon')">+ Add Position</button></div>
+      <div class="pg-actions"><button class="btn btn-navy" onclick="showToast('Position editor \u2014 coming soon')">+ Add Position</button></div>
     </div>
     <div class="full-col">
       <div class="card">
@@ -670,7 +707,7 @@ tr:hover td{background:#fafbfc;}
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px" id="pos-stat-cards"></div>
   </div>
 
-  <!-- ══ HELP & SUPPORT ══ -->
+  <!-- \u2550\u2550 HELP & SUPPORT \u2550\u2550 -->
   <div id="sec-support" class="hidden">
     <div class="pg-head">
       <div><h1 class="pg-h1">Help &amp; Support</h1><p class="pg-sub">Get help, submit a ticket or browse documentation</p></div>
@@ -678,23 +715,23 @@ tr:hover td{background:#fafbfc;}
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px">
       <div class="card" style="cursor:pointer;transition:transform .18s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'" onclick="showDocs()">
         <div style="padding:24px 22px;text-align:center">
-          <div style="width:48px;height:48px;border-radius:12px;background:var(--navy-50);color:var(--navy-600);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px">📖</div>
+          <div style="width:48px;height:48px;border-radius:12px;background:var(--navy-50);color:var(--navy-600);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px">\ud83d\udcd6</div>
           <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:6px">Documentation</div>
-          <div style="font-size:13px;color:var(--slate-500);line-height:1.6">Step-by-step guides for all features — issuing codes, reading scores, configuring assessments.</div>
+          <div style="font-size:13px;color:var(--slate-500);line-height:1.6">Step-by-step guides for all features \u2014 issuing codes, reading scores, configuring assessments.</div>
         </div>
       </div>
       <div class="card" style="cursor:pointer;transition:transform .18s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'" onclick="openModal('ticket-modal')">
         <div style="padding:24px 22px;text-align:center">
-          <div style="width:48px;height:48px;border-radius:12px;background:var(--success-bg);color:var(--success);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px">🎫</div>
+          <div style="width:48px;height:48px;border-radius:12px;background:var(--success-bg);color:var(--success);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px">\ud83c\udfab</div>
           <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:6px">Submit a Ticket</div>
           <div style="font-size:13px;color:var(--slate-500);line-height:1.6">Report a bug, request a feature or get help from the NovaCS support team.</div>
         </div>
       </div>
-      <div class="card" style="cursor:pointer;transition:transform .18s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'" onclick="showToast('Opening live chat…')">
+      <div class="card" style="cursor:pointer;transition:transform .18s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'" onclick="showToast('Opening live chat\u2026')">
         <div style="padding:24px 22px;text-align:center">
-          <div style="width:48px;height:48px;border-radius:12px;background:var(--warning-bg);color:var(--warning);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px">💬</div>
+          <div style="width:48px;height:48px;border-radius:12px;background:var(--warning-bg);color:var(--warning);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px">\ud83d\udcac</div>
           <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:6px">Live Chat</div>
-          <div style="font-size:13px;color:var(--slate-500);line-height:1.6">Chat with our support team in real time. Available Mon–Fri, 9am–6pm AEST.</div>
+          <div style="font-size:13px;color:var(--slate-500);line-height:1.6">Chat with our support team in real time. Available Mon\u2013Fri, 9am\u20136pm AEST.</div>
         </div>
       </div>
     </div>
@@ -713,8 +750,8 @@ tr:hover td{background:#fafbfc;}
     <div id="docs-panel" class="hidden" style="margin-top:18px">
       <div class="card">
         <div class="card-head">
-          <div class="card-title">📖 Documentation</div>
-          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('docs-panel').classList.add('hidden')">✕ Close</button>
+          <div class="card-title">\ud83d\udcd6 Documentation</div>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('docs-panel').classList.add('hidden')">\u2715 Close</button>
         </div>
         <div style="display:grid;grid-template-columns:220px 1fr;min-height:420px">
           <!-- Docs nav -->
@@ -727,12 +764,12 @@ tr:hover td{background:#fafbfc;}
   </div>
 
 
-  <!-- ══ ACCESS CODES ══ -->
+  <!-- \u2550\u2550 ACCESS CODES \u2550\u2550 -->
   <div id="sec-codes" class="hidden">
     <div class="pg-head">
       <div><h1 class="pg-h1">Access Codes</h1><p class="pg-sub">All issued codes, their status and usage</p></div>
       <div class="pg-actions">
-        <input type="text" class="filt-sel" id="codes-search" placeholder="Search name or code…" oninput="renderCodes()" style="width:200px"/>
+        <input type="text" class="filt-sel" id="codes-search" placeholder="Search name or code\u2026" oninput="renderCodes()" style="width:200px"/>
         <select class="filt-sel" id="codes-filter" onchange="renderCodes()">
           <option value="">All Statuses</option>
           <option value="pending">Pending</option>
@@ -758,7 +795,7 @@ tr:hover td{background:#fafbfc;}
     </div>
   </div>
 
-  <!-- ══ INVITE MANAGER ══ -->
+  <!-- \u2550\u2550 INVITE MANAGER \u2550\u2550 -->
   <div id="sec-invites" class="hidden">
     <div class="pg-head">
       <div><h1 class="pg-h1">Invite Manager</h1><p class="pg-sub">Send individual or batch invitations to candidates</p></div>
@@ -785,12 +822,12 @@ tr:hover td{background:#fafbfc;}
                 </select>
               </div>
               <div style="grid-column:span 2"><label class="field-label">Personal Message (optional)</label>
-                <textarea class="notes-field" id="inv-msg" style="min-height:70px" placeholder="Add a personal note to the invitation email…"></textarea>
+                <textarea class="notes-field" id="inv-msg" style="min-height:70px" placeholder="Add a personal note to the invitation email\u2026"></textarea>
               </div>
             </div>
             <div style="padding:0 20px 18px;display:flex;justify-content:flex-end;gap:9px">
               <button class="btn btn-outline" onclick="clearInviteForm()">Clear</button>
-              <button class="btn btn-navy" onclick="sendSingleInvite()">Generate Code &amp; Send →</button>
+              <button class="btn btn-navy" onclick="sendSingleInvite()">Generate Code &amp; Send \u2192</button>
             </div>
           </div>
         </div>
@@ -798,14 +835,14 @@ tr:hover td{background:#fafbfc;}
         <div id="invite-tab-bulk" class="hidden">
           <div class="card" style="margin-bottom:18px">
             <div class="card-head"><div class="card-title">Bulk CSV Upload</div></div>
-            <div style="padding:24px 28px;text-align:center;border:2px dashed var(--slate-200);border-radius:var(--r-lg);margin:16px 20px 0;cursor:pointer;transition:border-color .18s" id="csv-drop" onmouseover="this.style.borderColor='var(--navy-400)'" onmouseout="this.style.borderColor='var(--slate-200)'" onclick="showToast('File picker — coming soon')">
-              <div style="font-size:32px;margin-bottom:10px">📂</div>
+            <div style="padding:24px 28px;text-align:center;border:2px dashed var(--slate-200);border-radius:var(--r-lg);margin:16px 20px 0;cursor:pointer;transition:border-color .18s" id="csv-drop" onmouseover="this.style.borderColor='var(--navy-400)'" onmouseout="this.style.borderColor='var(--slate-200)'" onclick="showToast('File picker \u2014 coming soon')">
+              <div style="font-size:32px;margin-bottom:10px">\ud83d\udcc2</div>
               <div style="font-weight:600;font-size:14px;margin-bottom:4px">Drag &amp; drop CSV or click to upload</div>
               <div style="font-size:12.5px;color:var(--slate-400)">Required columns: first_name, last_name, email, role</div>
             </div>
             <div style="padding:14px 20px 18px;display:flex;justify-content:space-between;align-items:center">
               <a href="#" style="font-size:12.5px;color:var(--navy-600);font-weight:500" onclick="showToast('Template downloaded')">Download CSV template</a>
-              <button class="btn btn-navy" onclick="showToast('Upload CSV first')">Process &amp; Send All →</button>
+              <button class="btn btn-navy" onclick="showToast('Upload CSV first')">Process &amp; Send All \u2192</button>
             </div>
           </div>
         </div>
@@ -825,7 +862,7 @@ tr:hover td{background:#fafbfc;}
     </div>
   </div>
 
-  <!-- ══ SETTINGS ══ -->
+  <!-- \u2550\u2550 SETTINGS \u2550\u2550 -->
   <div id="sec-settings" class="hidden">
     <div class="pg-head">
       <div><h1 class="pg-h1">Settings</h1><p class="pg-sub">Organisation configuration, branding and defaults</p></div>
@@ -851,7 +888,7 @@ tr:hover td{background:#fafbfc;}
             <label class="field-label">Organisation Logo</label>
             <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
               <div style="width:52px;height:52px;border-radius:var(--r-sm);background:var(--navy-700);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0">AC</div>
-              <button class="btn btn-outline btn-sm" onclick="showToast('Logo upload — coming soon')">Upload Logo</button>
+              <button class="btn btn-outline btn-sm" onclick="showToast('Logo upload \u2014 coming soon')">Upload Logo</button>
             </div>
           </div>
           <div>
@@ -861,7 +898,7 @@ tr:hover td{background:#fafbfc;}
               <input class="field-input" value="#1e3a5f" style="flex:1;font-family:Courier New,monospace;font-size:13px"/>
             </div>
           </div>
-          <div><label class="field-label">Email Footer Text</label><textarea class="notes-field" style="min-height:60px">Acme Corp — HR & Talent Acquisition&#10;sydney@acmecorp.com · acmecorp.com</textarea></div>
+          <div><label class="field-label">Email Footer Text</label><textarea class="notes-field" style="min-height:60px">Acme Corp \u2014 HR & Talent Acquisition&#10;sydney@acmecorp.com \u00b7 acmecorp.com</textarea></div>
           <div>
             <label class="field-label">Applicant Portal Message</label>
             <textarea class="notes-field" style="min-height:60px">Welcome! Please complete this assessment honestly and without assistance. You have 25 minutes.</textarea>
@@ -889,7 +926,7 @@ tr:hover td{background:#fafbfc;}
               <div><label style="font-size:11px;color:var(--slate-500);font-weight:600;display:block;margin-bottom:4px">Verbal</label><input class="field-input" type="number" value="20" oninput="checkSettingsWeights(this)"/></div>
               <div><label style="font-size:11px;color:var(--slate-500);font-weight:600;display:block;margin-bottom:4px">Situational</label><input class="field-input" type="number" value="20" oninput="checkSettingsWeights(this)"/></div>
             </div>
-            <div id="settings-weight-msg" style="margin-top:8px;font-size:12px;font-weight:600;color:var(--success)">✓ Total: 100%</div>
+            <div id="settings-weight-msg" style="margin-top:8px;font-size:12px;font-weight:600;color:var(--success)">\u2713 Total: 100%</div>
           </div>
           <div>
             <label class="field-label">Default Time Limit</label>
@@ -948,7 +985,7 @@ tr:hover td{background:#fafbfc;}
     </div>
   </div>
 
-  <!-- ══ ANALYTICS ══ -->
+  <!-- \u2550\u2550 ANALYTICS \u2550\u2550 -->
   <div id="sec-analytics" class="hidden">
     <div class="pg-head">
       <div><h1 class="pg-h1">Analytics</h1><p class="pg-sub">Score distributions, trends and category breakdowns</p></div>
@@ -988,7 +1025,7 @@ tr:hover td{background:#fafbfc;}
 <!-- MODALS -->
 <div class="modal-bg" id="new-code-modal" onclick="closeBg(event,'new-code-modal')">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('new-code-modal')">✕</button>
+    <button class="modal-close" onclick="closeModal('new-code-modal')">\u2715</button>
     <h3>Issue Access Code</h3>
     <p class="modal-sub">Generate a unique one-use code for a candidate.</p>
     <div class="field"><label class="field-label">Full Name</label><input class="field-input" id="nc-name" placeholder="e.g. Jordan Smith"/></div>
@@ -1002,32 +1039,32 @@ tr:hover td{background:#fafbfc;}
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('new-code-modal')">Cancel</button>
-      <button class="btn btn-navy" onclick="issueCode()">Generate Code →</button>
+      <button class="btn btn-navy" onclick="issueCode()">Generate Code \u2192</button>
     </div>
   </div>
 </div>
 
 <div class="modal-bg" id="code-gen-modal" onclick="closeBg(event,'code-gen-modal')">
   <div class="modal" style="text-align:center">
-    <button class="modal-close" onclick="closeModal('code-gen-modal')">✕</button>
-    <div style="font-size:32px;margin-bottom:8px">🔑</div>
+    <button class="modal-close" onclick="closeModal('code-gen-modal')">\u2715</button>
+    <div style="font-size:32px;margin-bottom:8px">\ud83d\udd11</div>
     <h3>Code Generated</h3>
-    <p class="modal-sub">Share privately — expires after one use.</p>
-    <div class="gen-code-box"><span class="gen-code-val" id="gen-code-val">——————</span><div class="gen-code-hint">For: <strong id="gen-code-name"></strong> · <span id="gen-code-role"></span></div></div>
+    <p class="modal-sub">Share privately \u2014 expires after one use.</p>
+    <div class="gen-code-box"><span class="gen-code-val" id="gen-code-val">\u2014\u2014\u2014\u2014\u2014\u2014</span><div class="gen-code-hint">For: <strong id="gen-code-name"></strong> \u00b7 <span id="gen-code-role"></span></div></div>
     <div style="display:flex;gap:10px;justify-content:center">
-      <button class="btn btn-outline" onclick="copyCode()">📋 Copy Code</button>
+      <button class="btn btn-outline" onclick="copyCode()">\ud83d\udccb Copy Code</button>
       <button class="btn btn-navy" onclick="closeModal('code-gen-modal')">Done</button>
     </div>
   </div>
 </div>
 
 <div class="modal-bg" id="detail-modal" onclick="closeBg(event,'detail-modal')">
-  <div class="modal detail-modal"><button class="modal-close" onclick="closeModal('detail-modal')">✕</button><div id="detail-content"></div></div>
+  <div class="modal detail-modal"><button class="modal-close" onclick="closeModal('detail-modal')">\u2715</button><div id="detail-content"></div></div>
 </div>
 
 <div class="modal-bg" id="batch-detail-modal" onclick="closeBg(event,'batch-detail-modal')">
   <div class="modal" style="max-width:640px;max-height:85vh;overflow-y:auto">
-    <button class="modal-close" onclick="closeModal('batch-detail-modal')">✕</button>
+    <button class="modal-close" onclick="closeModal('batch-detail-modal')">\u2715</button>
     <div id="batch-detail-content"></div>
   </div>
 </div>
@@ -1037,7 +1074,7 @@ tr:hover td{background:#fafbfc;}
     <button class="modal-close" onclick="closeModal('new-batch-modal')">&#x2715;</button>
     <h3>Create New Batch</h3>
     <p class="modal-sub">Set up a new assessment round for a specific role or cohort.</p>
-    <div class="field"><label class="field-label">Batch Name</label><input class="field-input" placeholder="e.g. Batch 5 — Grad Intake 2026"/></div>
+    <div class="field"><label class="field-label">Batch Name</label><input class="field-input" placeholder="e.g. Batch 5 \u2014 Grad Intake 2026"/></div>
     <div class="field"><label class="field-label">Role / Position</label><select class="field-input"><option>Customer Success Manager</option><option>Operations Analyst</option><option>Project Manager</option><option>Sales Associate</option><option>HR Coordinator</option></select></div>
     <div class="field"><label class="field-label">Target Candidate Count</label><input class="field-input" type="number" placeholder="e.g. 20"/></div>
     <div class="modal-actions">
@@ -1068,17 +1105,17 @@ tr:hover td{background:#fafbfc;}
 <script src="js/db.js"></script>
 <script src="js/utils.js"></script>
 <script>
-// ── All data from window.DB ──
+// \u2500\u2500 All data from window.DB \u2500\u2500
 let threshold = DB.config.passThreshold;
 
 function wScore(s){return DB.wScore(s);}
 function sColor(s){return DB.scoreColor(s);}
 function rankOf(id){return DB.getRankOf(id);}
-function rankChip(r){if(!r)return'<span class="rank-chip rn">—</span>';if(r===1)return'<span class="rank-chip r1">🥇</span>';if(r===2)return'<span class="rank-chip r2">🥈</span>';if(r===3)return'<span class="rank-chip r3">🥉</span>';return`<span class="rank-chip rn">#${r}</span>`;}
-function statusPill(s){const m={completed:'pill-done',pending:'pill-pending',invited:'pill-invited'};const l={completed:'✓ Done',pending:'⏳ Pending',invited:'📧 Invited'};return`<span class="pill ${m[s]||''}">${l[s]||s}</span>`;}
-function passFail(s){if(s===null||s===undefined)return'';return s>=threshold?'<span class="pill pill-pass">✓ Pass</span>':'<span class="pill pill-fail">✗ Fail</span>';}
-function decPill(d){if(d==='shortlisted')return'<span class="pill pill-shortlisted">★ Shortlisted</span>';if(d==='rejected')return'<span class="pill pill-rejected">✗ Rejected</span>';return'<span style="color:var(--slate-300);font-size:12px">—</span>';}
-function stagePill(id){const c=DB.getCandidateById(id);const s=c?.stage||'';return s?`<span class="stage-tag">→ ${s}</span>`:'<span style="color:var(--slate-300);font-size:12px">—</span>';}
+function rankChip(r){if(!r)return'<span class="rank-chip rn">\u2014</span>';if(r===1)return'<span class="rank-chip r1">\ud83e\udd47</span>';if(r===2)return'<span class="rank-chip r2">\ud83e\udd48</span>';if(r===3)return'<span class="rank-chip r3">\ud83e\udd49</span>';return`<span class="rank-chip rn">#${r}</span>`;}
+function statusPill(s){const m={completed:'pill-done',pending:'pill-pending',invited:'pill-invited'};const l={completed:'\u2713 Done',pending:'\u23f3 Pending',invited:'\ud83d\udce7 Invited'};return`<span class="pill ${m[s]||''}">${l[s]||s}</span>`;}
+function passFail(s){if(s===null||s===undefined)return'';return s>=threshold?'<span class="pill pill-pass">\u2713 Pass</span>':'<span class="pill pill-fail">\u2717 Fail</span>';}
+function decPill(d){if(d==='shortlisted')return'<span class="pill pill-shortlisted">\u2605 Shortlisted</span>';if(d==='rejected')return'<span class="pill pill-rejected">\u2717 Rejected</span>';return'<span style="color:var(--slate-300);font-size:12px">\u2014</span>';}
+function stagePill(id){const c=DB.getCandidateById(id);const s=c?.stage||'';return s?`<span class="stage-tag">\u2192 ${s}</span>`:'<span style="color:var(--slate-300);font-size:12px">\u2014</span>';}
 const TREND_DATA = DB.analytics.completionTrend.map(w=>w.completed);
 const TREND_LBLS = DB.analytics.completionTrend.map(w=>w.week.replace(' 2026',''));
 
@@ -1112,24 +1149,24 @@ function buildMiniRow(c){
   const ws=wScore(c.scores);const col=sColor(ws);const r=rankOf(c.id);
   return`<tr>
     <td>${rankChip(r)}</td>
-    <td><div class="cand-cell"><div class="cand-av" style="background:${c.color}18;color:${c.color}">${c.initials}</div><div><div class="cand-name" style="cursor:pointer;transition:color .15s" onmouseover="this.style.color='var(--navy-600)'" onmouseout="this.style.color=''" onclick="window.location.href='pages/candidate-profile.html?id=${c.id}'">${c.name}${c.flagged?'<span style="margin-left:4px;font-size:10px;color:var(--warning)">⚠</span>':''}</div><div class="cand-email">${c.email}</div></div></div></td>
-    <td>${ws!==null?`<div class="score-cell"><div class="score-bar"><div class="score-fill" style="width:${ws}%;background:${col}"></div></div><div class="score-num" style="color:${col}">${ws}%</div></div>`:'<span style="color:var(--slate-300)">—</span>'}</td>
+    <td><div class="cand-cell"><div class="cand-av" style="background:${c.color}18;color:${c.color}">${c.initials}</div><div><div class="cand-name" style="cursor:pointer;transition:color .15s" onmouseover="this.style.color='var(--navy-600)'" onmouseout="this.style.color=''" onclick="window.location.href='pages/candidate-profile.html?id=${c.id}'">${c.name}${c.flagged?'<span style="margin-left:4px;font-size:10px;color:var(--warning)">\u26a0</span>':''}</div><div class="cand-email">${c.email}</div></div></div></td>
+    <td>${ws!==null?`<div class="score-cell"><div class="score-bar"><div class="score-fill" style="width:${ws}%;background:${col}"></div></div><div class="score-num" style="color:${col}">${ws}%</div></div>`:'<span style="color:var(--slate-300)">\u2014</span>'}</td>
     <td>${statusPill(c.status)}</td>
-    <td>${c.status==='completed'?`<a href="pages/candidate-profile.html?id=${c.id}" class="btn btn-ghost btn-sm">View →</a>`:''}</td>
+    <td>${c.status==='completed'?`<a href="pages/candidate-profile.html?id=${c.id}" class="btn btn-ghost btn-sm">View \u2192</a>`:''}</td>
   </tr>`;
 }
 function buildFullRow(c){
   const ws=wScore(c.scores);const col=sColor(ws);const r=rankOf(c.id);
   return`<tr>
     <td>${rankChip(r)}</td>
-    <td><div class="cand-cell"><div class="cand-av" style="background:${c.color}18;color:${c.color};cursor:pointer" onclick="window.location.href='pages/candidate-profile.html?id=${c.id}'">${c.initials}</div><div><div class="cand-name" style="cursor:pointer;transition:color .15s" onmouseover="this.style.color='var(--navy-600)'" onmouseout="this.style.color=''" onclick="window.location.href='pages/candidate-profile.html?id=${c.id}'">${c.name}${c.flagged?'<span style="margin-left:4px;font-size:10px;color:var(--warning)">⚠</span>':''}</div><div class="cand-email">${c.email}</div></div></div></td>
+    <td><div class="cand-cell"><div class="cand-av" style="background:${c.color}18;color:${c.color};cursor:pointer" onclick="window.location.href='pages/candidate-profile.html?id=${c.id}'">${c.initials}</div><div><div class="cand-name" style="cursor:pointer;transition:color .15s" onmouseover="this.style.color='var(--navy-600)'" onmouseout="this.style.color=''" onclick="window.location.href='pages/candidate-profile.html?id=${c.id}'">${c.name}${c.flagged?'<span style="margin-left:4px;font-size:10px;color:var(--warning)">\u26a0</span>':''}</div><div class="cand-email">${c.email}</div></div></div></td>
     <td style="color:var(--slate-500);font-size:12px">${c.role}</td>
-    <td>${ws!==null?`<div class="score-cell"><div class="score-bar"><div class="score-fill" style="width:${ws}%;background:${col}"></div></div><div class="score-num" style="color:${col}">${ws}%</div></div>`:'<span style="color:var(--slate-300)">—</span>'}</td>
+    <td>${ws!==null?`<div class="score-cell"><div class="score-bar"><div class="score-fill" style="width:${ws}%;background:${col}"></div></div><div class="score-num" style="color:${col}">${ws}%</div></div>`:'<span style="color:var(--slate-300)">\u2014</span>'}</td>
     <td>${passFail(ws)}</td>
     <td>${statusPill(c.status)}</td>
     <td>${decPill(c.decision)}</td>
     <td>${stagePill(c.id)}</td>
-    <td>${c.status==='completed'?`<a href="pages/candidate-profile.html?id=${c.id}" class="btn btn-ghost btn-sm">View →</a>`:''}</td>
+    <td>${c.status==='completed'?`<a href="pages/candidate-profile.html?id=${c.id}" class="btn btn-ghost btn-sm">View \u2192</a>`:''}</td>
   </tr>`;
 }
 
@@ -1150,7 +1187,7 @@ function renderLB(){
   el.innerHTML=ranked.map((c,i)=>{
     const ws=wScore(c.scores);
     return`<div class="lb-item" onclick="window.location.href='pages/candidate-profile.html?id='+c.id" style="cursor:pointer">
-      <div class="lb-rank ${i<3?'top':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</div>
+      <div class="lb-rank ${i<3?'top':''}">${i===0?'\ud83e\udd47':i===1?'\ud83e\udd48':i===2?'\ud83e\udd49':'#'+(i+1)}</div>
       <div class="lb-av" style="background:${c.color}18;color:${c.color}">${c.initials}</div>
       <div class="lb-info"><div class="lb-name">${c.name}</div><div style="font-size:11px;color:var(--slate-400)">${c.role.split(' ')[0]}</div></div>
       <div class="lb-score" style="color:${sColor(ws)}">${ws}%</div>
@@ -1188,11 +1225,11 @@ function renderPositions(){
 // DETAIL
 function openDetail(id){
   const c=DB.getCandidateById(id);if(!c||!c.scores)return;
-  const ws=wScore(c.scores);const note=candNotes[id]||'';const stage=candStages[id]||'';
+  const ws=wScore(c.scores);const note=c.notes||'';const stage=c.stage||'';
   document.getElementById('detail-content').innerHTML=`
     <div class="det-header">
       <div class="det-av" style="background:${c.color}18;color:${c.color}">${c.initials}</div>
-      <div style="flex:1"><div class="serif" style="font-size:19px;font-weight:700">${c.name}</div><div style="font-size:12px;color:var(--slate-500)">${c.role} · ${c.email}</div></div>
+      <div style="flex:1"><div class="serif" style="font-size:19px;font-weight:700">${c.name}</div><div style="font-size:12px;color:var(--slate-500)">${c.role} \u00b7 ${c.email}</div></div>
       ${passFail(ws)}
     </div>
     <div class="det-stats">
@@ -1207,20 +1244,20 @@ function openDetail(id){
     }).join('')}
     <div style="margin:14px 0 10px"><label class="field-label">Next Stage</label>
     <select class="stage-sel" onchange="setStage(${id},this.value)">
-      <option value="">— Not set —</option>
+      <option value="">\u2014 Not set \u2014</option>
       ${['Phone Screen','1st Interview','2nd Interview','Assessment Centre','Offer Extended'].map(s=>`<option ${stage===s?'selected':''}>${s}</option>`).join('')}
     </select></div>
-    <div style="margin-bottom:16px"><label class="field-label">Recruiter Notes</label><textarea class="notes-field" onchange="candNotes[${id}]=this.value">${note}</textarea></div>
+    <div style="margin-bottom:16px"><label class="field-label">Recruiter Notes</label><textarea class="notes-field" onchange="DB.updateCandidate(${id},{notes:this.value})">${note}</textarea></div>
     <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
       <div style="display:flex;gap:8px">
-        <button class="btn btn-success btn-sm" onclick="setDec(${id},'shortlisted')">★ Shortlist</button>
-        <button class="btn btn-danger btn-sm" onclick="setDec(${id},'rejected')">✗ Reject</button>
+        <button class="btn btn-success btn-sm" onclick="setDec(${id},'shortlisted')">\u2605 Shortlist</button>
+        <button class="btn btn-danger btn-sm" onclick="setDec(${id},'rejected')">\u2717 Reject</button>
       </div>
       <button class="btn btn-outline btn-sm" onclick="closeModal('detail-modal')">Close</button>
     </div>`;
   openModal('detail-modal');
 }
-function setDec(id,d){DB.updateCandidate(id,{decision:d});closeModal('detail-modal');renderRecent();renderAll();renderLB();updateStats();showToast(d==='shortlisted'?'★ Candidate shortlisted':'✗ Candidate rejected');}
+function setDec(id,d){DB.updateCandidate(id,{decision:d});closeModal('detail-modal');renderRecent();renderAll();renderLB();updateStats();showToast(d==='shortlisted'?'\u2605 Candidate shortlisted':'\u2717 Candidate rejected');}
 function setStage(id,s){DB.updateCandidate(id,{stage:s});renderRecent();renderAll();if(s)showToast(`Stage set: ${s}`);}
 
 // ISSUE CODE
@@ -1262,9 +1299,9 @@ function renderDonut(){
   const el=document.getElementById('donut-wrap');if(!el)return;
   const scores=DB.getCandidates().filter(c=>c.scores).map(c=>wScore(c.scores));
   const bands=[
-    {label:'80–100% Excellent',color:'var(--success)',count:scores.filter(s=>s>=80).length},
-    {label:'65–79% Good',color:'var(--navy-500)',count:scores.filter(s=>s>=65&&s<80).length},
-    {label:'50–64% Average',color:'var(--warning)',count:scores.filter(s=>s>=50&&s<65).length},
+    {label:'80\u2013100% Excellent',color:'var(--success)',count:scores.filter(s=>s>=80).length},
+    {label:'65\u201379% Good',color:'var(--navy-500)',count:scores.filter(s=>s>=65&&s<80).length},
+    {label:'50\u201364% Average',color:'var(--warning)',count:scores.filter(s=>s>=50&&s<65).length},
     {label:'Below 50%',color:'var(--danger)',count:scores.filter(s=>s<50).length},
   ];
   const total=scores.length||1;let cum=0;
@@ -1311,23 +1348,27 @@ function renderRoleBreakdown(){
 }
 
 // ASSESSMENTS
-const BATCHES=[
-  {id:1,name:'Batch 4 — General Applications',status:'active',created:'Mar 1',candidates:10,completed:8,passed:5},
-  {id:2,name:'Batch 3 — Sales Round',status:'closed',created:'Feb 10',candidates:14,completed:14,passed:9},
-  {id:3,name:'Batch 2 — Ops Team',status:'closed',created:'Jan 18',candidates:8,completed:8,passed:6},
-];
+const BATCHES = DB.batches.map(b=>({
+  id:         b.id,
+  name:       b.name,
+  status:     b.completed >= b.total ? 'closed' : 'active',
+  created:    b.date,
+  candidates: b.total,
+  completed:  b.completed,
+  passed:     b.pass,
+}));
 const CAT_CONFIG=[
-  {name:'Judgement & Decision Making',key:'judgement',weight:35,count:7,icon:'⚖️'},
-  {name:'Numerical Reasoning',key:'numerical',weight:25,count:6,icon:'🔢'},
-  {name:'Verbal & Communication',key:'verbal',weight:20,count:6,icon:'💬'},
-  {name:'Situational Scenarios',key:'situational',weight:20,count:6,icon:'🎭'},
+  {name:'Judgement & Decision Making',key:'judgement',weight:35,count:7,icon:'\u2696\ufe0f'},
+  {name:'Numerical Reasoning',key:'numerical',weight:25,count:6,icon:'\ud83d\udd22'},
+  {name:'Verbal & Communication',key:'verbal',weight:20,count:6,icon:'\ud83d\udcac'},
+  {name:'Situational Scenarios',key:'situational',weight:20,count:6,icon:'\ud83c\udfad'},
 ];
 function renderBatches(){
   const el=document.getElementById('batch-grid');if(!el)return;
   el.innerHTML=BATCHES.map(b=>`<div class="card" style="cursor:pointer" onclick="openBatchDetail(b.id)">
     <div style="padding:18px 20px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <span class="pill ${b.status==='active'?'pill-done':'pill-invited'}">${b.status==='active'?'● Active':'✓ Closed'}</span>
+        <span class="pill ${b.status==='active'?'pill-done':'pill-invited'}">${b.status==='active'?'\u25cf Active':'\u2713 Closed'}</span>
         <span style="font-size:11px;color:var(--slate-400)">${b.created}</span>
       </div>
       <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:14px;line-height:1.3">${b.name}</div>
@@ -1344,11 +1385,11 @@ function renderCatConfig(){
   const el=document.getElementById('cat-config-list');if(!el)return;
   el.innerHTML=CAT_CONFIG.map(c=>`<div class="pos-row">
     <div style="width:32px;height:32px;border-radius:8px;background:var(--navy-50);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${c.icon}</div>
-    <div style="flex:1"><div class="pos-title">${c.name}</div><div class="pos-meta">${c.count} questions · ${c.weight}% weight</div></div>
+    <div style="flex:1"><div class="pos-title">${c.name}</div><div class="pos-meta">${c.count} questions \u00b7 ${c.weight}% weight</div></div>
     <div style="display:flex;align-items:center;gap:10px">
       <div style="width:80px;height:5px;background:var(--slate-200);border-radius:3px;overflow:hidden"><div style="height:100%;background:var(--navy-500);border-radius:3px;width:${c.weight}%"></div></div>
       <span style="font-weight:700;font-size:13px;color:var(--navy-700);min-width:32px">${c.weight}%</span>
-      <button class="btn btn-ghost btn-sm" onclick="showToast('Question editor — coming soon')">Edit</button>
+      <button class="btn btn-ghost btn-sm" onclick="showToast('Question editor \u2014 coming soon')">Edit</button>
     </div>
   </div>`).join('');
 }
@@ -1356,7 +1397,7 @@ function updateWeights(){
   const ids=['w-judgement','w-numerical','w-verbal','w-situational'];
   const total=ids.reduce((s,id)=>s+(parseInt(document.getElementById(id)?.value)||0),0);
   const el=document.getElementById('weight-total-row');
-  if(el){el.textContent=(total===100?'✓':'⚠') + ' Total: '+total+'%';el.style.color=total===100?'var(--success)':'var(--danger)';}
+  if(el){el.textContent=(total===100?'\u2713':'\u26a0') + ' Total: '+total+'%';el.style.color=total===100?'var(--success)':'var(--danger)';}
 }
 
 // POSITIONS FULL
@@ -1380,7 +1421,7 @@ function renderPositionsFull(){
         <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--navy-700)">${passed}</div><div style="font-size:10.5px;color:var(--slate-400)">Passed</div></div>
         <div style="width:90px"><div style="font-size:10.5px;color:var(--slate-400);margin-bottom:3px">${done}/${total} assessed</div><div style="height:5px;background:var(--slate-200);border-radius:3px;overflow:hidden"><div style="height:100%;background:var(--navy-500);border-radius:3px;width:${total?Math.round(done/total*100):0}%"></div></div></div>
         <button class="btn btn-ghost btn-sm" onclick="openModal('new-code-modal');setTimeout(()=>{const s=document.getElementById('nc-role');if(s)s.value='${role}';},10)">+ Code</button>
-        <button class="btn btn-outline btn-sm" onclick="showToast('Position editor — coming soon')">Edit</button>
+        <button class="btn btn-outline btn-sm" onclick="showToast('Position editor \u2014 coming soon')">Edit</button>
       </div>
     </div>`;
   }).join('');
@@ -1389,11 +1430,11 @@ function renderPositionsFull(){
 // HELP & SUPPORT
 const FAQS=[
   {q:'How do I issue an access code?',a:'Go to Overview or Candidates and click "+ Issue Access Code". Fill in the candidate\'s name, email and role, then share the generated code privately.'},
-  {q:'Can a candidate retake the assessment?',a:'No — codes are single-use by default. You can issue a new code if needed, but this should be noted in the candidate\'s file.'},
+  {q:'Can a candidate retake the assessment?',a:'No \u2014 codes are single-use by default. You can issue a new code if needed, but this should be noted in the candidate\'s file.'},
   {q:'What does the weighted score represent?',a:'The weighted score combines all four category scores using the configured weights (default: Judgement 35%, Numerical 25%, Verbal 20%, Situational 20%).'},
   {q:'Why is a candidate flagged?',a:'A candidate is flagged if tab-switch detection was triggered during their assessment, meaning they navigated away from the page.'},
   {q:'How do I change the pass/fail threshold?',a:'Use the slider on the Overview or Analytics page. The threshold recalculates all results live.'},
-  {q:'Can I export results?',a:'Yes — click "Export CSV" on the Overview or Candidates page to download all candidate data.'},
+  {q:'Can I export results?',a:'Yes \u2014 click "Export CSV" on the Overview or Candidates page to download all candidate data.'},
 ];
 const TICKETS=[
   {id:'TKT-001',subject:'Candidate code not working',status:'resolved',date:'Mar 4',priority:'medium'},
@@ -1403,7 +1444,7 @@ function renderFAQ(){
   const el=document.getElementById('faq-list');if(!el)return;
   el.innerHTML=FAQS.map((f,i)=>`<div style="border-bottom:1px solid var(--slate-100);overflow:hidden">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 20px;cursor:pointer;font-weight:600;font-size:13px" onclick="toggleFAQ(${i})">
-      <span>${f.q}</span><span id="faq-arrow-${i}" style="color:var(--slate-400);transition:transform .2s;font-size:12px">▼</span>
+      <span>${f.q}</span><span id="faq-arrow-${i}" style="color:var(--slate-400);transition:transform .2s;font-size:12px">\u25bc</span>
     </div>
     <div id="faq-body-${i}" style="display:none;padding:0 20px 13px;font-size:13px;color:var(--slate-600);line-height:1.7">${f.a}</div>
   </div>`).join('');
@@ -1419,10 +1460,10 @@ function toggleFAQ(i){
 function renderTickets(){
   const el=document.getElementById('ticket-list');if(!el)return;
   const statusMap={open:'pill-pending',resolved:'pill-done',closed:'pill-invited'};
-  el.innerHTML=TICKETS.map(t=>`<div class="pos-row" onclick="showToast('Ticket ${t.id} — full view coming soon')" style="cursor:pointer">
+  el.innerHTML=TICKETS.map(t=>`<div class="pos-row" onclick="showToast('Ticket ${t.id} \u2014 full view coming soon')" style="cursor:pointer">
     <div style="flex:1">
       <div style="font-weight:600;font-size:13px;margin-bottom:2px">${t.subject}</div>
-      <div style="font-size:11.5px;color:var(--slate-400)">${t.id} · ${t.date}</div>
+      <div style="font-size:11.5px;color:var(--slate-400)">${t.id} \u00b7 ${t.date}</div>
     </div>
     <span class="pill ${statusMap[t.status]}">${t.status}</span>
   </div>`).join('')+'<div style="padding:12px 20px;border-top:1px solid var(--slate-100);text-align:center"><button class="btn btn-navy btn-sm" onclick="openModal(\'ticket-modal\')">+ New Ticket</button></div>';
@@ -1439,20 +1480,20 @@ function renderTeam(){
       const bg={admin:'var(--navy-50)',superadmin:'var(--navy-50)',recruiter:'var(--success-bg)',viewer:'var(--slate-100)'}[m.role]||'var(--slate-100)';
       const fc={admin:'var(--navy-700)',superadmin:'var(--navy-700)',recruiter:'var(--success)',viewer:'var(--slate-600)'}[m.role]||'var(--slate-600)';
       const bc={admin:'var(--navy-100)',superadmin:'var(--navy-100)',recruiter:'var(--success-border)',viewer:'var(--slate-200)'}[m.role]||'var(--slate-200)';
-      const lbl={admin:'Admin',superadmin:'⚡ Superadmin',recruiter:'Recruiter',viewer:'Viewer'}[m.role]||m.role;
+      const lbl={admin:'Admin',superadmin:'\u26a1 Superadmin',recruiter:'Recruiter',viewer:'Viewer'}[m.role]||m.role;
       const isYou=m.email===SESSION_EMAIL;
       return '<div style="display:flex;align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid var(--slate-100)">'
         +'<div style="width:38px;height:38px;border-radius:10px;background:'+col+'18;color:'+col+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">'+ini+'</div>'
         +'<div style="flex:1">'
           +'<div style="font-weight:600;font-size:13.5px">'+m.name+(isYou?'<span style="margin-left:6px;font-size:10.5px;font-weight:700;background:var(--navy-50);color:var(--navy-600);padding:1px 7px;border-radius:100px;border:1px solid var(--navy-100)">You</span>':'')+'</div>'
-          +'<div style="font-size:11.5px;color:var(--slate-400)">'+m.email+' · '+m.org+'</div>'
+          +'<div style="font-size:11.5px;color:var(--slate-400)">'+m.email+' \u00b7 '+m.org+'</div>'
         +'</div>'
         +'<div style="text-align:right;flex-shrink:0">'
           +'<div style="margin-bottom:4px"><span class="pill" style="background:'+bg+';color:'+fc+';border:1px solid '+bc+'">'+lbl+'</span></div>'
-          +'<div style="font-size:11px;color:var(--slate-400)">Last active: '+(m.last||'—')+'</div>'
+          +'<div style="font-size:11px;color:var(--slate-400)">Last active: '+(m.last||'\u2014')+'</div>'
         +'</div>'
         +'<div style="display:flex;gap:7px;flex-shrink:0">'
-          +'<button class="btn btn-ghost btn-sm" onclick="showToast(\'Edit role — coming soon\')">Edit</button>'
+          +'<button class="btn btn-ghost btn-sm" onclick="showToast(\'Edit role \u2014 coming soon\')">Edit</button>'
           +(!isYou ? `<button class="btn btn-danger btn-sm" onclick="showToast('Removed ${m.name}')">Remove</button>` : '')
         +'</div>'
       +'</div>';
@@ -1467,7 +1508,7 @@ function switchProfileTab(tab){
 }
 
 
-// ══ ACCESS CODES ══
+// \u2550\u2550 ACCESS CODES \u2550\u2550
 function renderCodes(){
   const search=(document.getElementById('codes-search')?.value||'').toLowerCase();
   const filt=document.getElementById('codes-filter')?.value||'';
@@ -1484,7 +1525,7 @@ function renderCodes(){
       <td style="font-size:12px;color:var(--slate-500)">${c.role}</td>
       <td style="font-size:12px;color:var(--slate-500)">${c.date}</td>
       <td><span class="pill ${statusMap[c.status]||'pill-invited'}">${c.status}</span></td>
-      <td>${ws!==null?`<span style="font-weight:700;color:${sColor(ws)}">${ws}%</span>`:'<span style="color:var(--slate-300)">—</span>'}</td>
+      <td>${ws!==null?`<span style="font-weight:700;color:${sColor(ws)}">${ws}%</span>`:'<span style="color:var(--slate-300)">\u2014</span>'}</td>
       <td style="display:flex;gap:7px">
         ${c.status==='pending'?`<button class="btn btn-ghost btn-sm" onclick="copyCodeVal('${c.code}')">Copy</button>`:''}
         ${c.status==='completed'?`<a href="pages/candidate-profile.html?id=${c.id}" class="btn btn-ghost btn-sm">Profile</a>`:''}
@@ -1497,7 +1538,7 @@ function copyCodeVal(code){navigator.clipboard.writeText(code).then(()=>showToas
 function revokeCode(id){const ac=DB.getAccessCodes().find(c=>c.candId==id);if(ac){DB.revokeCode(ac.id);renderCodes();showToast('Code revoked');}}
 function exportCodes(){showToast('CSV exported');}
 
-// ══ INVITE MANAGER ══
+// \u2550\u2550 INVITE MANAGER \u2550\u2550
 const INVITE_LOG=[
   {name:'Alex Chen',email:'alex@email.com',role:'Customer Success Manager',date:'Mar 6',status:'pending'},
   {name:'Priya Nair',email:'priya.n@email.com',role:'Operations Analyst',date:'Mar 6',status:'pending'},
@@ -1508,7 +1549,7 @@ function renderInviteLog(){
   const el=document.getElementById('invites-log');if(!el)return;
   el.innerHTML=INVITE_LOG.map(i=>`<div style="display:flex;align-items:center;gap:11px;padding:11px 18px;border-bottom:1px solid var(--slate-100)">
     <div style="width:32px;height:32px;border-radius:8px;background:var(--navy-50);color:var(--navy-700);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${i.name.split(' ').map(w=>w[0]).join('')}</div>
-    <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">${i.name}</div><div style="font-size:11px;color:var(--slate-400)">${i.role.split(' ')[0]} · ${i.date}</div></div>
+    <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">${i.name}</div><div style="font-size:11px;color:var(--slate-400)">${i.role.split(' ')[0]} \u00b7 ${i.date}</div></div>
     <span class="pill ${i.status==='completed'?'pill-done':'pill-pending'}">${i.status}</span>
   </div>`).join('');
 }
@@ -1537,19 +1578,19 @@ function sendSingleInvite(){
   const code=Math.random().toString(36).substring(2,8).toUpperCase();
   INVITE_LOG.unshift({name:first+' '+last,email,role:document.getElementById('inv-role')?.value||'',date:'Today',status:'pending'});
   renderInviteLog();clearInviteForm();
-  showToast('Invite sent · Code: '+code);
+  showToast('Invite sent \u00b7 Code: '+code);
 }
 
-// ══ SETTINGS ══
+// \u2550\u2550 SETTINGS \u2550\u2550
 function checkSettingsWeights(){
   const inputs=[...document.querySelectorAll('#sec-settings input[type=number]')];
   const total=inputs.reduce((s,i)=>s+(parseInt(i.value)||0),0);
   const msg=document.getElementById('settings-weight-msg');
-  if(msg){msg.textContent=(total===100?'✓':'⚠')+' Total: '+total+'%';msg.style.color=total===100?'var(--success)':'var(--danger)';}
+  if(msg){msg.textContent=(total===100?'\u2713':'\u26a0')+' Total: '+total+'%';msg.style.color=total===100?'var(--success)':'var(--danger)';}
 }
-function saveSettings(){showToast('✓ Settings saved');}
+function saveSettings(){showToast('\u2713 Settings saved');}
 
-// ══ BATCH DETAIL ══
+// \u2550\u2550 BATCH DETAIL \u2550\u2550
 function openBatchDetail(id){
   const b=BATCHES.find(x=>x.id===id);if(!b)return;
   const bCands=DB.getCandidates({status:'completed'}).slice(0,b.completed);
@@ -1558,7 +1599,7 @@ function openBatchDetail(id){
   const el=document.getElementById('batch-detail-content');
   el.innerHTML=`
     <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:4px">${b.name}</h3>
-    <p style="color:var(--slate-500);font-size:13px;margin-bottom:20px">Created ${b.created} · <span class="pill ${b.status==='active'?'pill-pending':'pill-done'}">${b.status}</span></p>
+    <p style="color:var(--slate-500);font-size:13px;margin-bottom:20px">Created ${b.created} \u00b7 <span class="pill ${b.status==='active'?'pill-pending':'pill-done'}">${b.status}</span></p>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
       ${[['Total Invited',b.candidates,'var(--slate-700)'],['Completed',b.completed,'var(--success)'],['Passed',passCount,'var(--navy-700)'],['Avg Score',avgScore+'%','var(--navy-700)']].map(([l,v,col])=>`
       <div style="background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-sm);padding:12px;text-align:center">
@@ -1580,13 +1621,13 @@ function openBatchDetail(id){
   openModal('batch-detail-modal');
 }
 
-// ══ DOCUMENTATION ══
+// \u2550\u2550 DOCUMENTATION \u2550\u2550
 const DOCS=[
-  {title:'Getting Started',icon:'🚀',content:`<h4 style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:10px">Getting Started</h4><p style="color:var(--slate-600);font-size:13.5px;line-height:1.8;margin-bottom:12px">NovaCS helps you screen candidates objectively using a timed, weighted assessment.</p><ol style="color:var(--slate-600);font-size:13.5px;line-height:2.1;padding-left:18px"><li>Go to <b>Invite Manager</b> and send an invitation</li><li>The candidate gets an email with a unique access code</li><li>They complete the assessment in their own time</li><li>Results appear automatically in Candidates</li><li>Review scores and shortlist from the candidate profile</li></ol>`},
-  {title:'Issuing Access Codes',icon:'🔑',content:`<h4 style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:10px">Issuing Access Codes</h4><p style="color:var(--slate-600);font-size:13.5px;line-height:1.8;margin-bottom:12px">Each candidate receives a unique 6-character access code. Codes are single-use and expire after submission.</p><ol style="color:var(--slate-600);font-size:13.5px;line-height:2.1;padding-left:18px"><li>Click <b>+ Issue Access Code</b> on Overview or the Access Codes page</li><li>Enter the candidate name, email and role</li><li>Share the generated code privately with the candidate</li><li>Candidate visits the portal and enters their code to begin</li></ol><div style="background:var(--warning-bg);border:1px solid var(--warning-border);border-radius:var(--r-sm);padding:10px 13px;margin-top:12px;font-size:12.5px;color:var(--warning)">⚠ Never share codes publicly — each is tied to one candidate.</div>`},
-  {title:'Reading Scores',icon:'📊',content:`<h4 style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:10px">Understanding Scores</h4><p style="color:var(--slate-600);font-size:13.5px;line-height:1.8;margin-bottom:12px">The <b>Weighted Score</b> combines all four category scores using configured weights.</p><div style="background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:12px">${[['Judgement & Decision Making','35%'],['Numerical Reasoning','25%'],['Verbal & Communication','20%'],['Situational Scenarios','20%']].map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--slate-200);font-size:13px"><span style="color:var(--slate-600)">${k}</span><span style="font-weight:700">${v}</span></div>`).join('')}</div><p style="color:var(--slate-600);font-size:13px;line-height:1.7">Adjust the pass threshold in <b>Settings</b> or via the slider on the dashboard — all results update instantly.</p>`},
-  {title:'Configuring Assessments',icon:'⚙️',content:`<h4 style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:10px">Configuring Assessments</h4><p style="color:var(--slate-600);font-size:13.5px;line-height:1.8;margin-bottom:10px">Go to <b>Manage → Assessments</b> to configure your settings.</p><ul style="color:var(--slate-600);font-size:13.5px;line-height:2.1;padding-left:18px"><li><b>Question count</b> — 20, 25 or 30 questions</li><li><b>Time limit</b> — 20 to 40 minutes</li><li><b>Category weights</b> — must total 100%</li><li><b>Randomise order</b> — unique sequence per candidate</li><li><b>Tab switch detection</b> — flags candidates who leave the page</li><li><b>One attempt only</b> — code expires on submission</li></ul>`},
-  {title:'Managing Your Team',icon:'👥',content:`<h4 style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:10px">Managing Your Team</h4><p style="color:var(--slate-600);font-size:13.5px;line-height:1.8;margin-bottom:10px">Go to <b>Manage → Profiles → Team</b> to manage recruiters.</p><ul style="color:var(--slate-600);font-size:13.5px;line-height:2.1;padding-left:18px"><li><b>Administrator</b> — full access including settings and billing</li><li><b>Recruiter</b> — can view candidates, issue codes, make decisions</li><li><b>Viewer</b> — read-only access to scores and reports</li></ul>`},
+  {title:'Getting Started',icon:'\ud83d\ude80',content:`<h4 style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:10px">Getting Started</h4><p style="color:var(--slate-600);font-size:13.5px;line-height:1.8;margin-bottom:12px">NovaCS helps you screen candidates objectively using a timed, weighted assessment.</p><ol style="color:var(--slate-600);font-size:13.5px;line-height:2.1;padding-left:18px"><li>Go to <b>Invite Manager</b> and send an invitation</li><li>The candidate gets an email with a unique access code</li><li>They complete the assessment in their own time</li><li>Results appear automatically in Candidates</li><li>Review scores and shortlist from the candidate profile</li></ol>`},
+  {title:'Issuing Access Codes',icon:'\ud83d\udd11',content:`<h4 style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:10px">Issuing Access Codes</h4><p style="color:var(--slate-600);font-size:13.5px;line-height:1.8;margin-bottom:12px">Each candidate receives a unique 6-character access code. Codes are single-use and expire after submission.</p><ol style="color:var(--slate-600);font-size:13.5px;line-height:2.1;padding-left:18px"><li>Click <b>+ Issue Access Code</b> on Overview or the Access Codes page</li><li>Enter the candidate name, email and role</li><li>Share the generated code privately with the candidate</li><li>Candidate visits the portal and enters their code to begin</li></ol><div style="background:var(--warning-bg);border:1px solid var(--warning-border);border-radius:var(--r-sm);padding:10px 13px;margin-top:12px;font-size:12.5px;color:var(--warning)">\u26a0 Never share codes publicly \u2014 each is tied to one candidate.</div>`},
+  {title:'Reading Scores',icon:'\ud83d\udcca',content:`<h4 style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:10px">Understanding Scores</h4><p style="color:var(--slate-600);font-size:13.5px;line-height:1.8;margin-bottom:12px">The <b>Weighted Score</b> combines all four category scores using configured weights.</p><div style="background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:12px">${[['Judgement & Decision Making','35%'],['Numerical Reasoning','25%'],['Verbal & Communication','20%'],['Situational Scenarios','20%']].map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--slate-200);font-size:13px"><span style="color:var(--slate-600)">${k}</span><span style="font-weight:700">${v}</span></div>`).join('')}</div><p style="color:var(--slate-600);font-size:13px;line-height:1.7">Adjust the pass threshold in <b>Settings</b> or via the slider on the dashboard \u2014 all results update instantly.</p>`},
+  {title:'Configuring Assessments',icon:'\u2699\ufe0f',content:`<h4 style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:10px">Configuring Assessments</h4><p style="color:var(--slate-600);font-size:13.5px;line-height:1.8;margin-bottom:10px">Go to <b>Manage \u2192 Assessments</b> to configure your settings.</p><ul style="color:var(--slate-600);font-size:13.5px;line-height:2.1;padding-left:18px"><li><b>Question count</b> \u2014 20, 25 or 30 questions</li><li><b>Time limit</b> \u2014 20 to 40 minutes</li><li><b>Category weights</b> \u2014 must total 100%</li><li><b>Randomise order</b> \u2014 unique sequence per candidate</li><li><b>Tab switch detection</b> \u2014 flags candidates who leave the page</li><li><b>One attempt only</b> \u2014 code expires on submission</li></ul>`},
+  {title:'Managing Your Team',icon:'\ud83d\udc65',content:`<h4 style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:10px">Managing Your Team</h4><p style="color:var(--slate-600);font-size:13.5px;line-height:1.8;margin-bottom:10px">Go to <b>Manage \u2192 Profiles \u2192 Team</b> to manage recruiters.</p><ul style="color:var(--slate-600);font-size:13.5px;line-height:2.1;padding-left:18px"><li><b>Administrator</b> \u2014 full access including settings and billing</li><li><b>Recruiter</b> \u2014 can view candidates, issue codes, make decisions</li><li><b>Viewer</b> \u2014 read-only access to scores and reports</li></ul>`},
 ];
 let activeDoc=0;
 function showDocs(){
@@ -1621,6 +1662,33 @@ function switchSection(name,el){
 }
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');}
 
+// LOGOUT
+function logout(){
+  sessionStorage.removeItem('novaCS_session');
+  localStorage.removeItem('novaCS_session');
+  window.location.href='index.html';
+}
+
+// USER DROPDOWN
+function toggleUserDropdown(e){
+  e.stopPropagation();
+  const pill=document.getElementById('user-pill');
+  const dd=document.getElementById('user-dropdown');
+  const open=!dd.classList.contains('hidden');
+  dd.classList.toggle('hidden',open);
+  pill.classList.toggle('open',!open);
+}
+function closeUserDropdown(){
+  const dd=document.getElementById('user-dropdown');
+  const pill=document.getElementById('user-pill');
+  if(dd)dd.classList.add('hidden');
+  if(pill)pill.classList.remove('open');
+}
+document.addEventListener('click',function(e){
+  const wrap=document.querySelector('.user-pill-wrap');
+  if(wrap&&!wrap.contains(e.target))closeUserDropdown();
+});
+
 // MODALS
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
@@ -1638,8 +1706,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(el)el.textContent=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
   updateStats();renderRecent();renderAll();renderLB();renderPositions();
   // Populate session UI
-  const sname=document.getElementById('session-name');if(sname)sname.textContent=DB.session.recruiter.name;
-  const sorg=document.getElementById('session-org');if(sorg)sorg.textContent=DB.session.org.name;
+  // Populate user pill + dropdown from session
+  const u=DB.session.recruiter;const o=DB.session.org;
+  const ini=u.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+  ['user-av'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ini;});
+  ['user-pill-name','ud-name'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=u.name;});
+  const orgRole=o.name+' · '+u.role.charAt(0).toUpperCase()+u.role.slice(1);
+  const pillOrg=document.getElementById('user-pill-org');if(pillOrg)pillOrg.textContent=orgRole;
+  const udEmail=document.getElementById('ud-email');if(udEmail)udEmail.textContent=u.email;
+  const tobar=document.getElementById('topbar-org');if(tobar)tobar.textContent=o.name;
   // Note: renderAnalytics() called lazily on tab switch, not at init (hidden section has no dimensions)
 });
 </script>
