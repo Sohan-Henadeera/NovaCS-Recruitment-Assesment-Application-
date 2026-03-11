@@ -339,7 +339,7 @@ function rankChip(r){if(!r)return'<span class="rank-chip rn">—</span>';if(r===
     <td>${stagePill(c.id)}</td>
     <td>${c.status==='completed'?`<div style="display:flex;gap:5px"><a href="candidate-profile.html?id=${c.id}" class="btn btn-ghost btn-sm">View →</a><button class="btn btn-ghost btn-sm" onclick="openDetail(${c.id})">Quick ⌄</button></div>`:''}</td>
   </tr>`;
-
+}
 
 function renderAll(){
   const el=document.getElementById('all-tbody');
@@ -354,7 +354,7 @@ function renderAll(){
 
 function openDetail(id){
   const c=DB.getCandidateById(id);if(!c||!c.scores)return;
-  const ws=wScore(c.scores);const note=candNotes[id]||'';const stage=candStages[id]||'';
+  const ws=wScore(c.scores);const note=c.notes||'';const stage=c.stage||'';
   document.getElementById('detail-content').innerHTML=`
     <div class="det-header">
       <div class="det-av" style="background:${c.color}18;color:${c.color}">${c.initials}</div>
@@ -376,7 +376,7 @@ function openDetail(id){
       <option value="">— Not set —</option>
       ${['Phone Screen','1st Interview','2nd Interview','Assessment Centre','Offer Extended'].map(s=>`<option ${stage===s?'selected':''}>${s}</option>`).join('')}
     </select></div>
-    <div style="margin-bottom:16px"><label class="field-label">Recruiter Notes</label><textarea class="notes-field" onchange="candNotes[${id}]=this.value">${note}</textarea></div>
+    <div style="margin-bottom:16px"><label class="field-label">Recruiter Notes</label><textarea class="notes-field" onchange="DB.updateCandidate(${id},{notes:this.value})">${note}</textarea></div>
     <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
       <div style="display:flex;gap:8px">
         <button class="btn btn-success btn-sm" onclick="setDec(${id},'shortlisted')">★ Shortlist</button>

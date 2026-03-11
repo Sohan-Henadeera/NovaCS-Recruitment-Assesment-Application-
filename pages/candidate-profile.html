@@ -195,7 +195,7 @@ body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--slate-900
     <div class="topbar-crumb">
       <a href="../dashboard.html">Dashboard</a>
       <span class="topbar-crumb-sep">›</span>
-      <a href="../dashboard.html">Candidates</a>
+      <a href="candidates.html">Candidates</a>
       <span class="topbar-crumb-sep">›</span>
       <span class="topbar-crumb-current" id="crumb-name">Maya Patel</span>
     </div>
@@ -203,8 +203,8 @@ body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--slate-900
   <div class="topbar-right">
     <button class="btn btn-outline btn-sm" onclick="window.history.back()">← Back</button>
     <div class="user-pill">
-      <div class="user-av">SM</div>
-      <div><div class="user-name">Sarah Mitchell</div><div class="user-org">Acme Corp · Admin</div></div>
+      <div class="user-av" id="topbar-av">SM</div>
+      <div><div class="user-name" id="topbar-name">Sarah Mitchell</div><div class="user-org" id="topbar-org">Acme Corp · Admin</div></div>
     </div>
   </div>
 </div>
@@ -419,6 +419,11 @@ function init(){
   // Breadcrumb & topbar
   document.getElementById('crumb-name').textContent = C.name;
   document.title = 'NovaCS — ' + C.name;
+  const rec = DB.session.recruiter;
+  const recInitials = rec.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const avEl = document.getElementById('topbar-av'); if(avEl) avEl.textContent = recInitials;
+  const nmEl = document.getElementById('topbar-name'); if(nmEl) nmEl.textContent = rec.name;
+  const orEl = document.getElementById('topbar-org'); if(orEl) orEl.textContent = DB.session.org.name + ' · ' + rec.role.charAt(0).toUpperCase()+rec.role.slice(1);
 
   // Hero
   const av = document.getElementById('hero-av');

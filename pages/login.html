@@ -204,7 +204,7 @@ body{
 .step-view{animation:stepIn .22s ease both;}
 @keyframes stepIn{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:none;}}
 
-to{opacity:1;transform:none;}
+to{opacity:1;transform:none;}}
 
 /* Toast */
 .toast{
@@ -334,18 +334,22 @@ to{opacity:1;transform:none;}
 
 <div class="toast" id="toast"></div>
 
+<script src="../js/db.js"></script>
 <script>
-const ORGS=[
-  {id:'org-001',name:'Acme Corp',type:'Professional Services',color:'#1e3a5f',ab:'AC'},
-  {id:'org-002',name:'NexGen Talent',type:'Recruitment Agency',color:'#0f6b3a',ab:'NT'},
-  {id:'org-003',name:'Vertex Consulting',type:'Management Consulting',color:'#6d28d9',ab:'VC'},
-  {id:'org-004',name:'ClearPath',type:'Technology',color:'#0e4e6e',ab:'CP'},
-];
-const DEMO=[
-  {email:'sarah.mitchell@acmecorp.com',org:'org-001',name:'Sarah'},
-  {email:'admin@acmecorp.com',org:'org-001',name:'Admin'},
-  {email:'recruiter@nexgen.com',org:'org-002',name:'Alex'},
-];
+// Orgs and demo users pulled from DB
+const ORGS = DB.orgs.map((o,i)=>({
+  id:   o.id,
+  name: o.name,
+  type: o.industry||'Organisation',
+  color:['#1e3a5f','#0f6b3a','#6d28d9','#0e4e6e'][i%4],
+  ab:   o.initials || o.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()
+}));
+const DEMO = DB.users.filter(u=>u.role!=='superadmin').map(u=>({
+  email: u.email,
+  org:   u.orgId,
+  name:  u.name.split(' ')[0],
+  role:  u.role
+}));
 let selOrg=null,pwVis=false;
 
 // Render org grid
@@ -426,10 +430,29 @@ function doLogin(){
       document.getElementById('err-banner').classList.add('show');
       return;
     }
-    // Demo: any email + any password works
-    const name=match?match.name:'there';
-    showToast('Welcome back, '+name+'!');
-    setTimeout(()=>window.location.href='../dashboard.html',900);
+    // Role-based redirect
+    const name = match ? match.name : 'there';
+    showToast('Welcome back, ' + name + '!');
+
+    // Check if superadmin
+    const dbUser = DB.users.find(u => u.email === email);
+    if(dbUser && dbUser.role === 'superadmin'){
+      sessionStorage.setItem('novaCS_admin_session', JSON.stringify({
+        name:  dbUser.name,
+        email: dbUser.email,
+        role:  dbUser.role,
+        loginTime: new Date().toISOString()
+      }));
+      setTimeout(()=>window.location.href='admin.html', 900);
+    } else {
+      sessionStorage.setItem('novaCS_session', JSON.stringify({
+        name:  name,
+        email: email,
+        org:   selOrg,
+        loginTime: new Date().toISOString()
+      }));
+      setTimeout(()=>window.location.href='../dashboard.html', 900);
+    }
   },1100);
 }
 

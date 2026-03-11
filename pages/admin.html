@@ -262,9 +262,13 @@ tr:hover td{background:#fafbfc;}
   </div>
   <div class="topbar-right">
     <div class="user-pill">
-      <div class="user-av">NC</div>
-      <div class="user-name">NovaCS Admin</div>
+      <div class="user-av">NA</div>
+      <div><div class="user-name" id="admin-name">NovaCS Admin</div><div style="font-size:10.5px;color:rgba(255,255,255,.4)">Superadmin</div></div>
     </div>
+    <button onclick="adminLogout()" style="display:flex;align-items:center;gap:7px;padding:7px 13px;background:rgba(220,38,38,.15);border:1.5px solid rgba(220,38,38,.3);border-radius:var(--r-sm);color:#fca5a5;font-family:'Figtree',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='rgba(220,38,38,.25)'" onmouseout="this.style.background='rgba(220,38,38,.15)'">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign Out
+    </button>
   </div>
 </div>
 
@@ -1311,6 +1315,12 @@ tr:hover td{background:#fafbfc;}
 <script src="../js/db.js"></script>
 <script src="../js/utils.js"></script>
 <script>
+/* ── Session guard — redirect to admin-login if not authenticated ── */
+(function(){
+  const s = sessionStorage.getItem('novaCS_admin_session');
+  if(!s){ window.location.replace('admin-login.html'); }
+})();
+
 /* ── All data from window.DB ── */
 const ORGS    = DB.orgs;
 const USERS   = DB.users;
@@ -1490,6 +1500,21 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 function closeBg(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
 
 /* ── TOAST ── */
+// ADMIN LOGOUT
+function adminLogout(){
+  sessionStorage.removeItem('novaCS_admin_session');
+  window.location.href = 'login.html';
+}
+
+// Populate admin name from session
+(function(){
+  try{
+    const s=JSON.parse(sessionStorage.getItem('novaCS_admin_session')||'{}');
+    const el=document.getElementById('admin-name');
+    if(el && s.name) el.textContent=s.name;
+  }catch(e){}
+})();
+
 let toastTimer;
 function showToast(msg) {
   const t = document.getElementById('toast');
