@@ -1103,7 +1103,6 @@ tr:hover td{background:#fafbfc;}
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
 
 <script src="js/db.js"></script>
-<script src="js/utils.js"></script>
 <script>
 // \u2500\u2500 All data from window.DB \u2500\u2500
 let threshold = DB.config.passThreshold;
@@ -1186,7 +1185,7 @@ function renderLB(){
   const ranked=DB.getCandidates({sort:'score_desc'}).filter(c=>c.scores).slice(0,7);
   el.innerHTML=ranked.map((c,i)=>{
     const ws=wScore(c.scores);
-    return`<div class="lb-item" onclick="window.location.href='pages/candidate-profile.html?id='+c.id" style="cursor:pointer">
+    return`<div class="lb-item" onclick="window.location.href='pages/candidate-profile.html?id=${c.id}'" style="cursor:pointer">
       <div class="lb-rank ${i<3?'top':''}">${i===0?'\ud83e\udd47':i===1?'\ud83e\udd48':i===2?'\ud83e\udd49':'#'+(i+1)}</div>
       <div class="lb-av" style="background:${c.color}18;color:${c.color}">${c.initials}</div>
       <div class="lb-info"><div class="lb-name">${c.name}</div><div style="font-size:11px;color:var(--slate-400)">${c.role.split(' ')[0]}</div></div>
