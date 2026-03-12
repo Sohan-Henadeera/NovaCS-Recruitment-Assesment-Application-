@@ -1,130 +1,68 @@
-# NovaCS — Platform File Structure
+# NovaCS — Recruitment Assessment Platform
 
-## Folder Structure
+> A full-stack web platform that lets hiring teams issue access codes, assess candidates at scale, and make smarter shortlist decisions — all without spreadsheets or manual scoring.
 
-```
-novaCS/
-├── index.html                  ← Landing page (v4 app — rename/replace)
-│
-├── css/
-│   └── base.css                ← Shared variables, buttons, forms, layout
-│
-├── js/
-│   ├── utils.js                ← Toast, modal, clipboard, sidebar, helpers
-│   └── data.js                 ← Mock data store — candidates, orgs, sections
-│
-└── pages/
-    ├── contact.html            ← Public: Contact & Demo Request form
-    ├── candidate-profile.html  ← Recruiter: Full candidate profile page
-    ├── invite-manager.html     ← Recruiter: Batch invite manager
-    ├── submitted.html          ← Applicant: Assessment submitted confirmation
-    ├── password-reset.html     ← Shared: Forgot / reset password flow
-    └── error.html              ← All error states (single file, URL param driven)
-```
 
----
+## What It Does
 
-## Error Page Usage
+NovaCS is a purpose-built recruitment tool with two dedicated portals:
 
-`error.html` handles all error states via a `?type=` URL parameter:
+For Recruiters & Hiring Teams
+- Create an organisation, configure weighted skill categories, and set a pass threshold tailored to the role
+- Issue unique, single-use access codes to candidates individually or in bulk via CSV upload
+- Review a live dashboard of ranked candidate scores with full category breakdowns
+- Move candidates through the hiring pipeline (shortlist, reject, hold) in one click
+- View batch analytics — pass rates, score distributions, completion trends
+- Export results to CSV for reporting or ATS upload
+- Multi-recruiter team support with role-based permissions (Admin, Recruiter, Viewer)
 
-| URL | Error shown |
-|-----|-------------|
-| `error.html?type=code` | Access code invalid / expired |
-| `error.html?type=identity&attempts=2` | Identity mismatch (pass attempt count) |
-| `error.html?type=locked` | Account locked after max attempts |
-| `error.html?type=timeout` | Session / timer expired |
-| `error.html?type=login&attempts=1` | Invalid recruiter login |
-| `error.html?type=404` | Page not found |
+For Candidates
+- Enter their unique access code and verify identity with the last 4 digits of their registered phone number
+- Complete a timed, multi-section assessment locked to a single device session
+- Tab-switching is detected and flagged to the recruiter automatically (anti-cheat)
+- Receive a confirmation screen on submission
 
 ---
 
-## Candidate Profile Usage
+## Tech Stack
 
-`candidate-profile.html` reads a `?id=` URL parameter to load a candidate:
+| Layer | Technology |
 
-```
-candidate-profile.html?id=1    → Maya Patel
-candidate-profile.html?id=2    → James Okafor
-candidate-profile.html?id=3    → Sophie Tan (flagged)
-candidate-profile.html?id=6    → Alex Chen (pending)
-```
-
-All candidate data lives in `js/data.js`. Replace with API calls in production.
-
----
-
-## Submitted Page
-
-`submitted.html` reads from `sessionStorage` key `novaCS_submission`:
-
-```js
-sessionStorage.setItem('novaCS_submission', JSON.stringify({
-  name:     'Alex Chen',
-  answered: 25,
-  time:     '18:42',
-  sections: 4,
-  org:      'Acme Corp',
-  flagged:  false
-}));
-```
-
-Set this in the assessment JS before redirecting to `submitted.html`.
+| Frontend | HTML5, CSS3, Vanilla JavaScript |
+| Styling | Custom CSS design system with CSS variables |
+| Routing | URL parameter-driven page logic (`?type=`, `?id=`) |
+| Data Layer | Modular JS data store (`data.js`) — drop-in ready for a real API |
+| Deployment | Vercel (static hosting + serverless functions) |
+| Security Headers | CSP, HSTS, X-Frame-Options, XSS Protection, Referrer Policy |
+| Font Stack | Playfair Display (serif headings) + Figtree (body) |
 
 ---
 
-## Linking Into v4
+## What I Learnt
 
-Add these links to the v4 recruiter dashboard sidebar:
-
-```html
-<!-- In sidebar nav -->
-<a href="pages/invite-manager.html"     data-page="invite">📨 Invite Manager</a>
-
-<!-- On each candidate row -->
-<a href="pages/candidate-profile.html?id=1">View profile →</a>
-
-<!-- On login error -->
-window.location.href = 'pages/error.html?type=login&attempts=1';
-
-<!-- Forgot password link -->
-<a href="pages/password-reset.html">Forgot password?</a>
-
-<!-- On applicant code failure -->
-window.location.href = 'pages/error.html?type=code&attempts=1';
-
-<!-- After assessment submit -->
-sessionStorage.setItem('novaCS_submission', JSON.stringify({...}));
-window.location.href = 'pages/submitted.html';
-
-<!-- Public contact page -->
-<a href="pages/contact.html">Request a demo</a>
-```
+- Design systems at scale — building a full CSS variable architecture that keeps a multi-page app visually consistent without a framework
+- URL-parameter driven UI — a single `error.html` handles six different error states via `?type=` params, keeping the codebase clean and DRY
+- sessionStorage for state handoff — passing assessment result data between pages without a backend using `sessionStorage`
+- Security hardening for static sites — configuring a full set of HTTP security headers in `vercel.json` (CSP, HSTS, X-Frame-Options, Permissions-Policy) to protect a frontend-only deployment
+- Role-based UI design — building interfaces that adapt their available actions based on the logged-in user's permissions
+- Anti-cheat mechanics — implementing tab-switch detection and single-use session locking at the frontend level
+- Product thinking -  designing a full user journey across two distinct user types (recruiter and candidate) with appropriate flows, error states, and confirmation screens for every path
 
 ---
 
-## CSS Variables (base.css)
+## Use Cases
 
-All colours and spacing use CSS custom properties. Key ones:
-
-```css
---navy-700:   #1e3a5f   /* Primary navy */
---navy-600:   #2452a0   /* Accent blue */
---slate-900:  #1c2333   /* Primary text */
---slate-400:  #94a3b8   /* Muted text */
---bg:         #f0f2f7   /* Page background */
---success:    #0f6b3a
---danger:     #991b1b
---warning:    #854d0e
-```
+- SMEs & startups running high-volume hiring campaigns who need a structured, consistent assessment process without enterprise software costs
+- Recruitment agencies managing multiple client organisations and candidate pools simultaneously
+- University careers services running graduate assessment days at scale
+- HR teams replacing inconsistent, manual phone screening with objective, weighted scoring
 
 ---
 
-## Pages Still To Build (from site flow)
+## Author
 
-| ID  | Page | Priority |
-|-----|------|----------|
-| R9  | Analytics & Reports | Future phase |
-| R10 | Assessment Customisation / Question Bank | Future phase |
-| S5  | Mobile / tablet warning | Future phase |
-| —   | Admin Super-Panel | Next sprint |
+**Sohan Henadeera**
+[LinkedIn](https://www.linkedin.com/in/sohan-henadeera-155040259/) · [GitHub](https://github.com/Sohan-Henadeera) · sohan.henad@gmail.com
+
+*Open source. If you use or build upon this project, please credit the original author and link back to this repository.*
+*All information within the application is fictitious and has been created solely for demonstration and assessment purposes. It does not represent real individuals, organisations, or recruitment data.*
